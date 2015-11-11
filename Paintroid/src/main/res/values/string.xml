@@ -113,6 +113,19 @@
     <string name="save_button_text">Save</string>
     <string name="discard_button_text">Discard</string>
 
+    <string name="layers_title">Layers</string>
+    <string name="layer_string_default">DEFAULT</string>
+    <string name="layer_new">New Layer</string>
+    <string name="layer_delete">Delete Layer</string>
+    <string name="layer_opacity">Opacity:</string>
+    <string name="layer_merge">Merge</string>
+    <string name="layer_visible">Visible</string>
+    <string name="layer_lock">Lock</string>
+    <string name="layer_rename">Rename</string>
+    <string name="layer_ok">OK</string>
+    <string name="layer_cancel">Cancel</string>
+    <string name="layer_rename_title">Enter new layer name</string>
+
     <!--
     exclude preferences for release
         <string name="menu_preferences">Settings</string>

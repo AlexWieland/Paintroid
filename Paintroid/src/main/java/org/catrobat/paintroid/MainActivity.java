@@ -28,6 +28,7 @@ import org.catrobat.paintroid.dialog.DialogTermsOfUseAndService;
 import org.catrobat.paintroid.dialog.IndeterminateProgressDialog;
 import org.catrobat.paintroid.dialog.InfoDialog;
 import org.catrobat.paintroid.dialog.InfoDialog.DialogType;
+import org.catrobat.paintroid.dialog.LayersDialog;
 import org.catrobat.paintroid.dialog.ToolsDialog;
 import org.catrobat.paintroid.dialog.colorpicker.ColorPickerDialog;
 import org.catrobat.paintroid.listener.DrawingSurfaceListener;
@@ -177,6 +178,7 @@ public class MainActivity extends OptionsMenuActivity {
 			initialiseNewBitmap();
 		}
 
+		LayersDialog.init(this, PaintroidApplication.drawingSurface.getBitmapCopy());
 	}
 
 	@Override
@@ -232,6 +234,7 @@ public class MainActivity extends OptionsMenuActivity {
 		PaintroidApplication.saveCopy = false;
 
 		ToolsDialog.getInstance().dismiss();
+		LayersDialog.getInstance().dismiss();
 		IndeterminateProgressDialog.getInstance().dismiss();
 		ColorPickerDialog.getInstance().dismiss();
 		// BrushPickerDialog.getInstance().dismiss(); // TODO: how can there
