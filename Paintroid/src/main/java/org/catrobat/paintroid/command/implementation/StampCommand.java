@@ -23,8 +23,11 @@ import org.catrobat.paintroid.FileIO;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
 import android.graphics.RectF;
 
 public class StampCommand extends BaseCommand {
@@ -33,6 +36,7 @@ public class StampCommand extends BaseCommand {
 	protected final float mBoxHeight;
 	protected final float mBoxRotation;
 	protected final RectF mBoxRect;
+	protected final Boolean mClearRect;
 
 	public StampCommand(Bitmap bitmap, Point position, float width,
 			float height, float rotation) {
@@ -51,6 +55,27 @@ public class StampCommand extends BaseCommand {
 		mBoxRotation = rotation;
 		mBoxRect = new RectF(-mBoxWidth / 2f, -mBoxHeight / 2f, mBoxWidth / 2f,
 				mBoxHeight / 2f);
+		mClearRect = false;
+	}
+
+	public StampCommand(Bitmap bitmap, Point position, float width,
+						float height, float rotation, boolean clearRect) {
+		super(new Paint(Paint.DITHER_FLAG));
+
+		if (position != null) {
+			mCoordinates = new Point(position.x, position.y);
+		} else {
+			mCoordinates = null;
+		}
+		if (bitmap != null) {
+			mBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, false);
+		}
+		mBoxWidth = width;
+		mBoxHeight = height;
+		mBoxRotation = rotation;
+		mBoxRect = new RectF(-mBoxWidth / 2f, -mBoxHeight / 2f, mBoxWidth / 2f,
+				mBoxHeight / 2f);
+		mClearRect = clearRect;
 	}
 
 	@Override
@@ -70,8 +95,12 @@ public class StampCommand extends BaseCommand {
 		canvas.save();
 		canvas.translate(mCoordinates.x, mCoordinates.y);
 		canvas.rotate(mBoxRotation);
+		if (mClearRect) {
+			mPaint.setColor(Color.TRANSPARENT);
+			mPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+			canvas.drawRect(mBoxRect, mPaint);
+		}
 		canvas.drawBitmap(mBitmap, null, mBoxRect, mPaint);
-
 		canvas.restore();
 
 		if (mFileToStoredBitmap == null) {

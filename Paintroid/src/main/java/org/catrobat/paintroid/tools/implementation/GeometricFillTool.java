@@ -32,9 +32,12 @@ import org.catrobat.paintroid.ui.TopBar.ToolButtonIDs;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.graphics.Point;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
 import android.graphics.RectF;
 
 public class GeometricFillTool extends BaseToolWithRectangleShape {
@@ -45,6 +48,7 @@ public class GeometricFillTool extends BaseToolWithRectangleShape {
 
 	private BaseShape mBaseShape;
 	private ShapeDrawType mShapeDrawType;
+	private Boolean mIsTransparent = false;
 
 	public static enum ShapeDrawType {
 		OUTLINE, FILL
@@ -104,6 +108,13 @@ public class GeometricFillTool extends BaseToolWithRectangleShape {
 		drawPaint.setColor(mCanvasPaint.getColor());
 		drawPaint.setAntiAlias(DEFAULT_ANTIALISING_ON);
 
+		if (mCanvasPaint.getColor() == Color.TRANSPARENT) {
+			mIsTransparent = true;
+		}
+		else {
+			mIsTransparent = false;
+		}
+
 		switch (mShapeDrawType) {
 		case FILL:
 			drawPaint.setStyle(Style.FILL);
@@ -141,7 +152,7 @@ public class GeometricFillTool extends BaseToolWithRectangleShape {
 		Point intPosition = new Point((int) mToolPosition.x,
 				(int) mToolPosition.y);
 		Command command = new StampCommand(mDrawingBitmap, intPosition,
-				mBoxWidth, mBoxHeight, mBoxRotation);
+				mBoxWidth, mBoxHeight, mBoxRotation, mIsTransparent);
 		((StampCommand) command).addObserver(this);
 		IndeterminateProgressDialog.getInstance().show();
 		PaintroidApplication.commandManager.commitCommand(command);
