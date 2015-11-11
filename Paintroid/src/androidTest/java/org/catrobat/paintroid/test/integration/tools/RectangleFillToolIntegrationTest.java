@@ -246,4 +246,44 @@ public class RectangleFillToolIntegrationTest extends BaseIntegrationTestClass {
 		assertTrue("Colors should have changed", colorInRectangleTool != colorInRectangleToolAfter);
 		assertEquals("Colors should be equal", colorInRectangleTool, colorInRectangle);
 	}
+
+	@Test
+	public void testFilledWithTransparentColor() {
+		int oldColor = PaintroidApplication.drawingSurface.getPixel(new PointF(mScreenWidth / 2, mScreenHeight / 2));
+		selectTool(ToolType.FILL);
+		mSolo.clickOnScreen(mScreenWidth / 2, mScreenHeight / 2);
+		selectTool(ToolType.RECT);
+		mSolo.clickOnView(mMenuBottomParameter2);
+		mSolo.clickOnButton(19);
+		mSolo.clickOnButton(getActivity().getResources().getString(R.string.done));
+		mSolo.waitForDialogToClose(SHORT_TIMEOUT);
+		mSolo.clickOnScreen(mScreenWidth / 2, mScreenHeight / 2);
+		mSolo.waitForDialogToClose(SHORT_TIMEOUT);
+		int newColor = PaintroidApplication.drawingSurface.getPixel(new PointF(mScreenWidth / 2, mScreenHeight / 2));
+		assertEquals("Should be transparent", oldColor, newColor);
+	}
+
+	@Test
+	public void testFilledWithNormalColorAfterTransparence() {
+		selectTool(ToolType.FILL);
+		mSolo.clickOnScreen(mScreenWidth / 2, mScreenHeight / 2);
+		mSolo.waitForDialogToClose(SHORT_TIMEOUT);
+		int oldColor = PaintroidApplication.drawingSurface.getPixel(new PointF(mScreenWidth / 2, mScreenHeight / 2));
+		selectTool(ToolType.RECT);
+		mSolo.clickOnView(mMenuBottomParameter2);
+		mSolo.clickOnButton(19);
+		mSolo.clickOnButton(getActivity().getResources().getString(R.string.done));
+		mSolo.waitForDialogToClose(SHORT_TIMEOUT);
+		mSolo.clickOnScreen(mScreenWidth / 2, mScreenHeight / 2);
+		mSolo.waitForDialogToClose(SHORT_TIMEOUT);
+		mSolo.clickOnView(mMenuBottomParameter2);
+		mSolo.clickOnButton(16);
+		mSolo.clickOnButton(getActivity().getResources().getString(R.string.done));
+		mSolo.waitForDialogToClose(SHORT_TIMEOUT);
+		mSolo.clickOnScreen(mScreenWidth / 2, mScreenHeight / 2);
+		mSolo.waitForDialogToClose(SHORT_TIMEOUT);
+		int newColor = PaintroidApplication.drawingSurface.getPixel(new PointF(mScreenWidth / 2, mScreenHeight / 2));
+		assertEquals("Should be transparent", oldColor, newColor);
+	}
+
 }
