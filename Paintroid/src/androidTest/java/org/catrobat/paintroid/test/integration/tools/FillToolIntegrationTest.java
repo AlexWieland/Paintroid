@@ -199,4 +199,16 @@ public class FillToolIntegrationTest extends BaseIntegrationTestClass {
 		int outsideColorAfterFill = PaintroidApplication.drawingSurface.getPixel(checkOutsideCanvasPoint);
 		assertNotSame("Pixel color should be different", colorToFill, outsideColorAfterFill);
 	}
+
+	public void testFillHalfChangeTool() {
+		PointF leftPointOnScreen = new PointF(10, 2 * mScreenHeight / 3);
+		PointF rightPointOnScreen = new PointF(mScreenWidth-10, 2 * mScreenHeight / 3);
+		mSolo.drag(leftPointOnScreen.x, rightPointOnScreen.x, leftPointOnScreen.y, rightPointOnScreen.y, 1);
+		mSolo.sleep(SHORT_SLEEP);
+		selectTool(ToolType.FILL);
+		mSolo.clickOnScreen(mScreenWidth / 2, mScreenHeight / 3);
+		mSolo.waitForDialogToClose(SHORT_TIMEOUT);
+		selectTool(ToolType.BRUSH); // or change color
+	}
+
 }

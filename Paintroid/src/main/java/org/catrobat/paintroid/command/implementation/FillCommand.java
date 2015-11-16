@@ -28,6 +28,8 @@ import android.graphics.Paint;
 import android.graphics.Point;
 import android.util.Log;
 
+import com.threekkapps.library.bitmap.JniBitmap;
+
 public class FillCommand extends BaseCommand {
 
 	private static final float SELECTION_THRESHOLD = 50.0f;
@@ -57,16 +59,23 @@ public class FillCommand extends BaseCommand {
 		} else {
 			int colorToReplace = bitmap.getPixel(mClickedPixel.x,
 					mClickedPixel.y);
-			int pixels[] = new int[bitmap.getWidth() * bitmap.getHeight()];
-			bitmap.getPixels(pixels, 0, bitmap.getWidth(), 0, 0,
-					bitmap.getWidth(), bitmap.getHeight());
 
-			QueueLinearFloodFiller.floodFill(pixels, bitmap.getWidth(),
-					bitmap.getHeight(), mClickedPixel, colorToReplace,
-					mPaint.getColor(), SELECTION_THRESHOLD);
+			try{
+				JniBitmap.floodFill(bitmap, mClickedPixel.x,
+						mClickedPixel.y, mPaint.getColor(), (int) SELECTION_THRESHOLD);
+			}catch(Throwable e){
+				//native floodfill did not work
+				Log.e("Floodfill", "Fallback to java floodfill: native floodfill error. Probably you did not include the native libaries. "+e.getMessage());
+				int pixels[] = new int[bitmap.getWidth() * bitmap.getHeight()];
+				bitmap.getPixels(pixels, 0, bitmap.getWidth(), 0, 0,
+						bitmap.getWidth(), bitmap.getHeight());
+				QueueLinearFloodFiller.floodFill(pixels, bitmap.getWidth(),
+						bitmap.getHeight(), mClickedPixel, colorToReplace,
+						mPaint.getColor(), SELECTION_THRESHOLD);
 
-			bitmap.setPixels(pixels, 0, bitmap.getWidth(), 0, 0,
-					bitmap.getWidth(), bitmap.getHeight());
+				bitmap.setPixels(pixels, 0, bitmap.getWidth(), 0, 0,
+						bitmap.getWidth(), bitmap.getHeight());
+			}
 		}
 
 		notifyStatus(NOTIFY_STATES.COMMAND_DONE);
