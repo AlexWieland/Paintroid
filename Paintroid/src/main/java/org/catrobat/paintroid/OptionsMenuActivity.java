@@ -34,6 +34,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -122,6 +123,7 @@ public abstract class OptionsMenuActivity extends SherlockFragmentActivity {
 										int id) {
 									saveTask.execute();
 									startLoadImageIntent();
+									LayersDialog.getInstance().resetLayer();
 								}
 							})
 					.setNegativeButton(R.string.discard_button_text,
@@ -129,7 +131,11 @@ public abstract class OptionsMenuActivity extends SherlockFragmentActivity {
 								@Override
 								public void onClick(DialogInterface dialog,
 										int id) {
+//									LayersDialog.getInstance().resetLayer();
 									startLoadImageIntent();
+//									LayersDialog.getInstance().resetForIntent(PaintroidApplication.drawingSurface.getContext(), PaintroidApplication.drawingSurface.getBitmapCopy());
+
+
 								}
 							});
 			AlertDialog alertLoadImage = alertLoadDialogBuilder.create();
@@ -192,7 +198,7 @@ public abstract class OptionsMenuActivity extends SherlockFragmentActivity {
 										int id) {
 									saveTask.execute();
 									initialiseNewBitmap();
-
+									LayersDialog.getInstance().resetLayer();
 								}
 							})
 					.setNegativeButton(R.string.discard_button_text,
@@ -200,7 +206,9 @@ public abstract class OptionsMenuActivity extends SherlockFragmentActivity {
 								@Override
 								public void onClick(DialogInterface dialog,
 										int id) {
+
 									initialiseNewBitmap();
+									LayersDialog.getInstance().resetLayer();
 								}
 							});
 			AlertDialog alertNewImage = alertDialogBuilder.create();
@@ -231,7 +239,10 @@ public abstract class OptionsMenuActivity extends SherlockFragmentActivity {
 								public void onClick(DialogInterface dialog,
 										int id) {
 									saveTask.execute();
+									LayersDialog.getInstance().resetLayer();
 									takePhoto();
+
+
 								}
 							})
 					.setNegativeButton(R.string.discard_button_text,
@@ -239,7 +250,9 @@ public abstract class OptionsMenuActivity extends SherlockFragmentActivity {
 								@Override
 								public void onClick(DialogInterface dialog,
 										int id) {
+									LayersDialog.getInstance().resetLayer();
 									takePhoto();
+
 								}
 							});
 			AlertDialog alertNewCameraImage = newCameraImageAlertDialogBuilder
@@ -374,7 +387,6 @@ public abstract class OptionsMenuActivity extends SherlockFragmentActivity {
 		PaintroidApplication.isPlainImage = true;
 		PaintroidApplication.isSaved = false;
 		PaintroidApplication.savedPictureUri = null;
-//		LayersDialog.init(this, PaintroidApplication.drawingSurface.getBitmapCopy());
 	}
 
 	protected class SaveTask extends AsyncTask<String, Void, Void> {
