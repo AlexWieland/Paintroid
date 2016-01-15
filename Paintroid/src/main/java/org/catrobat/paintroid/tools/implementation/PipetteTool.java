@@ -21,6 +21,7 @@ package org.catrobat.paintroid.tools.implementation;
 
 import org.catrobat.paintroid.PaintroidApplication;
 import org.catrobat.paintroid.dialog.colorpicker.ColorPickerDialog;
+import org.catrobat.paintroid.tools.Layer;
 import org.catrobat.paintroid.tools.ToolType;
 import org.catrobat.paintroid.ui.TopBar.ToolButtonIDs;
 
@@ -49,7 +50,7 @@ public class PipetteTool extends BaseTool {
 	}
 
 	@Override
-	public boolean handleUp(PointF coordinate) {
+	public boolean handleUp(PointF coordinate, Layer layer) {
 		return setColor(coordinate);
 	}
 
@@ -86,7 +87,7 @@ public class PipetteTool extends BaseTool {
 	}
 
 	@Override
-	public void attributeButtonClick(ToolButtonIDs buttonNumber) {
+	public void attributeButtonClick(ToolButtonIDs buttonNumber, Layer layer) {
 		// no clicks allowed
 	}
 

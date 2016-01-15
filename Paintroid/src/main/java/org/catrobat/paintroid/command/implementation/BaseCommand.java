@@ -27,6 +27,7 @@ import java.util.Random;
 
 import org.catrobat.paintroid.PaintroidApplication;
 import org.catrobat.paintroid.command.Command;
+import org.catrobat.paintroid.tools.Layer;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -37,7 +38,7 @@ import android.util.Log;
 
 public abstract class BaseCommand extends Observable implements Command {
 	protected Paint mPaint;
-	protected Bitmap mBitmap;
+	protected Layer mLayer;
 	protected File mFileToStoredBitmap;
 
 	public static enum NOTIFY_STATES {
@@ -47,7 +48,8 @@ public abstract class BaseCommand extends Observable implements Command {
 	public BaseCommand() {
 	}
 
-	public BaseCommand(Paint paint) {
+	public BaseCommand(Paint paint, Layer layer) {
+		mLayer = layer;
 		if (paint != null) {
 			mPaint = new Paint(paint);
 		} else {
@@ -62,20 +64,25 @@ public abstract class BaseCommand extends Observable implements Command {
 	}
 
 	@Override
-	public abstract void run(Canvas canvas, Bitmap bitmap);
+	public abstract void run(Canvas canvas, Layer layer);
 
 	@Override
 	public void freeResources() {
-		if (mBitmap != null && !mBitmap.isRecycled()) {
-			mBitmap.recycle();
-			mBitmap = null;
-		}
-		if (mFileToStoredBitmap != null && mFileToStoredBitmap.exists()) {
-			mFileToStoredBitmap.delete();
+		if(mLayer != null) {
+			Bitmap bitmap = mLayer.getImage();
+			if ( mLayer.getImage() != null && ! mLayer.getImage().isRecycled()) {
+				mLayer.getImage().recycle();
+				mLayer.setImage(null);
+			}
+			if (mFileToStoredBitmap != null && mFileToStoredBitmap.exists()) {
+				mFileToStoredBitmap.delete();
+			}
+
+			mLayer = null;
 		}
 	}
 
-	public final void storeBitmap() {
+	public final void storeBitmap(Bitmap bitmap) {
 		File cacheDir = PaintroidApplication.applicationContext.getCacheDir();
 		Random random = new Random();
 		random.setSeed(System.currentTimeMillis());
@@ -83,14 +90,14 @@ public abstract class BaseCommand extends Observable implements Command {
 				Long.toString(random.nextLong()));
 		try {
 			FileOutputStream fos = new FileOutputStream(mFileToStoredBitmap);
-			mBitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
+			bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
 			fos.flush();
 			fos.close();
 		} catch (IOException e) {
 			Log.e(PaintroidApplication.TAG, "Cannot store bitmap. ", e);
 		}
-		mBitmap.recycle();
-		mBitmap = null;
+		bitmap.recycle();
+		bitmap = null;
 	}
 
 	protected void notifyStatus(NOTIFY_STATES state) {

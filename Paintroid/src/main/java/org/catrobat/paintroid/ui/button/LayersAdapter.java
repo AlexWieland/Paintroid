@@ -50,16 +50,15 @@ public class LayersAdapter extends BaseAdapter {
     private int LayerNum = 0;
 	private int MaxLayer = 7;
 
-	public LayersAdapter(Context context, boolean fromCatrobat, Bitmap first_layer) {
+	public LayersAdapter(Context context, boolean fromCatrobat, Layer first_layer) {
 		this.mContext = context;
 		initLayers(fromCatrobat, first_layer);
 	}
 
-	private void initLayers(boolean fromCatrobat, Bitmap first_layer) {
+	private void initLayers(boolean fromCatrobat, Layer first_layer) {
 
 		mLayerList = new ArrayList<Layer>();
-
-        mLayerList.add(new Layer(0, first_layer));
+        mLayerList.add(first_layer);
         LayerNum++;
 
 	}
@@ -212,6 +211,22 @@ public class LayersAdapter extends BaseAdapter {
 			Collections.swap(mLayerList, PositionCurrentLayer, mLayerList.size()-1);
 	}
 
+	public void clearAndInitLayer(Bitmap first_layer) {
+
+		if(mLayerList.size() >= 1) {
+			for(int i = mLayerList.size() - 1; i >= 0; i--)
+			{
+				mLayerList.remove(i);
+			}
+		}
+		LayerNum = 0;
+
+		mLayerList = new ArrayList<Layer>();
+
+		mLayerList.add(new Layer(0, first_layer));
+		LayerNum++;
+//		notifyDataSetChanged();
+	}
 
 	/* EXCLUDE PREFERENCES FOR RELEASE */
 	// private void deactivateToolsFromPreferences() {

@@ -24,6 +24,7 @@ import org.catrobat.paintroid.R;
 import org.catrobat.paintroid.command.Command;
 import org.catrobat.paintroid.command.implementation.StampCommand;
 import org.catrobat.paintroid.dialog.IndeterminateProgressDialog;
+import org.catrobat.paintroid.tools.Layer;
 import org.catrobat.paintroid.tools.ToolType;
 import org.catrobat.paintroid.ui.TopBar.ToolButtonIDs;
 
@@ -97,13 +98,13 @@ public class StampTool extends BaseToolWithRectangleShape {
 	}
 
 	@Override
-	public void attributeButtonClick(ToolButtonIDs buttonNumber) {
+	public void attributeButtonClick(ToolButtonIDs buttonNumber, Layer layer) {
 		switch (buttonNumber) {
 		case BUTTON_ID_PARAMETER_BOTTOM_1:
 			if (!mStampActive) {
 				copy();
 			} else {
-				paste();
+				paste(layer);
 			}
 			break;
 		case BUTTON_ID_PARAMETER_BOTTOM_2:
@@ -275,11 +276,11 @@ public class StampTool extends BaseToolWithRectangleShape {
 	}
 
 	@Override
-	protected void onClickInBox() {
+	protected void onClickInBox(Layer layer) {
 		if (!mStampActive) {
 			copy();
 		} else if (mDrawingBitmap != null && !mDrawingBitmap.isRecycled()) {
-			paste();
+			paste(layer);
 		}
 	}
 
@@ -295,11 +296,11 @@ public class StampTool extends BaseToolWithRectangleShape {
 		mAttributeButton2.setImageResource(R.drawable.icon_menu_stamp_clear);
 	}
 
-	private void paste() {
+	private void paste(Layer layer) {
 		Point intPosition = new Point((int) mToolPosition.x,
 				(int) mToolPosition.y);
-		Command command = new StampCommand(mDrawingBitmap, intPosition,
-				mBoxWidth, mBoxHeight, mBoxRotation);
+		Command command = new StampCommand(intPosition,
+				mBoxWidth, mBoxHeight, mBoxRotation, layer);
 
 		((StampCommand) command).addObserver(this);
 		IndeterminateProgressDialog.getInstance().show();

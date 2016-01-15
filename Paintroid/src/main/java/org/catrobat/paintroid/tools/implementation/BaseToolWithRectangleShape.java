@@ -40,6 +40,7 @@ import android.view.WindowManager;
 
 import org.catrobat.paintroid.PaintroidApplication;
 import org.catrobat.paintroid.R;
+import org.catrobat.paintroid.tools.Layer;
 import org.catrobat.paintroid.tools.ToolType;
 
 public abstract class BaseToolWithRectangleShape extends BaseToolWithShape {
@@ -239,7 +240,7 @@ public abstract class BaseToolWithRectangleShape extends BaseToolWithShape {
 	}
 
 	@Override
-	public boolean handleUp(PointF coordinate) {
+	public boolean handleUp(PointF coordinate, Layer layer) {
 		mIsDown = false;
 		if (mPreviousEventCoordinate == null) {
 			return false;
@@ -252,7 +253,7 @@ public abstract class BaseToolWithRectangleShape extends BaseToolWithShape {
 		if (MOVE_TOLERANCE * 2 >= mMovedDistance.x
 				&& MOVE_TOLERANCE * 2 >= mMovedDistance.y
 				&& isCoordinateInsideBox(coordinate)) {
-			onClickInBox();
+			onClickInBox(layer);
 		}
 		return true;
 	}
@@ -828,7 +829,7 @@ public abstract class BaseToolWithRectangleShape extends BaseToolWithShape {
 		return mMaximumBoxResolution;
 	}
 
-	protected abstract void onClickInBox();
+	protected abstract void onClickInBox(Layer layer);
 
 	protected abstract void drawToolSpecifics(Canvas canvas);
 

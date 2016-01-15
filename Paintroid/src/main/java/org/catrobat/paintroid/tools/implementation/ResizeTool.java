@@ -27,6 +27,7 @@ import org.catrobat.paintroid.command.Command;
 import org.catrobat.paintroid.command.implementation.BaseCommand;
 import org.catrobat.paintroid.command.implementation.ResizeCommand;
 import org.catrobat.paintroid.dialog.IndeterminateProgressDialog;
+import org.catrobat.paintroid.tools.Layer;
 import org.catrobat.paintroid.tools.ToolType;
 import org.catrobat.paintroid.ui.TopBar.ToolButtonIDs;
 
@@ -156,7 +157,7 @@ public class ResizeTool extends BaseToolWithRectangleShape {
 	}
 
 	@Override
-	public void attributeButtonClick(ToolButtonIDs buttonNumber) {
+	public void attributeButtonClick(ToolButtonIDs buttonNumber, Layer layer) {
 		switch (buttonNumber) {
 			case BUTTON_ID_PARAMETER_BOTTOM_1:
 				if (mFindCroppingCoordinates == null
@@ -169,7 +170,7 @@ public class ResizeTool extends BaseToolWithRectangleShape {
 				executeResizeCommand();
 				break;
 			default:
-				super.attributeButtonClick(buttonNumber);
+				super.attributeButtonClick(buttonNumber, layer);
 		}
 	}
 
@@ -500,7 +501,7 @@ public class ResizeTool extends BaseToolWithRectangleShape {
 	}
 
 	@Override
-	protected void onClickInBox() {
+	protected void onClickInBox(Layer layer) {
 		executeResizeCommand();
 	}
 

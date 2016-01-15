@@ -4,6 +4,8 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.provider.Telephony;
 
+import org.catrobat.paintroid.tools.Layer;
+
 public class LayerCommand extends BaseCommand {
 
     public enum LayerAction{
@@ -30,7 +32,7 @@ public class LayerCommand extends BaseCommand {
         }
     }
     @Override
-    public void run(Canvas canvas, Bitmap bitmap) {
+    public void run(Canvas canvas, Layer layer) {
         notifyStatus(NOTIFY_STATES.COMMAND_STARTED);
         setChanged();
 

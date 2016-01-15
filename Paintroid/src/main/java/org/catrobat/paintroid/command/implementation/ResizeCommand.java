@@ -21,6 +21,7 @@ package org.catrobat.paintroid.command.implementation;
 
 import org.catrobat.paintroid.FileIO;
 import org.catrobat.paintroid.PaintroidApplication;
+import org.catrobat.paintroid.tools.Layer;
 
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
@@ -46,7 +47,7 @@ public class ResizeCommand extends BaseCommand {
 	}
 
 	@Override
-	public void run(Canvas canvas, Bitmap bitmap) {
+	public void run(Canvas canvas, Layer layer) {
 
 		notifyStatus(NOTIFY_STATES.COMMAND_STARTED);
 		if (mFileToStoredBitmap != null) {
@@ -72,6 +73,8 @@ public class ResizeCommand extends BaseCommand {
 				notifyStatus(NOTIFY_STATES.COMMAND_FAILED);
 				return;
 			}
+			Bitmap bitmap = layer.getImage();
+
 			if (mResizeCoordinateXLeft >= bitmap.getWidth() || mResizeCoordinateXRight < 0 ||
 					mResizeCoordinateYTop >= bitmap.getHeight() || mResizeCoordinateYBottom < 0) {
 				Log.e(PaintroidApplication.TAG,
@@ -124,10 +127,10 @@ public class ResizeCommand extends BaseCommand {
 
 			PaintroidApplication.drawingSurface.setBitmap(resizedBitmap);
 
-			if (mFileToStoredBitmap == null) {
-				mBitmap = resizedBitmap.copy(Config.ARGB_8888, true);
-				storeBitmap();
-			}
+//			if (mFileToStoredBitmap == null) {
+//				mBitmap = resizedBitmap.copy(Config.ARGB_8888, true);
+//				storeBitmap();
+//			}
 
 		} catch (Exception e) {
 			Log.e(PaintroidApplication.TAG,

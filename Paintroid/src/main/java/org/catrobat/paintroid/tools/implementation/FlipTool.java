@@ -25,6 +25,7 @@ import org.catrobat.paintroid.command.Command;
 import org.catrobat.paintroid.command.implementation.FlipCommand;
 import org.catrobat.paintroid.command.implementation.FlipCommand.FlipDirection;
 import org.catrobat.paintroid.dialog.IndeterminateProgressDialog;
+import org.catrobat.paintroid.tools.Layer;
 import org.catrobat.paintroid.tools.ToolType;
 import org.catrobat.paintroid.ui.TopBar.ToolButtonIDs;
 
@@ -50,7 +51,7 @@ public class FlipTool extends BaseTool {
 	}
 
 	@Override
-	public boolean handleUp(PointF coordinate) {
+	public boolean handleUp(PointF coordinate, Layer layer) {
 		return false;
 	}
 
@@ -71,7 +72,7 @@ public class FlipTool extends BaseTool {
 	}
 
 	@Override
-	public void attributeButtonClick(ToolButtonIDs toolButtonID) {
+	public void attributeButtonClick(ToolButtonIDs toolButtonID, Layer layer) {
 		FlipDirection flipDirection = null;
 		switch (toolButtonID) {
 		case BUTTON_ID_PARAMETER_BOTTOM_1:

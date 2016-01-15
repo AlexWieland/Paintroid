@@ -24,6 +24,7 @@ import org.catrobat.paintroid.R;
 import org.catrobat.paintroid.command.Command;
 import org.catrobat.paintroid.command.implementation.PathCommand;
 import org.catrobat.paintroid.command.implementation.PointCommand;
+import org.catrobat.paintroid.tools.Layer;
 import org.catrobat.paintroid.tools.ToolType;
 import org.catrobat.paintroid.ui.TopBar.ToolButtonIDs;
 
@@ -136,7 +137,7 @@ public class CursorTool extends BaseToolWithShape {
 	}
 
 	@Override
-	public boolean handleUp(PointF coordinate) {
+	public boolean handleUp(PointF coordinate, Layer layer) {
 
 		mMovedDistance.set(
 				mMovedDistance.x
@@ -144,7 +145,7 @@ public class CursorTool extends BaseToolWithShape {
 				mMovedDistance.y
 						+ Math.abs(coordinate.y - mPreviousEventCoordinate.y));
 
-		handleDrawMode();
+		handleDrawMode(layer);
 
 		return true;
 	}
@@ -265,19 +266,19 @@ public class CursorTool extends BaseToolWithShape {
 		this.drawShape(canvas);
 	}
 
-	protected boolean addPathCommand(PointF coordinate) {
+	protected boolean addPathCommand(PointF coordinate, Layer layer) {
 		pathToDraw.lineTo(coordinate.x, coordinate.y);
-		Command command = new PathCommand(mBitmapPaint, pathToDraw);
+		Command command = new PathCommand(mBitmapPaint, pathToDraw, layer);
 		return PaintroidApplication.commandManager.commitCommand(command);
 	}
 
-	protected boolean addPointCommand(PointF coordinate) {
-		Command command = new PointCommand(mBitmapPaint, coordinate);
+	protected boolean addPointCommand(PointF coordinate, Layer layer) {
+		Command command = new PointCommand(mBitmapPaint, coordinate, layer);
 		return PaintroidApplication.commandManager.commitCommand(command);
 	}
 
 	@Override
-	public void attributeButtonClick(ToolButtonIDs buttonNumber) {
+	public void attributeButtonClick(ToolButtonIDs buttonNumber, Layer layer) {
 		switch (buttonNumber) {
 		case BUTTON_ID_PARAMETER_BOTTOM_1:
 			showBrushPicker();
@@ -305,12 +306,12 @@ public class CursorTool extends BaseToolWithShape {
 		}
 	}
 
-	private void handleDrawMode() {
+	private void handleDrawMode(Layer layer) {
 
 		if (toolInDrawMode) {
 			if (MOVE_TOLERANCE < mMovedDistance.x
 					|| MOVE_TOLERANCE < mMovedDistance.y) {
-				addPathCommand(mToolPosition);
+				addPathCommand(mToolPosition, layer);
 				mSecondaryShapeColor = mBitmapPaint.getColor();
 			} else {
 				toolInDrawMode = false;
@@ -321,7 +322,7 @@ public class CursorTool extends BaseToolWithShape {
 					&& MOVE_TOLERANCE >= mMovedDistance.y) {
 				toolInDrawMode = true;
 				mSecondaryShapeColor = mBitmapPaint.getColor();
-				addPointCommand(mToolPosition);
+				addPointCommand(mToolPosition, layer);
 			}
 		}
 	}

@@ -23,6 +23,7 @@ import org.catrobat.paintroid.PaintroidApplication;
 import org.catrobat.paintroid.command.Command;
 import org.catrobat.paintroid.dialog.IndeterminateProgressDialog;
 import org.catrobat.paintroid.dialog.LayersDialog;
+import org.catrobat.paintroid.tools.Layer;
 import org.catrobat.paintroid.tools.Tool.StateChange;
 import org.catrobat.paintroid.tools.implementation.BaseTool;
 import org.catrobat.paintroid.ui.button.LayersAdapter;
@@ -51,7 +52,7 @@ public class DrawingSurface extends SurfaceView implements
 	protected static final int BACKGROUND_COLOR = Color.LTGRAY;
 
 	private DrawingSurfaceThread mDrawingThread;
-	private Bitmap mWorkingBitmap;
+	private Layer mCurrentLayer;
 	private Rect mWorkingBitmapRect;
 	private Canvas mWorkingBitmapCanvas;
 	private Paint mFramePaint;
@@ -76,6 +77,14 @@ public class DrawingSurface extends SurfaceView implements
 	public boolean getLock()
 	{
 		return lock;
+	}
+
+	public void setCurrentLayer(Layer mCurrentLayer) {
+		this.mCurrentLayer = mCurrentLayer;
+	}
+
+	public Layer getCurrentLayer() {
+		return mCurrentLayer;
 	}
 
 	public void setVisible(boolean visibility_to_set)
@@ -119,43 +128,50 @@ public class DrawingSurface extends SurfaceView implements
 	}
 
 	public synchronized void recycleBitmap() {
-		if (mWorkingBitmap != null) {
-			mWorkingBitmap.recycle();
+		if (mCurrentLayer != null) {
+			if(mCurrentLayer.getImage() != null){
+				mCurrentLayer.getImage().recycle();}
 		}
+
+		mCurrentLayer = null;
 	}
 
 	private synchronized void doDraw(Canvas surfaceViewCanvas) {
 		try {
 			if (mWorkingBitmapRect == null || surfaceViewCanvas == null
-					|| mWorkingBitmap == null || mWorkingBitmapCanvas == null
-					|| mWorkingBitmap.isRecycled()) {
+					|| mCurrentLayer == null || mWorkingBitmapCanvas == null
+					|| mCurrentLayer.getImage().isRecycled()) {
 				// Log.i(PaintroidApplication.TAG,
 				// "Drawing surface not ready for doDraw ... skipped");
 				return;
 			}
+
 			PaintroidApplication.perspective.applyToCanvas(surfaceViewCanvas);
 			surfaceViewCanvas.drawColor(BACKGROUND_COLOR);
-			surfaceViewCanvas.drawRect(mWorkingBitmapRect,
-					BaseTool.CHECKERED_PATTERN);
+			surfaceViewCanvas.drawRect(mWorkingBitmapRect, BaseTool.CHECKERED_PATTERN);
 			surfaceViewCanvas.drawRect(mWorkingBitmapRect, mFramePaint);
 			Command command = null;
-			while (mSurfaceCanBeUsed
-					&& (command = PaintroidApplication.commandManager
-							.getNextCommand()) != null) {
 
-				command.run(mWorkingBitmapCanvas, mWorkingBitmap);
+			while (mSurfaceCanBeUsed && (command = PaintroidApplication
+												   .commandManager.getNextCommand()) != null)
+			{
+				command.run(mWorkingBitmapCanvas, mCurrentLayer);
 				//surfaceViewCanvas.drawBitmap(mWorkingBitmap, 0, 0, null);
-				PaintroidApplication.currentTool
-						.resetInternalState(StateChange.RESET_INTERNAL_STATE);
+				PaintroidApplication.currentTool.resetInternalState(StateChange.RESET_INTERNAL_STATE);
 
 				if (!PaintroidApplication.commandManager.hasNextCommand()) {
 					IndeterminateProgressDialog.getInstance().dismiss();
 				}
 			}
 
-			if (mWorkingBitmap != null && !mWorkingBitmap.isRecycled()
-					&& mSurfaceCanBeUsed) {
+			if (mCurrentLayer != null && !mCurrentLayer.getImage().isRecycled()&& mSurfaceCanBeUsed)
+			{
 				LayersDialog layersDialog = LayersDialog.getInstance();
+				if(mCurrentLayer != layersDialog.getCurrentLayer())
+				{
+					mCurrentLayer = layersDialog.getCurrentLayer();
+				}
+
 				LayersAdapter layersAdapter = layersDialog.getAdapter();
 				mOpacityPaint = new Paint();
 				mOpacityPaint.setAlpha(layersDialog.getCurrentLayer().getScaledOpacity());
@@ -168,7 +184,7 @@ public class DrawingSurface extends SurfaceView implements
 								Bitmap bitmapDrawable = layersAdapter.getLayer(i).getImage();
 								surfaceViewCanvas.drawBitmap(bitmapDrawable, 0, 0, mOpacityPaint);
 							} else {
-								surfaceViewCanvas.drawBitmap(mWorkingBitmap, 0, 0, mOpacityPaint);
+								surfaceViewCanvas.drawBitmap(mCurrentLayer.getImage(), 0, 0, mOpacityPaint);
 							}
 						}
 					}
@@ -243,11 +259,11 @@ public class DrawingSurface extends SurfaceView implements
 	}
 
 	public synchronized void setBitmap(Bitmap bitmap) {
-		if (mWorkingBitmap != null && bitmap != null) {
-			mWorkingBitmap.recycle();
-		}
+//		if (mWorkingBitmap != null && bitmap != null) {
+//			mWorkingBitmap.recycle();
+//		}
 		if (bitmap != null) {
-			mWorkingBitmap = bitmap;
+			mCurrentLayer.setImage(bitmap);
 			mWorkingBitmapCanvas.setBitmap(bitmap);
 			mWorkingBitmapRect.set(0, 0, bitmap.getWidth(), bitmap.getHeight());
 			// PaintroidApplication.perspective.resetScaleAndTranslation();
@@ -255,15 +271,15 @@ public class DrawingSurface extends SurfaceView implements
 	}
 
 	public synchronized Bitmap getBitmapCopy() {
-		if (mWorkingBitmap != null && mWorkingBitmap.isRecycled() == false) {
-			return Bitmap.createBitmap(mWorkingBitmap);
+		if (mCurrentLayer != null && mCurrentLayer.getImage().isRecycled() == false) {
+			return Bitmap.createBitmap(mCurrentLayer.getImage());
 		} else {
 			return null;
 		}
 	}
 
 	public synchronized boolean isDrawingSurfaceBitmapValid() {
-		if (mWorkingBitmap == null || mWorkingBitmap.isRecycled()
+		if (mCurrentLayer == null || mCurrentLayer.getImage().isRecycled()
 				|| mSurfaceCanBeUsed == false) {
 			return false;
 		}
@@ -279,7 +295,7 @@ public class DrawingSurface extends SurfaceView implements
 																				// logging
 		PaintroidApplication.perspective.setSurfaceHolder(holder);
 
-		if (mWorkingBitmap != null && mDrawingThread != null) {
+		if (mCurrentLayer.getImage() != null && mDrawingThread != null) {
 			mDrawingThread.start();
 		}
 	}
@@ -306,8 +322,8 @@ public class DrawingSurface extends SurfaceView implements
 
 	public int getPixel(PointF coordinate) {
 		try {
-			if (mWorkingBitmap != null && mWorkingBitmap.isRecycled() == false) {
-				return mWorkingBitmap.getPixel((int) coordinate.x,
+			if (mCurrentLayer != null && mCurrentLayer.getImage().isRecycled() == false) {
+				return mCurrentLayer.getImage().getPixel((int) coordinate.x,
 						(int) coordinate.y);
 			}
 		} catch (IllegalArgumentException e) {
@@ -332,23 +348,31 @@ public class DrawingSurface extends SurfaceView implements
 
 	public void getPixels(int[] pixels, int offset, int stride, int x, int y,
 			int width, int height) {
-		if (mWorkingBitmap != null && mWorkingBitmap.isRecycled() == false) {
-			mWorkingBitmap.getPixels(pixels, offset, stride, x, y, width,
+		if (mCurrentLayer != null && mCurrentLayer.getImage().isRecycled() == false) {
+			mCurrentLayer.getImage().getPixels(pixels, offset, stride, x, y, width,
 					height);
 		}
 	}
 
 	public int getBitmapWidth() {
-		if (mWorkingBitmap == null) {
-			return -1;
+		if(mCurrentLayer != null) {
+			if (mCurrentLayer.getImage() == null) {
+				return -1;
+			}
+			return mCurrentLayer.getImage().getWidth();
 		}
-		return mWorkingBitmap.getWidth();
+
+		return 0;
 	}
 
 	public int getBitmapHeight() {
-		if (mWorkingBitmap == null) {
-			return -1;
+		if(mCurrentLayer != null) {
+			if (mCurrentLayer.getImage() == null) {
+				return -1;
+			}
+			return mCurrentLayer.getImage().getHeight();
 		}
-		return mWorkingBitmap.getHeight();
+
+		return 0;
 	}
 }

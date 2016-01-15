@@ -32,6 +32,7 @@ import org.catrobat.paintroid.dialog.LayersDialog;
 import org.catrobat.paintroid.dialog.ToolsDialog;
 import org.catrobat.paintroid.dialog.colorpicker.ColorPickerDialog;
 import org.catrobat.paintroid.listener.DrawingSurfaceListener;
+import org.catrobat.paintroid.tools.Layer;
 import org.catrobat.paintroid.tools.Tool;
 import org.catrobat.paintroid.tools.ToolFactory;
 import org.catrobat.paintroid.tools.ToolType;
@@ -135,8 +136,7 @@ public class MainActivity extends OptionsMenuActivity {
 		mTopBar = new TopBar(this, PaintroidApplication.openedFromCatroid);
 		mBottomBar = new BottomBar(this);
 
-		PaintroidApplication.drawingSurface
-				.setOnTouchListener(mDrawingSurfaceListener);
+		PaintroidApplication.drawingSurface.setOnTouchListener(mDrawingSurfaceListener);
 
 		if (PaintroidApplication.openedFromCatroid
 				&& catroidPicturePath != null
@@ -154,8 +154,8 @@ public class MainActivity extends OptionsMenuActivity {
 									bitmap = addAlphaChannel(bitmap);
 								}
 							}
-							PaintroidApplication.drawingSurface
-									.resetBitmap(bitmap);
+							PaintroidApplication.drawingSurface.setCurrentLayer(new Layer(0, bitmap));
+							PaintroidApplication.drawingSurface.resetBitmap(bitmap);
 						}
 
 						private Bitmap addAlphaChannel(Bitmap src) {
@@ -175,10 +175,13 @@ public class MainActivity extends OptionsMenuActivity {
 					});
 
 		} else {
+			PaintroidApplication.drawingSurface.setCurrentLayer(new Layer(0, Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)));
 			initialiseNewBitmap();
 		}
 
-		LayersDialog.init(this, PaintroidApplication.drawingSurface.getBitmapCopy());
+		LayersDialog.init(this, PaintroidApplication.drawingSurface.getCurrentLayer());
+		mDrawingSurfaceListener.setCurrentLayer(LayersDialog.getInstance().getCurrentLayer());
+
 	}
 
 	@Override

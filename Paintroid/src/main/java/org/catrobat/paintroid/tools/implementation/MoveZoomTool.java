@@ -21,6 +21,7 @@ package org.catrobat.paintroid.tools.implementation;
 
 import org.catrobat.paintroid.PaintroidApplication;
 import org.catrobat.paintroid.R;
+import org.catrobat.paintroid.tools.Layer;
 import org.catrobat.paintroid.tools.ToolType;
 import org.catrobat.paintroid.ui.TopBar.ToolButtonIDs;
 
@@ -36,7 +37,7 @@ public class MoveZoomTool extends BaseTool {
 	}
 
 	@Override
-	public void attributeButtonClick(ToolButtonIDs buttonNumber) {
+	public void attributeButtonClick(ToolButtonIDs buttonNumber, Layer layer) {
 		switch (buttonNumber) {
 		case BUTTON_ID_PARAMETER_BOTTOM_1:
 			zoomOut();
@@ -45,7 +46,7 @@ public class MoveZoomTool extends BaseTool {
 			zoomIn();
 			break;
 		default:
-			super.attributeButtonClick(buttonNumber);
+			super.attributeButtonClick(buttonNumber, layer);
 		}
 	}
 
@@ -95,7 +96,7 @@ public class MoveZoomTool extends BaseTool {
 	}
 
 	@Override
-	public boolean handleUp(PointF coordinate) {
+	public boolean handleUp(PointF coordinate, Layer layer) {
 		return false;
 	}
 

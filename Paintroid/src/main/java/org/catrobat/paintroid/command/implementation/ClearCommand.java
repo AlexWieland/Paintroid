@@ -23,6 +23,8 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 
+import org.catrobat.paintroid.tools.Layer;
+
 public class ClearCommand extends BaseCommand {
 	protected int mColor;
 
@@ -35,9 +37,11 @@ public class ClearCommand extends BaseCommand {
 	}
 
 	@Override
-	public void run(Canvas canvas, Bitmap bitmap) {
-		if (bitmap != null) {
-			bitmap.eraseColor(mColor);
+	public void run(Canvas canvas, Layer layer) {
+		if (layer != null) {
+			if(layer.getImage() != null) {
+				layer.getImage().eraseColor(mColor);
+			}
 		}
 	}
 }

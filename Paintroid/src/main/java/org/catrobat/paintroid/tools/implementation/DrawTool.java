@@ -24,6 +24,7 @@ import org.catrobat.paintroid.R;
 import org.catrobat.paintroid.command.Command;
 import org.catrobat.paintroid.command.implementation.PathCommand;
 import org.catrobat.paintroid.command.implementation.PointCommand;
+import org.catrobat.paintroid.tools.Layer;
 import org.catrobat.paintroid.tools.ToolType;
 import org.catrobat.paintroid.ui.TopBar.ToolButtonIDs;
 
@@ -96,7 +97,7 @@ public class DrawTool extends BaseTool {
 	}
 
 	@Override
-	public boolean handleUp(PointF coordinate) {
+	public boolean handleUp(PointF coordinate, Layer layer) {
 		if (mInitialEventCoordinate == null || mPreviousEventCoordinate == null
 				|| coordinate == null) {
 			return false;
@@ -109,22 +110,22 @@ public class DrawTool extends BaseTool {
 		boolean returnValue;
 		if (MOVE_TOLERANCE < movedDistance.x
 				|| MOVE_TOLERANCE < movedDistance.y) {
-			returnValue = addPathCommand(coordinate);
+			returnValue = addPathCommand(coordinate, layer);
 		} else {
-			returnValue = addPointCommand(mInitialEventCoordinate);
+			returnValue = addPointCommand(mInitialEventCoordinate, layer);
 		}
 		return returnValue;
 	}
 
-	protected boolean addPathCommand(PointF coordinate) {
+	protected boolean addPathCommand(PointF coordinate, Layer layer) {
 		pathToDraw.lineTo(coordinate.x, coordinate.y);
-		Command command = new PathCommand(mBitmapPaint, pathToDraw);
+		Command command = new PathCommand(mBitmapPaint, pathToDraw, layer);
 		PaintroidApplication.commandManager.commitCommand(command);
 		return true;
 	}
 
-	protected boolean addPointCommand(PointF coordinate) {
-		Command command = new PointCommand(mBitmapPaint, coordinate);
+	protected boolean addPointCommand(PointF coordinate, Layer layer) {
+		Command command = new PointCommand(mBitmapPaint, coordinate, layer);
 		PaintroidApplication.commandManager.commitCommand(command);
 		return true;
 	}
@@ -144,7 +145,7 @@ public class DrawTool extends BaseTool {
 	}
 
 	@Override
-	public void attributeButtonClick(ToolButtonIDs buttonNumber) {
+	public void attributeButtonClick(ToolButtonIDs buttonNumber, Layer layer) {
 		switch (buttonNumber) {
 		case BUTTON_ID_PARAMETER_BOTTOM_1:
 			showBrushPicker();

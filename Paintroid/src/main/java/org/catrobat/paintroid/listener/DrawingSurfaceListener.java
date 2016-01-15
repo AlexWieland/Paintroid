@@ -22,6 +22,7 @@ package org.catrobat.paintroid.listener;
 import java.util.EnumSet;
 
 import org.catrobat.paintroid.PaintroidApplication;
+import org.catrobat.paintroid.tools.Layer;
 import org.catrobat.paintroid.tools.Tool.StateChange;
 import org.catrobat.paintroid.tools.ToolType;
 import org.catrobat.paintroid.ui.Perspective;
@@ -45,6 +46,7 @@ public class DrawingSurfaceListener implements OnTouchListener {
 	private TouchMode mTouchMode;
 	private long mZoomTimeStamp;
 	private MoveThread moveThread;
+	private Layer mCurrentLayer;
 
 	public DrawingSurfaceListener() {
 		mPerspective = PaintroidApplication.perspective;
@@ -62,6 +64,14 @@ public class DrawingSurfaceListener implements OnTouchListener {
 		float x = (event.getX(0) + event.getX(1)) / 2f;
 		float y = (event.getY(0) + event.getY(1)) / 2f;
 		p.set(x, y);
+	}
+
+	public Layer getCurrentLayer() {
+		return mCurrentLayer;
+	}
+
+	public void setCurrentLayer(Layer currentLayer) {
+		this.mCurrentLayer = currentLayer;
 	}
 
 	@Override
@@ -130,7 +140,7 @@ public class DrawingSurfaceListener implements OnTouchListener {
 			}
 			moveThread = null;
 			if (mTouchMode == TouchMode.DRAW) {
-				PaintroidApplication.currentTool.handleUp(touchPoint);
+				PaintroidApplication.currentTool.handleUp(touchPoint, mCurrentLayer);
 			} else {
 				PaintroidApplication.currentTool
 						.resetInternalState(StateChange.MOVE_CANCELED);

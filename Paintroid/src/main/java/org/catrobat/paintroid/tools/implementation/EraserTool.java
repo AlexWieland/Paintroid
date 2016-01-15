@@ -20,6 +20,7 @@
 package org.catrobat.paintroid.tools.implementation;
 
 import org.catrobat.paintroid.PaintroidApplication;
+import org.catrobat.paintroid.tools.Layer;
 import org.catrobat.paintroid.tools.ToolType;
 import org.catrobat.paintroid.ui.TopBar.ToolButtonIDs;
 
@@ -78,10 +79,10 @@ public class EraserTool extends DrawTool {
 	}
 
 	@Override
-	public void attributeButtonClick(ToolButtonIDs buttonNumber) {
+	public void attributeButtonClick(ToolButtonIDs buttonNumber, Layer layer) {
 		switch (buttonNumber) {
 		case BUTTON_ID_PARAMETER_BOTTOM_1:
-			super.attributeButtonClick(buttonNumber);
+			super.attributeButtonClick(buttonNumber, layer);
 		default:
 			break;
 		}
@@ -93,8 +94,8 @@ public class EraserTool extends DrawTool {
 	}
 
 	@Override
-	public boolean handleUp(PointF coordinate) {
-		return (super.handleUp(coordinate));
+	public boolean handleUp(PointF coordinate, Layer layer) {
+		return (super.handleUp(coordinate, layer));
 	}
 
 	@Override

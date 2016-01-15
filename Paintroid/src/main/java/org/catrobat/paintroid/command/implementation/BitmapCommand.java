@@ -21,6 +21,7 @@ package org.catrobat.paintroid.command.implementation;
 
 import org.catrobat.paintroid.FileIO;
 import org.catrobat.paintroid.PaintroidApplication;
+import org.catrobat.paintroid.tools.Layer;
 
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
@@ -31,27 +32,31 @@ public class BitmapCommand extends BaseCommand {
 
 	private boolean mResetScaleAndTranslation = true;
 
-	public BitmapCommand(Bitmap bitmap) {
-		if (bitmap != null) {
-			mBitmap = Bitmap.createBitmap(bitmap);
+	public BitmapCommand(Layer layer) {
+		if(layer != null)
+		{
+			mLayer = layer;
 		}
+//		if (bitmap != null) {
+//			mBitmap = Bitmap.createBitmap(bitmap);
+//		}
 	}
 
 	public BitmapCommand(Bitmap bitmap, boolean resetScaleAndTranslation) {
-		this(bitmap);
+//		this(bitmap);
 		mResetScaleAndTranslation = resetScaleAndTranslation;
 	}
 
 	@Override
-	public void run(Canvas canvas, Bitmap bitmap) {
-		if (mBitmap == null && mFileToStoredBitmap != null) {
-			mBitmap = FileIO.getBitmapFromFile(mFileToStoredBitmap);
-		}
-		if (mBitmap != null) {
-			if (bitmap != null) {
-				bitmap.eraseColor(Color.TRANSPARENT);
+	public void run(Canvas canvas, Layer layer) {
+//		if (layer == null && mFileToStoredBitmap != null) {
+//			layer.setImage(FileIO.getBitmapFromFile(mFileToStoredBitmap));
+//		}
+		if (layer != null) {
+			if (layer.getImage() != null) {
+				layer.getImage().eraseColor(Color.TRANSPARENT);
 			}
-			PaintroidApplication.drawingSurface.setBitmap(mBitmap.copy(
+			PaintroidApplication.drawingSurface.setBitmap(layer.getImage().copy(
 					Config.ARGB_8888, true));
 
 			if (mResetScaleAndTranslation
@@ -59,9 +64,10 @@ public class BitmapCommand extends BaseCommand {
 				PaintroidApplication.perspective.resetScaleAndTranslation();
 			}
 
-			if (mFileToStoredBitmap == null) {
-				storeBitmap();
-			}
+			mLayer = layer;
+//			if (mFileToStoredBitmap == null) {
+//				storeBitmap(bitmap);
+//			}
 		}
 	}
 }

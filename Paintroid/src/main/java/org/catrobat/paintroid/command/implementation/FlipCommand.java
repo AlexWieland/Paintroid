@@ -20,6 +20,7 @@
 package org.catrobat.paintroid.command.implementation;
 
 import org.catrobat.paintroid.PaintroidApplication;
+import org.catrobat.paintroid.tools.Layer;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -40,7 +41,7 @@ public class FlipCommand extends BaseCommand {
 	}
 
 	@Override
-	public void run(Canvas canvas, Bitmap bitmap) {
+	public void run(Canvas canvas, Layer layer) {
 
 		notifyStatus(NOTIFY_STATES.COMMAND_STARTED);
 		if (mFlipDirection == null) {
@@ -50,7 +51,7 @@ public class FlipCommand extends BaseCommand {
 		}
 
 		Matrix flipMatrix = new Matrix();
-
+		Bitmap bitmap = layer.getImage();
 		switch (mFlipDirection) {
 		case FLIP_HORIZONTAL:
 			flipMatrix.setScale(1, -1);

@@ -24,6 +24,7 @@ import org.catrobat.paintroid.R;
 import org.catrobat.paintroid.command.Command;
 import org.catrobat.paintroid.command.implementation.FillCommand;
 import org.catrobat.paintroid.dialog.IndeterminateProgressDialog;
+import org.catrobat.paintroid.tools.Layer;
 import org.catrobat.paintroid.tools.ToolType;
 import org.catrobat.paintroid.ui.TopBar.ToolButtonIDs;
 
@@ -49,7 +50,7 @@ public class FillTool extends BaseTool {
 	}
 
 	@Override
-	public boolean handleUp(PointF coordinate) {
+	public boolean handleUp(PointF coordinate, Layer layer) {
 		int bitmapHeight = PaintroidApplication.drawingSurface
 				.getBitmapHeight();
 		int bitmapWidth = PaintroidApplication.drawingSurface.getBitmapWidth();
@@ -65,7 +66,7 @@ public class FillTool extends BaseTool {
 		}
 
 		Command command = new FillCommand(new Point((int) coordinate.x,
-				(int) coordinate.y), mBitmapPaint);
+				(int) coordinate.y), mBitmapPaint, layer);
 
 		IndeterminateProgressDialog.getInstance().show();
 		((FillCommand) command).addObserver(this);
@@ -87,14 +88,14 @@ public class FillTool extends BaseTool {
 	}
 
 	@Override
-	public void attributeButtonClick(ToolButtonIDs buttonNumber) {
+	public void attributeButtonClick(ToolButtonIDs buttonNumber, Layer layer) {
 		switch (buttonNumber) {
 		case BUTTON_ID_PARAMETER_TOP:
 		case BUTTON_ID_PARAMETER_BOTTOM_2:
 			showColorPicker();
 			break;
 		default:
-			super.attributeButtonClick(buttonNumber);
+			super.attributeButtonClick(buttonNumber, layer);
 			break;
 		}
 	}

@@ -21,6 +21,8 @@ package org.catrobat.paintroid.command;
 
 import android.graphics.Bitmap;
 
+import org.catrobat.paintroid.tools.Layer;
+
 public interface CommandManager {
 
 	public boolean hasCommands();

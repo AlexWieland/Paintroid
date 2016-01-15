@@ -20,6 +20,7 @@
 package org.catrobat.paintroid.command.implementation;
 
 import org.catrobat.paintroid.PaintroidApplication;
+import org.catrobat.paintroid.tools.Layer;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -30,15 +31,15 @@ import android.util.Log;
 public class PointCommand extends BaseCommand {
 	protected PointF mPoint;
 
-	public PointCommand(Paint paint, PointF point) {
-		super(paint);
+	public PointCommand(Paint paint, PointF point, Layer layer) {
+		super(paint, layer);
 		if (point != null) {
 			mPoint = new PointF(point.x, point.y);
 		}
 	}
 
 	@Override
-	public void run(Canvas canvas, Bitmap bitmap) {
+	public void run(Canvas canvas, Layer layer) {
 		if (canvas == null || mPoint == null) {
 			Log.w(PaintroidApplication.TAG,
 					"Object must not be null in PointCommand.");

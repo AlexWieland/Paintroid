@@ -5,6 +5,7 @@ import org.catrobat.paintroid.PaintroidApplication;
 import org.catrobat.paintroid.R;
 import org.catrobat.paintroid.dialog.LayersDialog;
 import org.catrobat.paintroid.dialog.ToolsDialog;
+import org.catrobat.paintroid.tools.Layer;
 import org.catrobat.paintroid.tools.Tool;
 
 import android.view.MotionEvent;
@@ -46,13 +47,13 @@ public class BottomBar implements View.OnTouchListener {
 			case R.id.btn_bottom_attribute1:
 				if (PaintroidApplication.currentTool != null) {
 					PaintroidApplication.currentTool
-							.attributeButtonClick(TopBar.ToolButtonIDs.BUTTON_ID_PARAMETER_BOTTOM_1);
+							.attributeButtonClick(TopBar.ToolButtonIDs.BUTTON_ID_PARAMETER_BOTTOM_1, null);
 				}
 				return true;
 			case R.id.btn_bottom_attribute2:
 				if (PaintroidApplication.currentTool != null) {
 					PaintroidApplication.currentTool
-							.attributeButtonClick(TopBar.ToolButtonIDs.BUTTON_ID_PARAMETER_BOTTOM_2);
+							.attributeButtonClick(TopBar.ToolButtonIDs.BUTTON_ID_PARAMETER_BOTTOM_2, null);
 				}
 				return true;
 			case R.id.btn_bottom_tools:

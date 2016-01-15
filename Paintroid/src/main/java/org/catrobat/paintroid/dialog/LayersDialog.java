@@ -90,12 +90,13 @@ public final class LayersDialog extends BaseDialog implements OnItemClickListene
 		return mLayerButtonAdapter;
 	}
 
-	private LayersDialog(Context context, Bitmap first_layer) {
+	private LayersDialog(Context context, Layer first_layer) {
 		super(context);
 		mContext = context;
 		mParent = (MainActivity) context;
         mLayerButtonAdapter = new LayersAdapter(context,
 				PaintroidApplication.openedFromCatroid, first_layer);
+		InitCurrentLayer();
 	}
 
 
@@ -109,8 +110,7 @@ public final class LayersDialog extends BaseDialog implements OnItemClickListene
 	{
 		if(mLayerButtonAdapter == null)
 		{
-			mLayerButtonAdapter = new LayersAdapter(mContext,
-					PaintroidApplication.openedFromCatroid, PaintroidApplication.drawingSurface.getBitmapCopy());
+			return;
 		}
 		currentLayer = mLayerButtonAdapter.getLayer(0);
 		if (currentLayer != null) {
@@ -120,7 +120,7 @@ public final class LayersDialog extends BaseDialog implements OnItemClickListene
 		Log.d("DEBUG", "CURRENT LAYER NOT INITIALIZED");
 
 	}
-	public static void init(MainActivity mainActivity, Bitmap first_layer) {
+	public static void init(MainActivity mainActivity, Layer first_layer) {
 		instance = new LayersDialog(mainActivity, first_layer);
 	}
 	public Layer getCurrentLayer()
@@ -480,8 +480,13 @@ public final class LayersDialog extends BaseDialog implements OnItemClickListene
 		refreshView();
 	}
 
+	public void resetForIntent(Context context, Layer first_Layer) {
+//		mLayerButtonAdapter.clearAndInitLayer(first_Layer);
+//		refreshView();
 
-	public void setMContext (Context context) {
 		mContext = context;
+		mParent = (MainActivity) context;
+		mLayerButtonAdapter = new LayersAdapter(context,
+				PaintroidApplication.openedFromCatroid, first_Layer);
 	}
 }

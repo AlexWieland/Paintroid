@@ -1,6 +1,7 @@
 package org.catrobat.paintroid.command.implementation;
 
 import org.catrobat.paintroid.PaintroidApplication;
+import org.catrobat.paintroid.tools.Layer;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -22,7 +23,7 @@ public class RotateCommand extends BaseCommand {
 	}
 
 	@Override
-	public void run(Canvas canvas, Bitmap bitmap) {
+	public void run(Canvas canvas, Layer layer) {
 		setChanged();
 		notifyStatus(NOTIFY_STATES.COMMAND_STARTED);
 		if (mRotateDirection == null) {
@@ -50,6 +51,7 @@ public class RotateCommand extends BaseCommand {
 			return;
 		}
 
+		Bitmap bitmap = layer.getImage();
 		Bitmap rotatedBitmap = Bitmap.createBitmap(bitmap, 0, 0,
 				bitmap.getWidth(), bitmap.getHeight(), rotateMatrix, true);
 		Canvas rotateCanvas = new Canvas(rotatedBitmap);

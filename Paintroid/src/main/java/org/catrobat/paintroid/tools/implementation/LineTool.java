@@ -23,6 +23,7 @@ import org.catrobat.paintroid.PaintroidApplication;
 import org.catrobat.paintroid.R;
 import org.catrobat.paintroid.command.Command;
 import org.catrobat.paintroid.command.implementation.PathCommand;
+import org.catrobat.paintroid.tools.Layer;
 import org.catrobat.paintroid.tools.ToolType;
 import org.catrobat.paintroid.ui.TopBar.ToolButtonIDs;
 
@@ -82,7 +83,7 @@ public class LineTool extends BaseTool {
 	}
 
 	@Override
-	public boolean handleUp(PointF coordinate) {
+	public boolean handleUp(PointF coordinate, Layer layer) {
 		if (mInitialEventCoordinate == null || mPreviousEventCoordinate == null
 				|| coordinate == null) {
 			return false;
@@ -90,7 +91,7 @@ public class LineTool extends BaseTool {
 		Path finalPath = new Path();
 		finalPath.moveTo(mInitialEventCoordinate.x, mInitialEventCoordinate.y);
 		finalPath.lineTo(coordinate.x, coordinate.y);
-		Command command = new PathCommand(mBitmapPaint, finalPath);
+		Command command = new PathCommand(mBitmapPaint, finalPath, layer);
 		PaintroidApplication.commandManager.commitCommand(command);
 		return true;
 	}
@@ -110,7 +111,7 @@ public class LineTool extends BaseTool {
 	}
 
 	@Override
-	public void attributeButtonClick(ToolButtonIDs buttonNumber) {
+	public void attributeButtonClick(ToolButtonIDs buttonNumber, Layer layer) {
 		switch (buttonNumber) {
 		case BUTTON_ID_PARAMETER_BOTTOM_1:
 			showBrushPicker();

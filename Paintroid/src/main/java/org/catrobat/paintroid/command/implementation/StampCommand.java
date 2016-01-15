@@ -20,6 +20,7 @@
 package org.catrobat.paintroid.command.implementation;
 
 import org.catrobat.paintroid.FileIO;
+import org.catrobat.paintroid.tools.Layer;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -34,17 +35,19 @@ public class StampCommand extends BaseCommand {
 	protected final float mBoxRotation;
 	protected final RectF mBoxRect;
 
-	public StampCommand(Bitmap bitmap, Point position, float width,
-			float height, float rotation) {
-		super(new Paint(Paint.DITHER_FLAG));
+	public StampCommand(Point position, float width,
+			float height, float rotation, Layer layer) {
+		super(new Paint(Paint.DITHER_FLAG), layer);
 
 		if (position != null) {
 			mCoordinates = new Point(position.x, position.y);
 		} else {
 			mCoordinates = null;
 		}
-		if (bitmap != null) {
-			mBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, false);
+		if(layer != null) {
+			if (layer.getImage() != null) {
+				layer.getImage().copy(Bitmap.Config.ARGB_8888, false);
+			}
 		}
 		mBoxWidth = width;
 		mBoxHeight = height;
@@ -54,14 +57,16 @@ public class StampCommand extends BaseCommand {
 	}
 
 	@Override
-	public void run(Canvas canvas, Bitmap bitmap) {
+	public void run(Canvas canvas, Layer layer) {
 
 		notifyStatus(NOTIFY_STATES.COMMAND_STARTED);
-		if (mFileToStoredBitmap != null) {
-			mBitmap = FileIO.getBitmapFromFile(mFileToStoredBitmap);
-		}
+//		if (mFileToStoredBitmap != null) {
+//			mBitmap = FileIO.getBitmapFromFile(mFileToStoredBitmap);
+//		}
 
-		if (mBitmap == null) {
+		Bitmap bitmap = layer.getImage();
+
+		if (bitmap == null) {
 			setChanged();
 			notifyStatus(NOTIFY_STATES.COMMAND_FAILED);
 			return;
@@ -70,16 +75,16 @@ public class StampCommand extends BaseCommand {
 		canvas.save();
 		canvas.translate(mCoordinates.x, mCoordinates.y);
 		canvas.rotate(mBoxRotation);
-		canvas.drawBitmap(mBitmap, null, mBoxRect, mPaint);
+		canvas.drawBitmap(bitmap, null, mBoxRect, mPaint);
 
 		canvas.restore();
 
-		if (mFileToStoredBitmap == null) {
-			storeBitmap();
-		} else {
-			mBitmap.recycle();
-			mBitmap = null;
-		}
+//		if (mFileToStoredBitmap == null) {
+//			storeBitmap();
+//		} else {
+//			bitmap.recycle();
+//			bitmap = null;
+//		}
 
 		notifyStatus(NOTIFY_STATES.COMMAND_DONE);
 	}

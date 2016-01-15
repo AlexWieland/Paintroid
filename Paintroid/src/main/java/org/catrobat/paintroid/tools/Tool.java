@@ -43,7 +43,7 @@ public interface Tool {
 
 	public boolean handleMove(PointF coordinate);
 
-	public boolean handleUp(PointF coordinate);
+	public boolean handleUp(PointF coordinate, Layer layer);
 
 	public void changePaintColor(int color);
 
@@ -63,7 +63,7 @@ public interface Tool {
 
 	public int getAttributeButtonColor(ToolButtonIDs buttonNumber);
 
-	public void attributeButtonClick(ToolButtonIDs buttonNumber);
+	public void attributeButtonClick(ToolButtonIDs buttonNumber, Layer layer);
 
 	public void resetInternalState(StateChange stateChange);
 
