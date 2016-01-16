@@ -87,6 +87,10 @@ public class DrawingSurfaceListener implements OnTouchListener {
 		switch (event.getAction())
 		{
 			case MotionEvent.ACTION_DOWN:
+                if(!PaintroidApplication.drawingSurface.canDrawOnSurface())
+                {
+                    return false;
+                }
 				PaintroidApplication.currentTool.handleDown(touchPoint);
 
 				moveThread = new MoveThread();
@@ -229,10 +233,10 @@ public class DrawingSurfaceListener implements OnTouchListener {
 
 					PaintroidApplication.perspective
                                         .translate(autoScrollDirection.x
-                                                    * step, autoScrollDirection.y * step);
+                                                * step, autoScrollDirection.y * step);
 
 					PointF newMovePoint = PaintroidApplication.perspective
-                                          .getCanvasPointFromSurfacePoint(new PointF(pointX,pointY));
+                                          .getCanvasPointFromSurfacePoint(new PointF(pointX, pointY));
 
                     PaintroidApplication.currentTool.handleMove(newMovePoint);
 				}

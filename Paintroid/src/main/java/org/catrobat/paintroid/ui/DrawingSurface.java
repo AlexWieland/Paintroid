@@ -134,7 +134,7 @@ public class DrawingSurface extends SurfaceView implements 	SurfaceHolder.Callba
         return mCurrentLayer.getLocked();
     }
 
-    private boolean canDrawOnSurface()
+    public boolean canDrawOnSurface()
     {
         return mCurrentLayer.getVisible() && !mCurrentLayer.getLocked()
                 && !mCurrentLayer.getBitmap().isRecycled();
@@ -165,10 +165,11 @@ public class DrawingSurface extends SurfaceView implements 	SurfaceHolder.Callba
         for(int position = layersAdapter.getCount()-1; position >= 0; position--)
         {
             Layer layer = layersAdapter.getLayer(position);
+            mOpacityPaint.setAlpha(layer.getScaledOpacity());
+            Bitmap bitmapDrawable = layer.getBitmap();
+
             if(layer.getVisible())
             {
-                mOpacityPaint.setAlpha(layer.getScaledOpacity());
-                Bitmap bitmapDrawable = (layer).getBitmap();
                 canvas.drawBitmap(bitmapDrawable, 0, 0, mOpacityPaint);
             }
         }
@@ -207,7 +208,7 @@ public class DrawingSurface extends SurfaceView implements 	SurfaceHolder.Callba
                 }
             }
 
-            if (mCurrentLayer != null && canDrawOnSurface())
+            if (mCurrentLayer != null)
             {
                 redrawAllTheLayers(surfaceViewCanvas);
             }

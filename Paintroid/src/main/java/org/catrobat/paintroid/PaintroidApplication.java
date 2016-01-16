@@ -37,6 +37,7 @@ import org.catrobat.paintroid.ui.Perspective;
 
 public class PaintroidApplication extends Application {
 	public static final String TAG = "PAINTROID";
+	public static final String ERROR_TAG = "ERROR";
 
 	public static Context applicationContext;
 	public static DrawingSurface drawingSurface;
