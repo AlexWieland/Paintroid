@@ -19,7 +19,6 @@
 
 package org.catrobat.paintroid.command.implementation;
 
-import org.catrobat.paintroid.FileIO;
 import org.catrobat.paintroid.tools.Layer;
 
 import android.graphics.Bitmap;
@@ -45,8 +44,8 @@ public class StampCommand extends BaseCommand {
 			mCoordinates = null;
 		}
 		if(layer != null) {
-			if (layer.getImage() != null) {
-				layer.getImage().copy(Bitmap.Config.ARGB_8888, false);
+			if (layer.getBitmap() != null) {
+				layer.getBitmap().copy(Bitmap.Config.ARGB_8888, false);
 			}
 		}
 		mBoxWidth = width;
@@ -64,7 +63,7 @@ public class StampCommand extends BaseCommand {
 //			mBitmap = FileIO.getBitmapFromFile(mFileToStoredBitmap);
 //		}
 
-		Bitmap bitmap = layer.getImage();
+		Bitmap bitmap = layer.getBitmap();
 
 		if (bitmap == null) {
 			setChanged();

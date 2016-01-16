@@ -51,7 +51,7 @@ public class FlipCommand extends BaseCommand {
 		}
 
 		Matrix flipMatrix = new Matrix();
-		Bitmap bitmap = layer.getImage();
+		Bitmap bitmap = layer.getBitmap();
 		switch (mFlipDirection) {
 		case FLIP_HORIZONTAL:
 			flipMatrix.setScale(1, -1);

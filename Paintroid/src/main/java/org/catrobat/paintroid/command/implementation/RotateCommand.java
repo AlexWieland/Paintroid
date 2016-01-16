@@ -51,7 +51,7 @@ public class RotateCommand extends BaseCommand {
 			return;
 		}
 
-		Bitmap bitmap = layer.getImage();
+		Bitmap bitmap = layer.getBitmap();
 		Bitmap rotatedBitmap = Bitmap.createBitmap(bitmap, 0, 0,
 				bitmap.getWidth(), bitmap.getHeight(), rotateMatrix, true);
 		Canvas rotateCanvas = new Canvas(rotatedBitmap);

@@ -19,7 +19,6 @@
 
 package org.catrobat.paintroid.command.implementation;
 
-import org.catrobat.paintroid.FileIO;
 import org.catrobat.paintroid.PaintroidApplication;
 import org.catrobat.paintroid.tools.Layer;
 
@@ -50,13 +49,13 @@ public class BitmapCommand extends BaseCommand {
 	@Override
 	public void run(Canvas canvas, Layer layer) {
 //		if (layer == null && mFileToStoredBitmap != null) {
-//			layer.setImage(FileIO.getBitmapFromFile(mFileToStoredBitmap));
+//			layer.setBitmap(FileIO.getBitmapFromFile(mFileToStoredBitmap));
 //		}
 		if (layer != null) {
-			if (layer.getImage() != null) {
-				layer.getImage().eraseColor(Color.TRANSPARENT);
+			if (layer.getBitmap() != null) {
+				layer.getBitmap().eraseColor(Color.TRANSPARENT);
 			}
-			PaintroidApplication.drawingSurface.setBitmap(layer.getImage().copy(
+			PaintroidApplication.drawingSurface.setBitmap(layer.getBitmap().copy(
 					Config.ARGB_8888, true));
 
 			if (mResetScaleAndTranslation

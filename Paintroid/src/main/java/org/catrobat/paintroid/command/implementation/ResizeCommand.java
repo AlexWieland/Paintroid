@@ -24,7 +24,6 @@ import org.catrobat.paintroid.PaintroidApplication;
 import org.catrobat.paintroid.tools.Layer;
 
 import android.graphics.Bitmap;
-import android.graphics.Bitmap.Config;
 import android.graphics.Canvas;
 import android.util.Log;
 
@@ -73,7 +72,7 @@ public class ResizeCommand extends BaseCommand {
 				notifyStatus(NOTIFY_STATES.COMMAND_FAILED);
 				return;
 			}
-			Bitmap bitmap = layer.getImage();
+			Bitmap bitmap = layer.getBitmap();
 
 			if (mResizeCoordinateXLeft >= bitmap.getWidth() || mResizeCoordinateXRight < 0 ||
 					mResizeCoordinateYTop >= bitmap.getHeight() || mResizeCoordinateYBottom < 0) {

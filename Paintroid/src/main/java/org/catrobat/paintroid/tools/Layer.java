@@ -1,13 +1,15 @@
 package org.catrobat.paintroid.tools;
 
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
 
 public class Layer {
-    private static final String LAYER_PREFIX = "Layer";
+    private static final String LAYER_PREFIX = "Layer ";
 
     private int mLayerID;
     private int mOpacity;
     private Bitmap mBitmap;
+    private Canvas mCanvas;
     private String mLayerName;
     private boolean mIsLocked;
     private boolean mIsVisible;
@@ -86,14 +88,14 @@ public class Layer {
         return mLayerID;
     }
 
-    public Bitmap getImage()
+    public Bitmap getBitmap()
     {
         return mBitmap;
     }
 
-    public void setImage(Bitmap image)
+    public void setBitmap(Bitmap bitmap)
     {
-        mBitmap = image;
+        mBitmap = bitmap;
     }
 
     public Layer getLayer()

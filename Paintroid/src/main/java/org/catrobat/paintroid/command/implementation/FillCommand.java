@@ -56,7 +56,7 @@ public class FillCommand extends BaseCommand {
 			Log.w(PaintroidApplication.TAG,
 					"Fill Command color: " + mPaint.getColor());
 		} else {
-			Bitmap bitmap = layer.getImage();
+			Bitmap bitmap = layer.getBitmap();
 			int colorToReplace = bitmap.getPixel(mClickedPixel.x,
 					mClickedPixel.y);
 			int pixels[] = new int[bitmap.getWidth() * bitmap.getHeight()];

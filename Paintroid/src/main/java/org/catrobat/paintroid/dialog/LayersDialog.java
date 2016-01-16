@@ -207,8 +207,8 @@ public final class LayersDialog extends BaseDialog implements OnItemClickListene
 	}
 
 	@Override
-	public boolean onItemLongClick(AdapterView<?> adapterView, View button,
-							int position, long id) {
+	public boolean onItemLongClick(AdapterView<?> adapterView, View button,	int position, long id)
+    {
 		selectLayer(mLayerButtonAdapter.getLayer(position));
 
 		AlertDialog.Builder alertChooseNewBuilder = new AlertDialog.Builder(this.getContext());
@@ -256,7 +256,7 @@ public final class LayersDialog extends BaseDialog implements OnItemClickListene
 
     public void createLayer()
     {
-        boolean success = mLayerButtonAdapter.addLayer();
+        boolean success = mLayerButtonAdapter.tryAddLayer();
 		refreshView();
         //if(!success)
           //TODO show error too many layers
@@ -288,14 +288,14 @@ public final class LayersDialog extends BaseDialog implements OnItemClickListene
 		if(currentLayer!=null)
 		{
 			currentLayer.setSelected(false);
-			currentLayer.setImage(PaintroidApplication.drawingSurface.getBitmapCopy());
+			currentLayer.setBitmap(PaintroidApplication.drawingSurface.getBitmapCopy());
 		}
 		currentLayer = toSelect;
 		currentLayer.setSelected(true);
 
 		//PaintroidApplication.drawingSurface.setLock(currentLayer.getLocked());
 		//PaintroidApplication.drawingSurface.setVisible(currentLayer.getVisible());
-		PaintroidApplication.drawingSurface.setBitmap(currentLayer.getImage());
+		PaintroidApplication.drawingSurface.setCurrentLayer(currentLayer);
 		refreshView();
 		mOpacitySeekbar = (SeekBar) findViewById(R.id.seekbar_layer_opacity);
 		if(mOpacitySeekbar != null)
@@ -377,15 +377,15 @@ public final class LayersDialog extends BaseDialog implements OnItemClickListene
 				if (mLayerButtonAdapter.getPosition(currentLayer.getLayerID())
 						 < mLayerButtonAdapter.getPosition(firstLayertoMerge.getLayerID())) {
 					currentLayer.setName(currentLayer.getName() + "/" + firstLayertoMerge.getName());
-					currentLayer.setImage(overlay(firstLayertoMerge, currentLayer));
+					currentLayer.setBitmap(overlay(firstLayertoMerge, currentLayer));
 				}
 				else {
 					currentLayer.setName(firstLayertoMerge.getName() + "/" + currentLayer.getName());
-					currentLayer.setImage(overlay(currentLayer, firstLayertoMerge));
+					currentLayer.setBitmap(overlay(currentLayer, firstLayertoMerge));
 				}
 				mLayerButtonAdapter.removeLayer(firstLayertoMerge.getLayerID());
 				currentLayer.setOpacity(100);
-				PaintroidApplication.drawingSurface.setBitmap(currentLayer.getImage());
+				PaintroidApplication.drawingSurface.setBitmap(currentLayer.getBitmap());
 				refreshView();
 				mergeButtonDisabled();
 				Command command = new LayerCommand(LayerCommand.LayerAction.MERGE);
@@ -395,8 +395,8 @@ public final class LayersDialog extends BaseDialog implements OnItemClickListene
     }
 
     public static Bitmap overlay(Layer layer1, Layer layer2) {
-		Bitmap bmp1 = layer1.getImage();
-		Bitmap bmp2 = layer2.getImage();
+		Bitmap bmp1 = layer1.getBitmap();
+		Bitmap bmp2 = layer2.getBitmap();
         Bitmap bmOverlay = Bitmap.createBitmap(bmp1.getWidth(), bmp1.getHeight(), bmp1.getConfig());
         Canvas canvas = new Canvas(bmOverlay);
 		Paint overlayPaint = new Paint();

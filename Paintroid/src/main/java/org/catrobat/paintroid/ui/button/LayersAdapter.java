@@ -38,65 +38,80 @@ import org.catrobat.paintroid.ui.DrawingSurface;
 import java.util.ArrayList;
 import java.util.Collections;
 
-
 public class LayersAdapter extends BaseAdapter {
 
 	private Context mContext;
-
 	private ArrayList<Layer> mLayerList;
-    private int LayerNum = 0;
-	private int MaxLayer = 7;
+    private int mLayerCount = 0;
+	private int mMaxLayer = 7;
 
 	public LayersAdapter(Context context, boolean fromCatrobat, Layer first_layer) {
 		this.mContext = context;
 		initLayers(fromCatrobat, first_layer);
 	}
 
-	private void initLayers(boolean fromCatrobat, Layer first_layer) {
-
+	//is fromCatrobat relevant?!
+	private void initLayers(boolean fromCatrobat, Layer first_layer)
+	{
 		mLayerList = new ArrayList<Layer>();
         mLayerList.add(first_layer);
-        LayerNum++;
-
+		mLayerCount++;
 	}
 
 	@Override
-	public int getCount() {
+	public int getCount()
+	{
 		return mLayerList.size();
 	}
 
 	@Override
-	public Object getItem(int position) {
+	public Object getItem(int position)
+	{
+		if((mLayerList.size() - 1) >= position)
+		{
+			return  mLayerList.get(position);
+		}
+
 		return null;
 	}
 
 	@Override
-	public long getItemId(int position) {
+	public long getItemId(int position)
+	{
+		if((mLayerList.size() - 1) >= position)
+		{
+			return  mLayerList.get(position).getLayerID();
+		}
+
 		return 0;
 	}
 
     public Layer getLayer(int position)
     {
-     return mLayerList.get(position);
+        return (Layer)getItem(position);
     }
 
-	public int getPosition(int layerID) {
-		int i;
-		for (i = 0; i < mLayerList.size(); i++) {
-			if (mLayerList.get(i).getLayerID() == layerID)
-				break;
+	public int getPosition(int layerID)
+	{
+		for (int position = 0; position < mLayerList.size(); position++)
+		{
+			if (mLayerList.get(position).getLayerID() == layerID)
+				return position;
 		}
-		return i;
-	}
-    public boolean addLayer()
-    {
-        if(mLayerList.size() < MaxLayer) {
-            DrawingSurface drawingSurface = PaintroidApplication.drawingSurface;
-            Bitmap image = Bitmap.createBitmap(drawingSurface.getBitmapWidth(),
-					             drawingSurface.getBitmapHeight(), Bitmap.Config.ARGB_8888);
-            mLayerList.add(0, new Layer(LayerNum, image));
 
-            LayerNum++;
+		return -1;
+	}
+    public boolean tryAddLayer()
+	{
+        if(mLayerList.size() < mMaxLayer)
+		{
+            DrawingSurface drawingSurface = PaintroidApplication.drawingSurface;
+            Bitmap image = Bitmap.createBitmap(drawingSurface.getBitmapWidth()
+											   ,drawingSurface.getBitmapHeight()
+											   ,Bitmap.Config.ARGB_8888);
+            mLayerList.add(0, new Layer(mLayerCount, image));
+
+			mLayerCount++;
             notifyDataSetChanged();
 			return true;
         }
@@ -126,7 +141,7 @@ public class LayersAdapter extends BaseAdapter {
 			rowView = inflater.inflate(R.layout.layer_button, null);
 			ImageView imageView = (ImageView) rowView
 					.findViewById(R.id.layer_button_image);
-			imageView.setImageBitmap(mLayerList.get(position).getImage());
+			imageView.setImageBitmap(mLayerList.get(position).getBitmap());
 			TextView textView = (TextView) rowView
 					.findViewById(R.id.layer_button_text);
             textView.setText(mLayerList.get(position).getName());
@@ -167,17 +182,17 @@ public class LayersAdapter extends BaseAdapter {
 					mLayerList.remove(i);
 			}
 		}
-		LayerNum = 0;
-		addLayer();
+		mLayerCount = 0;
+		tryAddLayer();
 		return mLayerList.get(0);
 	}
 
 	public void copy(int currentLayer) {
 
-		if(mLayerList.size() < MaxLayer) {
-			Bitmap image = mLayerList.get(currentLayer).getImage().copy(mLayerList.get(currentLayer).getImage().getConfig(), true);
-			mLayerList.add(0, new Layer(LayerNum, image));
-			LayerNum++;
+		if(mLayerList.size() < mMaxLayer) {
+			Bitmap image = mLayerList.get(currentLayer).getBitmap().copy(mLayerList.get(currentLayer).getBitmap().getConfig(), true);
+			mLayerList.add(0, new Layer(mLayerCount, image));
+			mLayerCount++;
 			notifyDataSetChanged();
 		}
 
@@ -216,12 +231,12 @@ public class LayersAdapter extends BaseAdapter {
 				mLayerList.remove(i);
 			}
 		}
-		LayerNum = 0;
+		mLayerCount = 0;
 
 		mLayerList = new ArrayList<Layer>();
 
 		mLayerList.add(new Layer(0, first_layer));
-		LayerNum++;
+		mLayerCount++;
 //		notifyDataSetChanged();
 	}
 

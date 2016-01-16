@@ -69,10 +69,10 @@ public abstract class BaseCommand extends Observable implements Command {
 	@Override
 	public void freeResources() {
 		if(mLayer != null) {
-			Bitmap bitmap = mLayer.getImage();
-			if ( mLayer.getImage() != null && ! mLayer.getImage().isRecycled()) {
-				mLayer.getImage().recycle();
-				mLayer.setImage(null);
+			Bitmap bitmap = mLayer.getBitmap();
+			if ( mLayer.getBitmap() != null && ! mLayer.getBitmap().isRecycled()) {
+				mLayer.getBitmap().recycle();
+				mLayer.setBitmap(null);
 			}
 			if (mFileToStoredBitmap != null && mFileToStoredBitmap.exists()) {
 				mFileToStoredBitmap.delete();
