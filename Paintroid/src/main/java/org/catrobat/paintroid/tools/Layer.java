@@ -1,85 +1,111 @@
 package org.catrobat.paintroid.tools;
 
 import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.util.Log;
-
-import org.catrobat.paintroid.MainActivity;
 
 public class Layer {
-    private int mLayerID;
-    private Bitmap mImage;
-    private boolean isSelected;
-    private String myName;
-    private boolean isLocked;
-    private boolean isVisible;
-    private int opacity;
+    private static final String LAYER_PREFIX = "Layer";
 
-    public void setSelected(boolean toSet) {
-        isSelected = toSet;
+    private int mLayerID;
+    private int mOpacity;
+    private Bitmap mBitmap;
+    private String mLayerName;
+    private boolean mIsLocked;
+    private boolean mIsVisible;
+    private boolean mIsSelected;
+
+
+    public void setSelected(boolean toSet)
+    {
+        mIsSelected = toSet;
     }
+
     public boolean getSelected()
     {
-        return isSelected;
+        return mIsSelected;
     }
 
-    public Layer(int layer_id, Bitmap image) {
+    public Layer(int layer_id, Bitmap bitmap) {
         mLayerID = layer_id;
-        mImage = image;
+        mBitmap = bitmap;
         setSelected(false);
-        myName = "Layer " + layer_id;
-        isLocked = false;
-        isVisible = true;
-        opacity = 100;
-    }
-    public void setOpacity(int newOpacity){
-        opacity = newOpacity;
-    }
-    public int getOpacity(){ return opacity; }
-
-    public int getScaledOpacity(){
-        return Math.round((opacity * 255)/100);
+        mLayerName = LAYER_PREFIX + layer_id;
+        mIsLocked = false;
+        mIsVisible = true;
+        mOpacity = 100;
     }
 
-    public void setLocked(boolean setTo) {isLocked = setTo;}
-    public void setVisible(boolean setTo)
+    public void setOpacity(int newOpacity)
     {
-        isVisible = setTo;
+        mOpacity = newOpacity;
     }
+    public int getOpacity()
+    {
+        return mOpacity;
+    }
+
+    public int getScaledOpacity()
+    {
+        return Math.round((mOpacity * 255)/100);
+    }
+
+    public void setLocked(boolean isLocked)
+    {
+        mIsLocked = isLocked;
+    }
+
     public boolean getLocked()
     {
-        return isLocked;
+        return mIsLocked;
     }
+
+    public void setVisible(boolean isVisible)
+    {
+        mIsVisible = isVisible;
+    }
+
     public boolean getVisible()
     {
-        return isVisible;
+        return mIsVisible;
     }
 
-    public String getName() {
-        return myName;
+    public String getName()
+    {
+        return mLayerName;
     }
 
-    public void setName(String nameTo) {
-        if(nameTo.length()>0)
+    public void setName(String layerName)
+    {
+        if(layerName != null && layerName.length()>0)
         {
-            myName = nameTo;
+            mLayerName = layerName;
         }
     }
 
-    public int getLayerID() {
+    public int getLayerID()
+    {
         return mLayerID;
     }
 
     public Bitmap getImage()
     {
-        return mImage;
+        return mBitmap;
     }
 
     public void setImage(Bitmap image)
     {
-        mImage = image;
+        mBitmap = image;
     }
 
-    public Layer getLayer() { return this; }
+    public Layer getLayer()
+    {
+        return this;
+    }
 
+    public void recycleBitmap()
+    {
+        if(mBitmap != null && !mBitmap.isRecycled())
+        {
+            mBitmap.recycle();
+        }
+    }
 }

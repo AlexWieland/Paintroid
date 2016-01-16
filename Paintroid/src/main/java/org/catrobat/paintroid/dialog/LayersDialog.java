@@ -27,24 +27,18 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.text.InputType;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -53,20 +47,14 @@ import org.catrobat.paintroid.PaintroidApplication;
 import org.catrobat.paintroid.R;
 import org.catrobat.paintroid.command.Command;
 import org.catrobat.paintroid.command.implementation.LayerCommand;
-import org.catrobat.paintroid.command.implementation.PathCommand;
-import org.catrobat.paintroid.dialog.InfoDialog.DialogType;
 import org.catrobat.paintroid.tools.Layer;
-import org.catrobat.paintroid.tools.ToolType;
-import org.catrobat.paintroid.ui.DrawingSurface;
 import org.catrobat.paintroid.ui.button.LayersAdapter;
-import org.catrobat.paintroid.ui.button.ToolsAdapter;
 
 public final class LayersDialog extends BaseDialog implements OnItemClickListener,
 	OnItemLongClickListener, DialogInterface.OnDismissListener,
 		SeekBar.OnSeekBarChangeListener{
 
 	private static final String NOT_INITIALIZED_ERROR_MESSAGE = "LayerDialog has not been initialized. Call init() first!";
-	public static final String FRAGMENT_TRANSACTION_TAG_HELP = "helpdialogfragmenttag";
 
 	private static LayersDialog instance;
 
@@ -94,8 +82,8 @@ public final class LayersDialog extends BaseDialog implements OnItemClickListene
 		super(context);
 		mContext = context;
 		mParent = (MainActivity) context;
-        mLayerButtonAdapter = new LayersAdapter(context,
-				PaintroidApplication.openedFromCatroid, first_layer);
+        mLayerButtonAdapter = new LayersAdapter(context, PaintroidApplication.openedFromCatroid,
+												first_layer);
 		InitCurrentLayer();
 	}
 
@@ -215,7 +203,7 @@ public final class LayersDialog extends BaseDialog implements OnItemClickListene
 
 		mOpacitySeekbar = (SeekBar) findViewById(R.id.seekbar_layer_opacity);
 		mOpacitySeekbar.setOnSeekBarChangeListener(this);
-		PaintroidApplication.drawingSurface.setLock(currentLayer.getLocked());
+		//PaintroidApplication.drawingSurface.setLock(currentLayer.getLocked());
 	}
 
 	@Override
@@ -305,8 +293,8 @@ public final class LayersDialog extends BaseDialog implements OnItemClickListene
 		currentLayer = toSelect;
 		currentLayer.setSelected(true);
 
-		PaintroidApplication.drawingSurface.setLock(currentLayer.getLocked());
-		PaintroidApplication.drawingSurface.setVisible(currentLayer.getVisible());
+		//PaintroidApplication.drawingSurface.setLock(currentLayer.getLocked());
+		//PaintroidApplication.drawingSurface.setVisible(currentLayer.getVisible());
 		PaintroidApplication.drawingSurface.setBitmap(currentLayer.getImage());
 		refreshView();
 		mOpacitySeekbar = (SeekBar) findViewById(R.id.seekbar_layer_opacity);
@@ -370,14 +358,14 @@ public final class LayersDialog extends BaseDialog implements OnItemClickListene
 	public void toggleLayerVisible()
 	{
 		currentLayer.setVisible(!currentLayer.getVisible());
-		PaintroidApplication.drawingSurface.setVisible(currentLayer.getVisible());
+		//PaintroidApplication.drawingSurface.setVisible(currentLayer.getVisible());
 		refreshView();
 	}
 
 	public void toggleLayerLocked()
 	{
 		currentLayer.setLocked(!currentLayer.getLocked());
-		PaintroidApplication.drawingSurface.setLock(currentLayer.getLocked());
+		//PaintroidApplication.drawingSurface.setLock(currentLayer.getLocked());
 		refreshView();
 	}
 

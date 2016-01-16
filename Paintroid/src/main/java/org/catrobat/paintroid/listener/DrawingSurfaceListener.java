@@ -79,75 +79,89 @@ public class DrawingSurfaceListener implements OnTouchListener {
 		PointF touchPoint = mPerspective
 				.getCanvasPointFromSurfacePoint(new PointF(event.getX(), event
 						.getY()));
-		if(PaintroidApplication.drawingSurface.getLock()) {
+		if(PaintroidApplication.drawingSurface.isSurfaceLocked())
+		{
 			mTouchMode = TouchMode.LOCK;
 		}
-		switch (event.getAction()) {
-		case MotionEvent.ACTION_DOWN:
-			PaintroidApplication.currentTool.handleDown(touchPoint);
 
-			moveThread = new MoveThread();
-			moveThread.setCalculationVariables(event.getX(), event.getY(),
-					view.getWidth(), view.getHeight());
-			moveThread.start();
+		switch (event.getAction())
+		{
+			case MotionEvent.ACTION_DOWN:
+				PaintroidApplication.currentTool.handleDown(touchPoint);
 
-			break;
-		case MotionEvent.ACTION_MOVE:
-			if (event.getPointerCount() == 1) {
-				if (System.nanoTime() < (mZoomTimeStamp + BLOCKING_TIME)) {
-					break;
-				}
-				mTouchMode = TouchMode.DRAW;
-				if (moveThread != null) {
-					moveThread.setCalculationVariables(event.getX(),
-							event.getY(), view.getWidth(), view.getHeight());
-				}
-				PaintroidApplication.currentTool.handleMove(touchPoint);
+				moveThread = new MoveThread();
+				moveThread.setCalculationVariables(event.getX(), event.getY(), view.getWidth(), view.getHeight());
+				moveThread.start();
+				break;
 
-			} else {
-				if (moveThread != null) {
-					if (moveThread.scrolling
-							&& (System.nanoTime() > (moveThread.threadStartTime + BLOCKING_TIME))) {
+			case MotionEvent.ACTION_MOVE:
+
+                if (event.getPointerCount() == 1)
+                {
+					if (System.nanoTime() < (mZoomTimeStamp + BLOCKING_TIME))
+                    {
 						break;
-					} else {
-						moveThread.kill();
-						moveThread = null;
 					}
-				}
-				mTouchMode = TouchMode.PINCH;
 
-				float pointerDistanceOld = mPointerDistance;
-				mPointerDistance = calculatePointerDistance(event);
-				if (pointerDistanceOld > 0) {
-					float scale = (mPointerDistance / pointerDistanceOld);
-					mPerspective.multiplyScale(scale);
-				}
+					mTouchMode = TouchMode.DRAW;
 
-				float xOld = mPointerMean.x;
-				float yOld = mPointerMean.y;
-				calculatePointerMean(event, mPointerMean);
-				if (xOld > 0 || yOld > 0) {
-					mPerspective.translate(mPointerMean.x - xOld,
-							mPointerMean.y - yOld);
+					if (moveThread != null)
+                    {
+						moveThread.setCalculationVariables(event.getX(), event.getY(), view.getWidth(), view.getHeight());
+					}
+
+					PaintroidApplication.currentTool.handleMove(touchPoint);
+
 				}
-				mZoomTimeStamp = System.nanoTime();
-			}
-			break;
-		case MotionEvent.ACTION_UP:
-		case MotionEvent.ACTION_CANCEL:
-			if (moveThread != null) {
-				moveThread.kill();
-			}
-			moveThread = null;
-			if (mTouchMode == TouchMode.DRAW) {
-				PaintroidApplication.currentTool.handleUp(touchPoint, mCurrentLayer);
-			} else {
-				PaintroidApplication.currentTool
-						.resetInternalState(StateChange.MOVE_CANCELED);
-			}
-			mPointerDistance = 0;
-			mPointerMean.set(0, 0);
-			break;
+                else
+                {
+					if (moveThread != null)
+                    {
+						if (moveThread.scrolling && (System.nanoTime() > (moveThread.threadStartTime + BLOCKING_TIME)))
+                        {
+							break;
+						}
+                        else
+                        {
+							moveThread.kill();
+							moveThread = null;
+						}
+					}
+
+					mTouchMode = TouchMode.PINCH;
+					float pointerDistanceOld = mPointerDistance;
+					mPointerDistance = calculatePointerDistance(event);
+					if (pointerDistanceOld > 0)
+                    {
+						float scale = (mPointerDistance / pointerDistanceOld);
+						mPerspective.multiplyScale(scale);
+					}
+
+					float xOld = mPointerMean.x;
+					float yOld = mPointerMean.y;
+					calculatePointerMean(event, mPointerMean);
+					if (xOld > 0 || yOld > 0)
+                    {
+						mPerspective.translate(mPointerMean.x - xOld, mPointerMean.y - yOld);
+					}
+					mZoomTimeStamp = System.nanoTime();
+				}
+				break;
+			case MotionEvent.ACTION_UP:
+			case MotionEvent.ACTION_CANCEL:
+				if (moveThread != null) {
+					moveThread.kill();
+				}
+				moveThread = null;
+				if (mTouchMode == TouchMode.DRAW) {
+					PaintroidApplication.currentTool.handleUp(touchPoint, mCurrentLayer);
+				} else {
+					PaintroidApplication.currentTool
+							.resetInternalState(StateChange.MOVE_CANCELED);
+				}
+				mPointerDistance = 0;
+				mPointerMean.set(0, 0);
+				break;
 		}
 		return true;
 	}
@@ -155,7 +169,7 @@ public class DrawingSurfaceListener implements OnTouchListener {
 	private class MoveThread extends Thread {
 
 		private static final int SCROLL_INTERVAL_FACTOR = 8; // the higher the
-																// slower
+		// slower
 
 		private int step = 1;
 
@@ -167,19 +181,19 @@ public class DrawingSurfaceListener implements OnTouchListener {
 		private int width;
 		private int height;
 		private long threadStartTime;
-		private EnumSet<ToolType> ignoredTools = EnumSet.of(ToolType.PIPETTE,
-				ToolType.FILL, ToolType.RESIZE, ToolType.FLIP, ToolType.MOVE,
-				ToolType.ZOOM);
+		private EnumSet<ToolType> ignoredTools = EnumSet.of(ToolType.PIPETTE, ToolType.FILL,
+                                                            ToolType.RESIZE, ToolType.FLIP,
+                                                            ToolType.MOVE, ToolType.ZOOM);
 
-		protected MoveThread() {
+		protected MoveThread()
+        {
 			threadStartTime = System.nanoTime();
-			running = !ignoredTools.contains(PaintroidApplication.currentTool
-					.getToolType());
+			running = !ignoredTools.contains(PaintroidApplication.currentTool.getToolType());
 			scrolling = false;
 		}
 
-		protected void setCalculationVariables(float pointX, float pointY,
-				int width, int height) {
+		protected void setCalculationVariables(float pointX, float pointY, int width, int height)
+        {
 			this.pointX = pointX;
 			this.pointY = pointY;
 			this.width = width;
@@ -188,44 +202,46 @@ public class DrawingSurfaceListener implements OnTouchListener {
 
 		@Override
 		public synchronized void start() {
-			if (width == 0 || height == 0) {
-				throw new IllegalStateException(
-						"MoveThread could not be started. Illegal width and/or height values.");
+			if (width == 0 || height == 0)
+            {
+				throw new IllegalStateException("MoveThread could not be started. Illegal width and/or height values.");
 			}
 			super.start();
 		}
 
-		protected void kill() {
+		protected void kill()
+        {
 			running = false;
 		}
 
 		protected int calculateScrollInterval(float scale) {
 			return (int) (SCROLL_INTERVAL_FACTOR / Math.pow(scale, 1 / 3));// approximate
-																			// calculation
 		}
 
 		@Override
 		public void run() {
 			while (running) {
 				Point autoScrollDirection = PaintroidApplication.currentTool
-						.getAutoScrollDirection(pointX, pointY, width, height);
+                                            .getAutoScrollDirection(pointX, pointY, width, height);
 
 				if (autoScrollDirection.x != 0 || autoScrollDirection.y != 0) {
 					scrolling = true;
 
-					PaintroidApplication.perspective.translate(
-							autoScrollDirection.x * step, autoScrollDirection.y
-									* step);
+					PaintroidApplication.perspective
+                                        .translate(autoScrollDirection.x
+                                                    * step, autoScrollDirection.y * step);
+
 					PointF newMovePoint = PaintroidApplication.perspective
-							.getCanvasPointFromSurfacePoint(new PointF(pointX,
-									pointY));
-					PaintroidApplication.currentTool.handleMove(newMovePoint);
+                                          .getCanvasPointFromSurfacePoint(new PointF(pointX,pointY));
+
+                    PaintroidApplication.currentTool.handleMove(newMovePoint);
 				}
 
-				try {
-					sleep(calculateScrollInterval(PaintroidApplication.perspective
-							.getScale()));
-				} catch (InterruptedException e) {
+				try
+                {
+					sleep(calculateScrollInterval(PaintroidApplication.perspective.getScale()));
+				} catch (InterruptedException e)
+                {
 					e.printStackTrace();
 				}
 				scrolling = false;
