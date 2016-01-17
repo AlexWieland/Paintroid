@@ -58,7 +58,6 @@ public class DrawingSurface extends SurfaceView implements 	SurfaceHolder.Callba
     private Paint mClearPaint;
 
     protected boolean mSurfaceCanBeUsed;
-    private Paint mOpacityPaint;
 
     public Bitmap mTestBitmap;
 
@@ -85,15 +84,12 @@ public class DrawingSurface extends SurfaceView implements 	SurfaceHolder.Callba
         mClearPaint = new Paint();
         mClearPaint.setColor(Color.TRANSPARENT);
         mClearPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
-        mOpacityPaint = new Paint();
     }
 
     @Override
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
         mSurfaceCanBeUsed = true;
-        Log.w(PaintroidApplication.TAG, "DrawingSurfaceView.surfaceChanged"); // TODO
-        // remove
-        // logging
+        Log.w(PaintroidApplication.TAG, "DrawingSurfaceView.surfaceChanged");
         PaintroidApplication.perspective.setSurfaceHolder(holder);
 
         if (mCurrentLayer.getBitmap() != null && mDrawingThread != null) {
@@ -121,7 +117,6 @@ public class DrawingSurface extends SurfaceView implements 	SurfaceHolder.Callba
         if (mCurrentLayer != null) {
             mWorkingBitmapCanvas.setBitmap(mCurrentLayer.getBitmap());
             mWorkingBitmapRect.set(0, 0, mCurrentLayer.getBitmap().getWidth(), mCurrentLayer.getBitmap().getHeight());
-            // PaintroidApplication.perspective.resetScaleAndTranslation();
         }
     }
 
@@ -152,25 +147,20 @@ public class DrawingSurface extends SurfaceView implements 	SurfaceHolder.Callba
     {
         LayersDialog layersDialog = LayersDialog.getInstance();
 
-        if(mCurrentLayer != layersDialog.getCurrentLayer())
+        if(mCurrentLayer != layersDialog.getmCurrentLayer())
         {
-            mCurrentLayer = layersDialog.getCurrentLayer();
+            mCurrentLayer = layersDialog.getmCurrentLayer();
         }
 
         LayersAdapter layersAdapter = layersDialog.getAdapter();
 
-        mOpacityPaint = new Paint();
-        mOpacityPaint.setAlpha(layersDialog.getCurrentLayer().getScaledOpacity());
-
-        for(int position = layersAdapter.getCount()-1; position >= 0; position--)
+        for(Layer layer : layersAdapter.getLayers())
         {
-            Layer layer = layersAdapter.getLayer(position);
-            mOpacityPaint.setAlpha(layer.getScaledOpacity());
-            Bitmap bitmapDrawable = layer.getBitmap();
-
             if(layer.getVisible())
             {
-                canvas.drawBitmap(bitmapDrawable, 0, 0, mOpacityPaint);
+                Paint opacity = new Paint();
+                opacity.setAlpha(layer.getScaledOpacity());
+                canvas.drawBitmap(layer.getBitmap(), 0, 0, opacity);
             }
         }
 
@@ -256,14 +246,11 @@ public class DrawingSurface extends SurfaceView implements 	SurfaceHolder.Callba
     }
 
     public synchronized void setBitmap(Bitmap bitmap) {
-//		if (mWorkingBitmap != null && bitmap != null) {
-//			mWorkingBitmap.recycle();
-//		}
+
         if (bitmap != null) {
             mCurrentLayer.setBitmap(bitmap);
             mWorkingBitmapCanvas.setBitmap(bitmap);
             mWorkingBitmapRect.set(0, 0, bitmap.getWidth(), bitmap.getHeight());
-            // PaintroidApplication.perspective.resetScaleAndTranslation();
         }
     }
 

@@ -42,7 +42,6 @@ public class LayersAdapter extends BaseAdapter {
 
 	private Context mContext;
 	private ArrayList<Layer> mLayerList;
-    private int mLayerCount = 0;
 	private int mMaxLayer = 7;
 
 	public LayersAdapter(Context context, boolean fromCatrobat, Layer first_layer) {
@@ -54,8 +53,12 @@ public class LayersAdapter extends BaseAdapter {
 	private void initLayers(boolean fromCatrobat, Layer first_layer)
 	{
 		mLayerList = new ArrayList<Layer>();
-        mLayerList.add(first_layer);
-		mLayerCount++;
+		mLayerList.add(first_layer);
+	}
+
+	public ArrayList<Layer> getLayers()
+	{
+		return mLayerList;
 	}
 
 	@Override
@@ -69,7 +72,7 @@ public class LayersAdapter extends BaseAdapter {
 	{
 		if((mLayerList.size() - 1) >= position)
 		{
-			return  mLayerList.get(position);
+			return mLayerList.get(position);
 		}
 
 		return null;
@@ -83,13 +86,13 @@ public class LayersAdapter extends BaseAdapter {
 			return  mLayerList.get(position).getLayerID();
 		}
 
-		return 0;
+		return -1;
 	}
 
-    public Layer getLayer(int position)
-    {
-        return (Layer)getItem(position);
-    }
+	public Layer getLayer(int position)
+	{
+		return (Layer)getItem(position);
+	}
 
 	public int getPosition(int layerID)
 	{
@@ -101,143 +104,155 @@ public class LayersAdapter extends BaseAdapter {
 
 		return -1;
 	}
-    public boolean tryAddLayer()
-	{
-        if(mLayerList.size() < mMaxLayer)
-		{
-            DrawingSurface drawingSurface = PaintroidApplication.drawingSurface;
-            Bitmap image = Bitmap.createBitmap(drawingSurface.getBitmapWidth()
-											   ,drawingSurface.getBitmapHeight()
-											   ,Bitmap.Config.ARGB_8888);
-            mLayerList.add(0, new Layer(mLayerCount, image));
 
-			mLayerCount++;
-            notifyDataSetChanged();
+	public boolean tryAddLayer()
+	{
+		if(mLayerList.size() < mMaxLayer)
+		{
+			DrawingSurface drawingSurface = PaintroidApplication.drawingSurface;
+			Bitmap image = Bitmap.createBitmap(drawingSurface.getBitmapWidth()
+											   ,drawingSurface.getBitmapHeight()
+										       ,Bitmap.Config.ARGB_8888);
+
+			mLayerList.add(0, new Layer(getCount(), image));
+			notifyDataSetChanged();
 			return true;
-        }
-        else
-            return false;
-    }
+		}
+		else
+		{
+			return false;
+		}
+	}
 
 	public void removeLayer(int layer_to_remove)
 	{
-		if(mLayerList.size() > 1) {
-			for(int i = 0; i < mLayerList.size(); ++i)
+		if(mLayerList.size() > 1)
+		{
+			for(int position = 0; position < mLayerList.size(); position++)
 			{
-				if(mLayerList.get(i).getLayerID() == layer_to_remove) {
-					mLayerList.remove(i);
+				if(mLayerList.get(position).getLayerID() == layer_to_remove) {
+					mLayerList.remove(position);
 					break;
 				}
 			}
+
 			notifyDataSetChanged();
 		}
 	}
 
 	@Override
-	public View getView(int position, View convertView, ViewGroup parent) {
+	public View getView(int position, View convertView, ViewGroup parent)
+	{
 		View rowView = convertView;
-		if (rowView == null) {
+
+		if (rowView == null)
+		{
 			LayoutInflater inflater = ((Activity) mContext).getLayoutInflater();
 			rowView = inflater.inflate(R.layout.layer_button, null);
-			ImageView imageView = (ImageView) rowView
-					.findViewById(R.id.layer_button_image);
+
+			ImageView imageView = (ImageView) rowView.findViewById(R.id.layer_button_image);
 			imageView.setImageBitmap(mLayerList.get(position).getBitmap());
-			TextView textView = (TextView) rowView
-					.findViewById(R.id.layer_button_text);
-            textView.setText(mLayerList.get(position).getName());
+
+			TextView textView = (TextView) rowView.findViewById(R.id.layer_button_text);
+			textView.setText(mLayerList.get(position).getName());
+
 			LinearLayout linear_layout = (LinearLayout)rowView.findViewById(R.id.layer_button);
 
-			if(mLayerList.get(position).getSelected()) {
-				linear_layout.setBackgroundColor(
-						mContext.getResources().getColor(R.color.color_chooser_blue1));
-			} else {
-				linear_layout.setBackgroundColor(
-						mContext.getResources().getColor(R.color.custom_background_color));
+			if(mLayerList.get(position).getSelected())
+			{
+				linear_layout.setBackgroundColor(mContext.getResources()
+						.getColor(R.color.color_chooser_blue1));
 			}
+			else
+			{
+				linear_layout.setBackgroundColor(mContext.getResources()
+														 .getColor(R.color.custom_background_color));
+			}
+
 			ImageView imageVisible = (ImageView) rowView.findViewById(R.id.layer_image_visible);
+
 			if(mLayerList.get(position).getVisible())
 			{
 				imageVisible.setVisibility(View.INVISIBLE);
-			}else{
+			}
+			else
+			{
 				imageVisible.setVisibility(View.VISIBLE);
 			}
 
 			TextView layerOpacityText = (TextView) rowView.findViewById(R.id.layer_opacity_text);
-			layerOpacityText.setText(""+mLayerList.get(position).getOpacity()+"%");
+			layerOpacityText.setText(mLayerList.get(position).getOpacity() + "%");
+
 			ImageView imageLock = (ImageView) rowView.findViewById(R.id.layer_image_locked);
+
 			if(mLayerList.get(position).getLocked())
 			{
 				imageLock.setVisibility(View.VISIBLE);
-			}else{
+			}
+			else
+			{
 				imageLock.setVisibility(View.INVISIBLE);
 			}
 		}
+
 		return rowView;
 	}
 
-	public Layer clearLayer() {
-		if(mLayerList.size() >= 1) {
-			for(int i = mLayerList.size() - 1; i >= 0; i--)
-			{
-					mLayerList.remove(i);
-			}
-		}
-		mLayerCount = 0;
+	public Layer resetLayers()
+	{
+		mLayerList.clear();
 		tryAddLayer();
 		return mLayerList.get(0);
 	}
 
-	public void copy(int currentLayer) {
+	public boolean copyLayer(int currentLayer)
+	{
+		if(mLayerList.size() < mMaxLayer)
+		{
+			Bitmap image = getLayer(currentLayer).getBitmap();
+			mLayerList.add(0, new Layer(getCount(), image.copy(image.getConfig(), true)));
 
-		if(mLayerList.size() < mMaxLayer) {
-			Bitmap image = mLayerList.get(currentLayer).getBitmap().copy(mLayerList.get(currentLayer).getBitmap().getConfig(), true);
-			mLayerList.add(0, new Layer(mLayerCount, image));
-			mLayerCount++;
 			notifyDataSetChanged();
+			return true;
 		}
 
+		return false;
 	}
 
-	public void swapUp(int IDcurrentLayer) {
-		int PositionCurrentLayer = getPosition(IDcurrentLayer);
+	public void moveLayerUp(int currentLayerId)
+	{
+		int PositionCurrentLayer = getPosition(currentLayerId);
 		if (PositionCurrentLayer > 0)
+		{
 			Collections.swap(mLayerList, PositionCurrentLayer, PositionCurrentLayer - 1);
-
-	}
-
-	public void swapDown(int IDcurrentLayer) {
-		int PositionCurrentLayer = getPosition(IDcurrentLayer);
-		if (PositionCurrentLayer < mLayerList.size()-1)
-			Collections.swap(mLayerList, PositionCurrentLayer, PositionCurrentLayer + 1);
-	}
-
-	public void swapTop(int IDcurrentLayer) {
-		int PositionCurrentLayer = getPosition(IDcurrentLayer);
-		if (PositionCurrentLayer > 0)
-			Collections.swap(mLayerList, PositionCurrentLayer, 0);
-	}
-
-	public void swapBottom(int IDcurrentLayer) {
-		int PositionCurrentLayer = getPosition(IDcurrentLayer);
-		if (PositionCurrentLayer < mLayerList.size()-1)
-			Collections.swap(mLayerList, PositionCurrentLayer, mLayerList.size()-1);
-	}
-
-	public void clearAndInitLayer(Bitmap first_layer) {
-
-		if(mLayerList.size() >= 1) {
-			for(int i = mLayerList.size() - 1; i >= 0; i--)
-			{
-				mLayerList.remove(i);
-			}
 		}
-		mLayerCount = 0;
+	}
 
-		mLayerList = new ArrayList<Layer>();
+	public void moveLayerDown(int currentLayerId)
+	{
+		int PositionCurrentLayer = getPosition(currentLayerId);
+		if (PositionCurrentLayer < mMaxLayer)
+		{
+			Collections.swap(mLayerList, PositionCurrentLayer, PositionCurrentLayer + 1);
+		}
+	}
 
-		mLayerList.add(new Layer(0, first_layer));
-		mLayerCount++;
-//		notifyDataSetChanged();
+	public void moveLayerOnTop(int currentLayerId)
+	{
+		int PositionCurrentLayer = getPosition(currentLayerId);
+		if (PositionCurrentLayer > 0)
+		{
+			Collections.swap(mLayerList, PositionCurrentLayer, 0);
+		}
+	}
+
+	public void moveLayerToBottom(int currentLayerId)
+	{
+		int PositionCurrentLayer = getPosition(currentLayerId);
+		if (PositionCurrentLayer < mMaxLayer)
+		{
+			Collections.swap(mLayerList, PositionCurrentLayer, mLayerList.size() - 1);
+		}
 	}
 
 	/* EXCLUDE PREFERENCES FOR RELEASE */
