@@ -180,7 +180,7 @@ public class MainActivity extends OptionsMenuActivity {
 		}
 
 		LayersDialog.init(this, PaintroidApplication.drawingSurface.getCurrentLayer());
-		mDrawingSurfaceListener.setCurrentLayer(LayersDialog.getInstance().getmCurrentLayer());
+		mDrawingSurfaceListener.setCurrentLayer(LayersDialog.getInstance().getCurrentLayer());
 
 	}
 

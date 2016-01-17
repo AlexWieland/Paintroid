@@ -147,15 +147,17 @@ public class DrawingSurface extends SurfaceView implements 	SurfaceHolder.Callba
     {
         LayersDialog layersDialog = LayersDialog.getInstance();
 
-        if(mCurrentLayer != layersDialog.getmCurrentLayer())
+        if(mCurrentLayer != layersDialog.getCurrentLayer())
         {
-            mCurrentLayer = layersDialog.getmCurrentLayer();
+            mCurrentLayer = layersDialog.getCurrentLayer();
         }
 
         LayersAdapter layersAdapter = layersDialog.getAdapter();
 
-        for(Layer layer : layersAdapter.getLayers())
+        //top-bottom drawing order, otherwise changes on upper layer not visible.
+        for(int position = layersAdapter.getCount() - 1; position >= 0; position--)
         {
+            Layer layer = layersAdapter.getLayer(position);
             if(layer.getVisible())
             {
                 Paint opacity = new Paint();

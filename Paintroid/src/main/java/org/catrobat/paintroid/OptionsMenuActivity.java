@@ -123,7 +123,7 @@ public abstract class OptionsMenuActivity extends SherlockFragmentActivity {
 										int id) {
 									saveTask.execute();
 									startLoadImageIntent();
-									LayersDialog.getInstance().resetLayer();
+									LayersDialog.getInstance().resetLayers();
 								}
 							})
 					.setNegativeButton(R.string.discard_button_text,
@@ -198,7 +198,7 @@ public abstract class OptionsMenuActivity extends SherlockFragmentActivity {
 										int id) {
 									saveTask.execute();
 									initialiseNewBitmap();
-									LayersDialog.getInstance().resetLayer();
+									LayersDialog.getInstance().resetLayers();
 								}
 							})
 					.setNegativeButton(R.string.discard_button_text,
@@ -208,7 +208,7 @@ public abstract class OptionsMenuActivity extends SherlockFragmentActivity {
 										int id) {
 
 									initialiseNewBitmap();
-									LayersDialog.getInstance().resetLayer();
+									LayersDialog.getInstance().resetLayers();
 								}
 							});
 			AlertDialog alertNewImage = alertDialogBuilder.create();
@@ -239,7 +239,7 @@ public abstract class OptionsMenuActivity extends SherlockFragmentActivity {
 								public void onClick(DialogInterface dialog,
 										int id) {
 									saveTask.execute();
-									LayersDialog.getInstance().resetLayer();
+									LayersDialog.getInstance().resetLayers();
 									takePhoto();
 
 
@@ -250,7 +250,7 @@ public abstract class OptionsMenuActivity extends SherlockFragmentActivity {
 								@Override
 								public void onClick(DialogInterface dialog,
 										int id) {
-									LayersDialog.getInstance().resetLayer();
+									LayersDialog.getInstance().resetLayers();
 									takePhoto();
 
 								}

@@ -51,27 +51,27 @@ import org.catrobat.paintroid.tools.Layer;
 import org.catrobat.paintroid.ui.button.LayersAdapter;
 
 public final class LayersDialog extends BaseDialog implements OnItemClickListener
-                                                             ,OnItemLongClickListener
-                                                             ,DialogInterface.OnDismissListener,
-                                                              SeekBar.OnSeekBarChangeListener {
+		,OnItemLongClickListener
+		,DialogInterface.OnDismissListener,
+		SeekBar.OnSeekBarChangeListener {
 
 	private static final String NOT_INITIALIZED_ERROR_MESSAGE = "LayerDialog has not been " +
-                                                                "initialized. Call init() first!";
+			"initialized. Call init() first!";
 
 	private static LayersDialog instance;
 
 	private LayersAdapter mLayerButtonAdapter;
-    private ImageButton mNewLayerButton;
-    private ImageButton mDeleteLayerButton;
+	private ImageButton mNewLayerButton;
+	private ImageButton mDeleteLayerButton;
 	private ImageButton mNameLayerButton;
 	private ImageButton mVisibleLayerButton;
 	private ImageButton mLockLayerButton;
-    private ImageButton mMergeLayerButton;
+	private ImageButton mMergeLayerButton;
 	private MainActivity mParent;
-    private Layer mCurrentLayer;
+	private Layer mCurrentLayer;
 	private Context mContext;
-    private Layer firstLayertoMerge;
-    private Boolean mergeClicked;
+	private Layer firstLayertoMerge;
+	private Boolean mergeClicked;
 	private SeekBar mOpacitySeekbar;
 	private TextView mOpacitySeekbarLabel;
 
@@ -84,18 +84,18 @@ public final class LayersDialog extends BaseDialog implements OnItemClickListene
 		super(context);
 		mContext = context;
 		mParent = (MainActivity) context;
-        mLayerButtonAdapter = new LayersAdapter(context, PaintroidApplication.openedFromCatroid
-                                                , first_layer);
+		mLayerButtonAdapter = new LayersAdapter(context, PaintroidApplication.openedFromCatroid
+				, first_layer);
 		selectFirstLayer();
 	}
 
-    public static void init(MainActivity mainActivity, Layer first_layer)
-    {
-        instance = new LayersDialog(mainActivity, first_layer);
-    }
+	public static void init(MainActivity mainActivity, Layer first_layer)
+	{
+		instance = new LayersDialog(mainActivity, first_layer);
+	}
 
 	public static LayersDialog getInstance()
-    {
+	{
 		if (instance == null) {
 			throw new IllegalStateException(NOT_INITIALIZED_ERROR_MESSAGE);
 		}
@@ -103,7 +103,7 @@ public final class LayersDialog extends BaseDialog implements OnItemClickListene
 		return instance;
 	}
 
-	void selectFirstLayer()
+	private void selectFirstLayer()
 	{
 		if(mLayerButtonAdapter == null)
 		{
@@ -112,15 +112,15 @@ public final class LayersDialog extends BaseDialog implements OnItemClickListene
 
 		mCurrentLayer = mLayerButtonAdapter.getLayer(0);
 		if (mCurrentLayer != null)
-        {
+		{
 			selectLayer(mCurrentLayer);
 			return;
 		}
 
-        Log.d("DEBUG", "CURRENT LAYER NOT INITIALIZED");
+		Log.d("DEBUG", "CURRENT LAYER NOT INITIALIZED");
 	}
 
-	public Layer getmCurrentLayer()
+	public Layer getCurrentLayer()
 	{
 		if(mCurrentLayer == null)
 		{
@@ -131,38 +131,41 @@ public final class LayersDialog extends BaseDialog implements OnItemClickListene
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
-    {
+	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.layers_menu);
 		setTitle(R.string.layers_title);
 		setCanceledOnTouchOutside(true);
-        setOnDismissListener(this);
+		setOnDismissListener(this);
 		GridView gridView = (GridView) findViewById(R.id.gridview_layers_menu);
 
 		gridView.setAdapter(mLayerButtonAdapter);
 		gridView.setOnItemClickListener(this);
 		gridView.setOnItemLongClickListener(this);
 
-        mNewLayerButton = (ImageButton) findViewById(R.id.mButtonLayerNew);
-        mNewLayerButton.setOnClickListener(new View.OnClickListener() {
+		mNewLayerButton = (ImageButton) findViewById(R.id.mButtonLayerNew);
+		mNewLayerButton.setOnClickListener(new View.OnClickListener() {
 			@Override
-			public void onClick(View v) {
+			public void onClick(View v)
+			{
 				createLayer();
 			}
 		});
 
-        mDeleteLayerButton = (ImageButton)findViewById(R.id.mButtonLayerDelete);
-        mDeleteLayerButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                deleteLayer();
-            }
-        });
+		mDeleteLayerButton = (ImageButton)findViewById(R.id.mButtonLayerDelete);
+		mDeleteLayerButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v)
+			{
+				deleteLayer();
+			}
+		});
 
 		mNameLayerButton = (ImageButton)findViewById(R.id.mButtonLayerRename);
 		mNameLayerButton.setOnClickListener(new View.OnClickListener() {
 			@Override
-			public void onClick(View v) {
+			public void onClick(View v)
+			{
 				renameLayer();
 			}
 		});
@@ -170,7 +173,8 @@ public final class LayersDialog extends BaseDialog implements OnItemClickListene
 		mVisibleLayerButton = (ImageButton)	findViewById(R.id.mButtonLayerVisible);
 		mVisibleLayerButton.setOnClickListener(new View.OnClickListener() {
 			@Override
-			public void onClick(View v) {
+			public void onClick(View v)
+			{
 				toggleLayerVisible();
 			}
 		});
@@ -178,7 +182,8 @@ public final class LayersDialog extends BaseDialog implements OnItemClickListene
 		mLockLayerButton = (ImageButton)findViewById(R.id.mButtonLayerLock);
 		mLockLayerButton.setOnClickListener(new View.OnClickListener() {
 			@Override
-			public void onClick(View v) {
+			public void onClick(View v)
+			{
 				toggleLayerLocked();
 			}
 		});
@@ -187,56 +192,61 @@ public final class LayersDialog extends BaseDialog implements OnItemClickListene
 		mOpacitySeekbarLabel.setText(R.string.layer_opacity);
 
 		mergeClicked = false;
-        mMergeLayerButton = (ImageButton)findViewById(R.id.mButtonLayerMerge);
-        mMergeLayerButton.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v) {
+		mMergeLayerButton = (ImageButton)findViewById(R.id.mButtonLayerMerge);
+		mMergeLayerButton.setOnClickListener(new View.OnClickListener()
+		{
+			@Override
+			public void onClick(View v)
+			{
+				if(!mCurrentLayer.getLocked())
+				{
+					if (mergeClicked)
+					{
+						mergeButtonDisabled();
+					}
+					else
+					{
+						mergeButtonEnabled();
+						firstLayertoMerge = mCurrentLayer;
+					}
 
-                if(mergeClicked)
-                {
-                    mergeButtonDisabled();
-                }
-                else
-                {
-                    mergeButtonEnabled();
-                    firstLayertoMerge = mCurrentLayer;
-                }
-
-                mergeLayer();
-            }
-        });
+					mergeLayer();
+				}
+			}
+		});
 
 		mOpacitySeekbar = (SeekBar) findViewById(R.id.seekbar_layer_opacity);
+		mOpacitySeekbar.setProgress(mCurrentLayer.getOpacity());
 		mOpacitySeekbar.setOnSeekBarChangeListener(this);
 	}
 
 	@Override
 	public boolean onItemLongClick(AdapterView<?> adapterView, View button,	int position, long id)
-    {
+	{
 		selectLayer(mLayerButtonAdapter.getLayer(position));
 
 		AlertDialog.Builder alertChooseNewBuilder = new AlertDialog.Builder(this.getContext());
 
-        alertChooseNewBuilder.setTitle(mCurrentLayer.getName()).setItems(R.array.edit_layer
-				, new DialogInterface.OnClickListener() {
+		alertChooseNewBuilder.setTitle(mCurrentLayer.getName()).setItems(R.array.edit_layer
+									   ,new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
-				switch (which) {
-					case 0: //copy
+				switch (which)
+				{
+					case 0:
 						copyLayer();
 						break;
-					case 1:// move up
-						moveUp();
+					case 1:
+						moveLayerUp();
 						break;
-					case 2://move down
-						moveDown();
+					case 2:
+						moveLayerDown();
 						break;
-					case 3://move to top
-						moveToTop();
+					case 3:
+						moveLayerOnTop();
 						break;
-					case 4: //move to bottom
-						moveToBottom();
+					case 4:
+						moveLayerToBottom();
 						break;
 				}
 			}
@@ -249,76 +259,78 @@ public final class LayersDialog extends BaseDialog implements OnItemClickListene
 
 	@Override
 	public void onItemClick(AdapterView<?> adapterView, View button, int position, long id)
-    {
+	{
 		selectLayer(mLayerButtonAdapter.getLayer(position));
-        if(mergeClicked)
-        {
-            mergeLayer();
-        }
+		if(mergeClicked)
+		{
+			mergeLayer();
+		}
 	}
 
-    public void createLayer()
-    {
-        if(mLayerButtonAdapter.tryAddLayer()) {
-            refreshView();
-            Command command = new LayerCommand(LayerCommand.LayerAction.ADD);
-            PaintroidApplication.commandManager.commitCommand(command);
-        }else
-        {
-            Log.d(PaintroidApplication.ERROR_TAG,
-                    String.format("Could not add layer. Current layer count %d",
-                                   mLayerButtonAdapter.getCount()));
-        }
-    }
+	public void createLayer()
+	{
+		if(mLayerButtonAdapter.tryAddLayer())
+		{
+			refreshView();
+			Command command = new LayerCommand(LayerCommand.LayerAction.ADD);
+			PaintroidApplication.commandManager.commitCommand(command);
+		}
+		else
+		{
+			Log.d(PaintroidApplication.ERROR_TAG
+					,String.format("Could not add layer. Current layer count %d"
+					,mLayerButtonAdapter.getCount()));
+		}
+	}
 
-    public void deleteLayer()
-    {
-        if(mLayerButtonAdapter.getCount() == 1 || mCurrentLayer == null)
-        {
-            return;
-        }
+	public void deleteLayer()
+	{
+		int layerCount = mLayerButtonAdapter.getCount();
+
+		if(layerCount == 1 || mCurrentLayer == null)
+		{
+			return;
+		}
 
 		int currentLayerPosition = mLayerButtonAdapter.getPosition(mCurrentLayer.getLayerID());
 		int adjacentLayerPosition = currentLayerPosition;
 
-		if (currentLayerPosition == mLayerButtonAdapter.getCount() - 1
-                                 && mLayerButtonAdapter.getCount() > 1)
-        {
-            adjacentLayerPosition = currentLayerPosition - 1;
+		if (currentLayerPosition == layerCount - 1 && layerCount > 1)
+		{
+			adjacentLayerPosition = currentLayerPosition - 1;
 		}
 
-        mLayerButtonAdapter.removeLayer(mCurrentLayer.getLayerID());
-        refreshView();
-
+		mLayerButtonAdapter.removeLayer(mCurrentLayer.getLayerID());
 		selectLayer(mLayerButtonAdapter.getLayer(adjacentLayerPosition));
+		refreshView();
+
 		Command command = new LayerCommand(LayerCommand.LayerAction.REMOVE);
 		PaintroidApplication.commandManager.commitCommand(command);
-    }
+	}
 
 	public void selectLayer(Layer layer)
-    {
+	{
 		if(mCurrentLayer != null)
 		{
 			mCurrentLayer.setSelected(false);
-			mCurrentLayer.setBitmap(PaintroidApplication.drawingSurface.getBitmapCopy());
 		}
 
 		mCurrentLayer = layer;
 		mCurrentLayer.setSelected(true);
-        refreshView();
 
 		mOpacitySeekbar = (SeekBar) findViewById(R.id.seekbar_layer_opacity);
-
-        if(mOpacitySeekbar != null)
+		if(mOpacitySeekbar != null)
 		{
 			mOpacitySeekbar.setProgress(mCurrentLayer.getOpacity());
 		}
-        else
-        {
-		    Log.d("DEBUG", "OPACITYSEEKBAR NOT INTIALIZED");
-        }
+		else
+		{
+			Log.d("DEBUG", "OPACITYSEEKBAR NOT INTIALIZED");
+		}
 
-        PaintroidApplication.drawingSurface.setCurrentLayer(mCurrentLayer);
+		refreshView();
+
+		PaintroidApplication.drawingSurface.setCurrentLayer(mCurrentLayer);
 	}
 
 	public void renameLayer()
@@ -331,21 +343,23 @@ public final class LayersDialog extends BaseDialog implements OnItemClickListene
 		input.setInputType(InputType.TYPE_CLASS_TEXT);
 		input.requestFocus();
 
-        final InputMethodManager imm = (InputMethodManager) mContext.getSystemService(Context.INPUT_METHOD_SERVICE);
+		final InputMethodManager imm = (InputMethodManager) mContext.getSystemService(Context.INPUT_METHOD_SERVICE);
 		imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
 
 		alertBuilder.setView(input);
 
-        alertBuilder.setPositiveButton(R.string.layer_ok, new DialogInterface.OnClickListener() {
+		alertBuilder.setPositiveButton(R.string.layer_ok, new DialogInterface.OnClickListener() {
 			@Override
-			public void onClick(DialogInterface dialog, int which) {
+			public void onClick(DialogInterface dialog, int which)
+			{
 				mCurrentLayer.setName(input.getText().toString());
 				getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 				refreshView();
 			}
 		});
 
-		alertBuilder.setNegativeButton(R.string.layer_cancel, new DialogInterface.OnClickListener() {
+		alertBuilder.setNegativeButton(R.string.layer_cancel, new DialogInterface.OnClickListener()
+		{
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 				getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
@@ -358,24 +372,26 @@ public final class LayersDialog extends BaseDialog implements OnItemClickListene
 
 	public void refreshView()
 	{
-        if(mLayerButtonAdapter != null) {
+		if(mLayerButtonAdapter != null)
+		{
 
-            GridView gridView = (GridView) findViewById(R.id.gridview_layers_menu);
-            if (gridView != null)
-            {
-                gridView.setAdapter(mLayerButtonAdapter);
-            }
-            else
-            {
-                Log.d("DEBUG", "LAYERGRIDVIEW NOT INITIALIZED");
-            }
-        }
-        else
-        {
-            Log.d("DEBUG","LAYERBUTTONADAPTER NOT INITIALIZED");
-        }
-    }
-    public void toggleLayerVisible()
+			GridView gridView = (GridView) findViewById(R.id.gridview_layers_menu);
+			if (gridView != null)
+			{
+				gridView.setAdapter(mLayerButtonAdapter);
+			}
+			else
+			{
+				Log.d("DEBUG", "LAYERGRIDVIEW NOT INITIALIZED");
+			}
+		}
+		else
+		{
+			Log.d("DEBUG","LAYERBUTTONADAPTER NOT INITIALIZED");
+		}
+	}
+
+	public void toggleLayerVisible()
 	{
 		mCurrentLayer.setVisible(!mCurrentLayer.getVisible());
 		refreshView();
@@ -384,110 +400,127 @@ public final class LayersDialog extends BaseDialog implements OnItemClickListene
 	public void toggleLayerLocked()
 	{
 		mCurrentLayer.setLocked(!mCurrentLayer.getLocked());
-		//PaintroidApplication.drawingSurface.setLock(mCurrentLayer.getLocked());
 		refreshView();
 	}
 
-    public void mergeLayer()
-    {
-		if(mCurrentLayer.getLayerID() != firstLayertoMerge.getLayerID()){
-			if(!mCurrentLayer.getLocked()) {
+	public void mergeLayer()
+	{
+		if(mCurrentLayer.getLayerID() != firstLayertoMerge.getLayerID())
+		{
+			if(!mCurrentLayer.getLocked())
+			{
+				Bitmap mergedBitmap = null;
+				if (mLayerButtonAdapter.getPosition(firstLayertoMerge.getLayerID())
+						< mLayerButtonAdapter.getPosition(firstLayertoMerge.getLayerID()))
+				{
+					mergedBitmap = overlay(firstLayertoMerge, mCurrentLayer);
+				}
+				else
+				{
+					mergedBitmap =  overlay(mCurrentLayer, firstLayertoMerge);
+				}
 
-				if (mLayerButtonAdapter.getPosition(mCurrentLayer.getLayerID())
-						 < mLayerButtonAdapter.getPosition(firstLayertoMerge.getLayerID())) {
-					mCurrentLayer.setName(mCurrentLayer.getName() + "/" + firstLayertoMerge.getName());
-					mCurrentLayer.setBitmap(overlay(firstLayertoMerge, mCurrentLayer));
-				}
-				else {
-					mCurrentLayer.setName(firstLayertoMerge.getName() + "/" + mCurrentLayer.getName());
-					mCurrentLayer.setBitmap(overlay(mCurrentLayer, firstLayertoMerge));
-				}
-				mLayerButtonAdapter.removeLayer(firstLayertoMerge.getLayerID());
 				mCurrentLayer.setOpacity(100);
-				PaintroidApplication.drawingSurface.setBitmap(mCurrentLayer.getBitmap());
-				refreshView();
-				mergeButtonDisabled();
+				mCurrentLayer.setBitmap(mergedBitmap);
+				mCurrentLayer.setName(mCurrentLayer.getName());
+
+				mLayerButtonAdapter.removeLayer(firstLayertoMerge.getLayerID());
+
 				Command command = new LayerCommand(LayerCommand.LayerAction.MERGE);
 				PaintroidApplication.commandManager.commitCommand(command);
-        	}
-	   	}
-    }
 
-    public static Bitmap overlay(Layer layer1, Layer layer2) {
-		Bitmap bmp1 = layer1.getBitmap();
-		Bitmap bmp2 = layer2.getBitmap();
-        Bitmap bmOverlay = Bitmap.createBitmap(bmp1.getWidth(), bmp1.getHeight(), bmp1.getConfig());
-        Canvas canvas = new Canvas(bmOverlay);
-		Paint overlayPaint = new Paint();
-		overlayPaint.setAlpha(layer1.getScaledOpacity());
-        canvas.drawBitmap(bmp1, new Matrix(), overlayPaint);
-		overlayPaint.setAlpha(layer2.getScaledOpacity());
-        canvas.drawBitmap(bmp2, 0, 0, overlayPaint);
-        return bmOverlay;
-    }
-
-    public void onDismiss(DialogInterface dialog) {
-        mergeButtonDisabled();
+				mergeButtonDisabled();
+				refreshView();
+			}
+		}
 	}
 
-	private void mergeButtonEnabled() {
-        mMergeLayerButton.setBackgroundColor(Color.rgb(0, 180, 241));
-        mergeClicked = true;
-    }
+	public static Bitmap overlay(Layer layer1, Layer layer2)
+	{
+		Bitmap bmp1 = layer1.getBitmap();
+		Bitmap bmp2 = layer2.getBitmap();
 
-    private void mergeButtonDisabled() {
-        mMergeLayerButton.setBackgroundColor(Color.BLACK);
-        mergeClicked = false;
-    }
+		Bitmap bmOverlay = Bitmap.createBitmap(bmp1.getWidth(), bmp1.getHeight(), bmp1.getConfig());
+		Canvas canvas = new Canvas(bmOverlay);
 
+		Paint overlayPaint = new Paint();
+		overlayPaint.setAlpha(layer1.getScaledOpacity());
+
+		canvas.drawBitmap(bmp1, new Matrix(), overlayPaint);
+		overlayPaint.setAlpha(layer2.getScaledOpacity());
+		canvas.drawBitmap(bmp2, 0, 0, overlayPaint);
+
+		return bmOverlay;
+	}
+
+	public void onDismiss(DialogInterface dialog)
+    {
+		mergeButtonDisabled();
+	}
+
+	private void mergeButtonEnabled()
+	{
+		mMergeLayerButton.setBackgroundColor(Color.rgb(0, 180, 241));
+		mergeClicked = true;
+	}
+
+	private void mergeButtonDisabled()
+	{
+		mMergeLayerButton.setBackgroundColor(Color.BLACK);
+		mergeClicked = false;
+	}
 
 	@Override
-	public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+	public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser)
+	{
 		mCurrentLayer.setOpacity(seekBar.getProgress());
 		refreshView();
 	}
 
 	@Override
-	public void onStartTrackingTouch(SeekBar seekBar) {
-
-	}
+	public void onStartTrackingTouch(SeekBar seekBar) {	}
 
 	@Override
-	public void onStopTrackingTouch(SeekBar seekBar) {
+	public void onStopTrackingTouch(SeekBar seekBar) { }
 
-	}
-
-	public void resetLayer() {
+	public void resetLayers()
+	{
 		selectLayer(mLayerButtonAdapter.resetLayers());
 		refreshView();
 	}
 
-	public void copyLayer() {
+	public void copyLayer()
+	{
 		mLayerButtonAdapter.copyLayer(mCurrentLayer.getLayerID());
 		refreshView();
 	}
 
-	public void moveUp() {
+	public void moveLayerUp()
+	{
 		mLayerButtonAdapter.moveLayerUp(mCurrentLayer.getLayerID());
 		refreshView();
 	}
 
-	public void moveDown() {
+	public void moveLayerDown()
+	{
 		mLayerButtonAdapter.moveLayerDown(mCurrentLayer.getLayerID());
 		refreshView();
 	}
 
-	public void moveToTop() {
+	public void moveLayerOnTop()
+	{
 		mLayerButtonAdapter.moveLayerOnTop(mCurrentLayer.getLayerID());
 		refreshView();
 	}
 
-	public void moveToBottom() {
+	public void moveLayerToBottom()
+	{
 		mLayerButtonAdapter.moveLayerToBottom(mCurrentLayer.getLayerID());
 		refreshView();
 	}
 
-	public void resetForIntent(Context context, Layer first_Layer) {
+	public void resetForIntent(Context context, Layer first_Layer)
+	{
 		mContext = context;
 		mParent = (MainActivity) context;
 		mLayerButtonAdapter = new LayersAdapter(context, PaintroidApplication.openedFromCatroid

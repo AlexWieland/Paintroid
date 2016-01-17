@@ -42,6 +42,7 @@ public class LayersAdapter extends BaseAdapter {
 
 	private Context mContext;
 	private ArrayList<Layer> mLayerList;
+	private int mLayerCounter = 0;
 	private int mMaxLayer = 7;
 
 	public LayersAdapter(Context context, boolean fromCatrobat, Layer first_layer) {
@@ -54,6 +55,7 @@ public class LayersAdapter extends BaseAdapter {
 	{
 		mLayerList = new ArrayList<Layer>();
 		mLayerList.add(first_layer);
+		mLayerCounter++;
 	}
 
 	public ArrayList<Layer> getLayers()
@@ -89,6 +91,11 @@ public class LayersAdapter extends BaseAdapter {
 		return -1;
 	}
 
+	public int getLayerCounterState()
+	{
+		return mLayerCounter;
+	}
+
 	public Layer getLayer(int position)
 	{
 		return (Layer)getItem(position);
@@ -114,7 +121,8 @@ public class LayersAdapter extends BaseAdapter {
 											   ,drawingSurface.getBitmapHeight()
 										       ,Bitmap.Config.ARGB_8888);
 
-			mLayerList.add(0, new Layer(getCount(), image));
+			mLayerList.add(0, new Layer(mLayerCounter, image));
+			mLayerCounter++;
 			notifyDataSetChanged();
 			return true;
 		}
@@ -201,6 +209,7 @@ public class LayersAdapter extends BaseAdapter {
 	public Layer resetLayers()
 	{
 		mLayerList.clear();
+		mLayerCounter = 0;
 		tryAddLayer();
 		return mLayerList.get(0);
 	}
@@ -210,7 +219,7 @@ public class LayersAdapter extends BaseAdapter {
 		if(mLayerList.size() < mMaxLayer)
 		{
 			Bitmap image = getLayer(currentLayer).getBitmap();
-			mLayerList.add(0, new Layer(getCount(), image.copy(image.getConfig(), true)));
+			mLayerList.add(0, new Layer(mLayerCounter, image.copy(image.getConfig(), true)));
 
 			notifyDataSetChanged();
 			return true;
