@@ -374,7 +374,6 @@ public final class LayersDialog extends BaseDialog implements OnItemClickListene
 	{
 		if(mLayerButtonAdapter != null)
 		{
-
 			GridView gridView = (GridView) findViewById(R.id.gridview_layers_menu);
 			if (gridView != null)
 			{
@@ -483,7 +482,7 @@ public final class LayersDialog extends BaseDialog implements OnItemClickListene
 	@Override
 	public void onStopTrackingTouch(SeekBar seekBar) { }
 
-	public void resetLayers()
+    public void resetLayers()
 	{
 		selectLayer(mLayerButtonAdapter.resetLayers());
 		refreshView();

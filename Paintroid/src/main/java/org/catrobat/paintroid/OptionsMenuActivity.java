@@ -376,7 +376,7 @@ public abstract class OptionsMenuActivity extends SherlockFragmentActivity {
 		float width = display.getWidth();
 		float height = display.getHeight();
 		Log.d("PAINTROID - MFA", "init new bitmap with: w: " + width + " h:"
-				+ height);
+                + height);
 		Bitmap bitmap = Bitmap.createBitmap((int) width, (int) height,
 				Config.ARGB_8888);
 		bitmap.eraseColor(Color.TRANSPARENT);
