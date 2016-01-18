@@ -108,57 +108,72 @@ public class MainActivity extends OptionsMenuActivity {
 		// setDefaultPreferences();
 		initActionBar();
 
-		PaintroidApplication.catroidPicturePath = null;
-		String catroidPicturePath = null;
+        PaintroidApplication.catroidPicturePath = null;
+        String catroidPicturePath = null;
+
 		Bundle extras = getIntent().getExtras();
-		if (extras != null) {
+		if (extras != null)
+        {
 			catroidPicturePath = extras
 					.getString(getString(R.string.extra_picture_path_catroid));
 
 			Log.d(PaintroidApplication.TAG, "catroidPicturePath: "
 					+ catroidPicturePath);
 		}
-		if (catroidPicturePath != null) {
+
+		if (catroidPicturePath != null)
+        {
 			PaintroidApplication.openedFromCatroid = true;
-			if (!catroidPicturePath.equals("")) {
+			if (!catroidPicturePath.equals(""))
+            {
 				PaintroidApplication.catroidPicturePath = catroidPicturePath;
 			}
 			getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 			getSupportActionBar().setDisplayShowHomeEnabled(true);
-		} else {
+		}
+        else
+        {
 			PaintroidApplication.openedFromCatroid = false;
 		}
 
 		PaintroidApplication.drawingSurface = (DrawingSurface) findViewById(R.id.drawingSurfaceView);
-		PaintroidApplication.perspective = new Perspective(
-				((SurfaceView) PaintroidApplication.drawingSurface).getHolder());
-		mDrawingSurfaceListener = new DrawingSurfaceListener();
-		mTopBar = new TopBar(this, PaintroidApplication.openedFromCatroid);
-		mBottomBar = new BottomBar(this);
+        PaintroidApplication.perspective = new Perspective(((SurfaceView) PaintroidApplication
+                                                                    .drawingSurface).getHolder());
+        mDrawingSurfaceListener = new DrawingSurfaceListener();
+        PaintroidApplication.drawingSurface.setOnTouchListener(mDrawingSurfaceListener);
 
-		PaintroidApplication.drawingSurface.setOnTouchListener(mDrawingSurfaceListener);
+        mTopBar = new TopBar(this, PaintroidApplication.openedFromCatroid);
+        mBottomBar = new BottomBar(this);
 
-		if (PaintroidApplication.openedFromCatroid
-				&& catroidPicturePath != null
-				&& catroidPicturePath.length() > 0) {
+        LayersDialog.init(this, new Layer(0,  Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)));
+
+		if (PaintroidApplication.openedFromCatroid && catroidPicturePath != null
+				&& catroidPicturePath.length() > 0)
+        {
 			loadBitmapFromUriAndRun(Uri.fromFile(new File(catroidPicturePath)),
-					new RunnableWithBitmap() {
+                    new RunnableWithBitmap()
+                    {
 						@SuppressLint("NewApi")
 						@Override
-						public void run(Bitmap bitmap) {
-							if (!bitmap.hasAlpha()) {
-
-								if (Build.VERSION.SDK_INT > Build.VERSION_CODES.HONEYCOMB) {
+						public void run(Bitmap bitmap)
+                        {
+							if (!bitmap.hasAlpha())
+                            {
+								if (Build.VERSION.SDK_INT > Build.VERSION_CODES.HONEYCOMB)
+                                {
 									bitmap.setHasAlpha(true);
-								} else {
+								} else
+                                {
 									bitmap = addAlphaChannel(bitmap);
 								}
 							}
-							PaintroidApplication.drawingSurface.setCurrentLayer(new Layer(0, bitmap));
-							//PaintroidApplication.drawingSurface.loadImageIntoCurrentLayer(bitmap);
+                            Layer layer = LayersDialog.getInstance().getCurrentLayer();
+                            layer.setBitmap(bitmap);
+							PaintroidApplication.drawingSurface.setCurrentLayer(layer);
 						}
 
-						private Bitmap addAlphaChannel(Bitmap src) {
+						private Bitmap addAlphaChannel(Bitmap src)
+                        {
 							int width = src.getWidth();
 							int height = src.getHeight();
 							Bitmap dest = Bitmap.createBitmap(width, height,
@@ -174,52 +189,53 @@ public class MainActivity extends OptionsMenuActivity {
 						}
 					});
 
-		} else
+		}
+        else
         {
-			PaintroidApplication.drawingSurface.setCurrentLayer(new Layer(0, Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)));
+			PaintroidApplication.drawingSurface.setCurrentLayer(LayersDialog.getInstance().getCurrentLayer());
 			initialiseNewBitmap();
 		}
 
-		LayersDialog.init(this, PaintroidApplication.drawingSurface.getCurrentLayer());
-		mDrawingSurfaceListener.setCurrentLayer(LayersDialog.getInstance().getCurrentLayer());
-
+		mDrawingSurfaceListener.setCurrentLayer(PaintroidApplication.drawingSurface.getCurrentLayer());
 	}
 
 	@Override
-	protected void onResume() {
+	protected void onResume()
+    {
 		super.onResume();
 		checkIfLoadBitmapFailed();
 	}
 
-	public void checkIfLoadBitmapFailed() {
-		if (loadBitmapFailed) {
+	public void checkIfLoadBitmapFailed()
+    {
+		if (loadBitmapFailed)
+        {
 			loadBitmapFailed = false;
 			new InfoDialog(DialogType.WARNING,
 					R.string.dialog_loading_image_failed_title,
-					R.string.dialog_loading_image_failed_text).show(
-					getSupportFragmentManager(), "loadbitmapdialogerror");
+					R.string.dialog_loading_image_failed_text).show(getSupportFragmentManager(),"loadbitmapdialogerror");
 		}
 	}
 
-	private void initActionBar() {
-
+	private void initActionBar()
+    {
 		getSupportActionBar().setCustomView(R.layout.top_bar);
 		getSupportActionBar().setDisplayShowHomeEnabled(false);
 		getSupportActionBar().setDisplayShowCustomEnabled(true);
-		if (Build.VERSION.SDK_INT < ANDROID_VERSION_ICE_CREAM_SANDWICH) {
-			Bitmap bitmapActionBarBackground = Bitmap.createBitmap(1, 1,
-					Config.ARGB_8888);
-			bitmapActionBarBackground.eraseColor(getResources().getColor(
-					R.color.custom_background_color));
-			Drawable drawable = new BitmapDrawable(getResources(),
-					bitmapActionBarBackground);
+
+		if (Build.VERSION.SDK_INT < ANDROID_VERSION_ICE_CREAM_SANDWICH)
+        {
+			Bitmap bitmapActionBarBackground = Bitmap.createBitmap(1, 1, Config.ARGB_8888);
+			bitmapActionBarBackground.eraseColor(getResources().getColor(R.color.custom_background_color));
+			Drawable drawable = new BitmapDrawable(getResources(), bitmapActionBarBackground);
 			getSupportActionBar().setBackgroundDrawable(drawable);
 			getSupportActionBar().setSplitBackgroundDrawable(drawable);
 		}
 	}
 
 	@Override
-	public void onDetachedFromWindow() {
+	public void onDetachedFromWindow()
+    {
 		IndeterminateProgressDialog.getInstance().dismiss();
 		super.onDetachedFromWindow();
 	}
@@ -245,14 +261,19 @@ public class MainActivity extends OptionsMenuActivity {
 	}
 
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
+	public boolean onCreateOptionsMenu(Menu menu)
+    {
 		super.onCreateOptionsMenu(menu);
 		mMenu = menu;
 		PaintroidApplication.menu = mMenu;
 		MenuInflater inflater = getSupportMenuInflater();
-		if (PaintroidApplication.openedFromCatroid) {
+
+        if (PaintroidApplication.openedFromCatroid)
+        {
 			inflater.inflate(R.menu.main_menu_opened_from_catroid, menu);
-		} else {
+		}
+        else
+        {
 			inflater.inflate(R.menu.main_menu, menu);
 		}
 
@@ -260,43 +281,50 @@ public class MainActivity extends OptionsMenuActivity {
 	}
 
 	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
+	public boolean onOptionsItemSelected(MenuItem item)
+    {
+        switch (item.getItemId())
+        {
+            case R.id.menu_item_back_to_catroid:
+                showSecurityQuestionBeforeExit();
+                return true;
 
-		switch (item.getItemId()) {
-		case R.id.menu_item_back_to_catroid:
-			showSecurityQuestionBeforeExit();
-			return true;
-		case R.id.menu_item_terms_of_use_and_service:
-			DialogTermsOfUseAndService termsOfUseAndService = new DialogTermsOfUseAndService();
-			termsOfUseAndService.show(getSupportFragmentManager(),
-					"termsofuseandservicedialogfragment");
-			return true;
-		case R.id.menu_item_about:
-			DialogAbout about = new DialogAbout();
-			about.show(getSupportFragmentManager(), "aboutdialogfragment");
-			return true;
-		case R.id.menu_item_hide_menu:
-			setFullScreen(mToolbarIsVisible);
-			return true;
-		case android.R.id.home:
-			if (PaintroidApplication.openedFromCatroid) {
-				showSecurityQuestionBeforeExit();
-			}
-			return true;
+            case R.id.menu_item_terms_of_use_and_service:
+                DialogTermsOfUseAndService termsOfUseAndService = new DialogTermsOfUseAndService();
+                termsOfUseAndService.show(getSupportFragmentManager(), "termsofuseandservicedialogfragment");
+                return true;
+
+            case R.id.menu_item_about:
+                DialogAbout about = new DialogAbout();
+                about.show(getSupportFragmentManager(), "aboutdialogfragment");
+                return true;
+
+            case R.id.menu_item_hide_menu:
+                setFullScreen(mToolbarIsVisible);
+                return true;
+
+            case android.R.id.home:
+                if (PaintroidApplication.openedFromCatroid)
+                {
+                    showSecurityQuestionBeforeExit();
+                }
+                return true;
 			/* EXCLUDE PREFERENCES FOR RELEASE */
-			// case R.id.menu_item_preferences:
-			// Intent intent = new Intent(this, SettingsActivity.class);
-			// intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
-			// startActivity(intent);
-			// return false;
-		default:
-			return super.onOptionsItemSelected(item);
-		}
+            // case R.id.menu_item_preferences:
+            // Intent intent = new Intent(this, SettingsActivity.class);
+            // intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+            // startActivity(intent);
+            // return false;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
 	}
 
 	@Override
-	public boolean onPrepareOptionsMenu(Menu menu) {
-		if (mToolbarIsVisible == false) {
+	public boolean onPrepareOptionsMenu(Menu menu)
+    {
+		if (mToolbarIsVisible == false)
+        {
 			setFullScreen(false);
 			return true;
 		}
@@ -304,86 +332,104 @@ public class MainActivity extends OptionsMenuActivity {
 	}
 
 	@Override
-	public void onBackPressed() {
-		if (!mToolbarIsVisible) {
+	public void onBackPressed()
+    {
+		if (!mToolbarIsVisible)
+        {
 			setFullScreen(false);
 
-		} else if (PaintroidApplication.currentTool.getToolType() == ToolType.BRUSH) {
+		}
+        else if (PaintroidApplication.currentTool.getToolType() == ToolType.BRUSH)
+        {
 			showSecurityQuestionBeforeExit();
-		} else {
+		}
+        else
+        {
 			switchTool(ToolType.BRUSH);
 		}
 	}
 
 	@Override
-	public void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if (resultCode != Activity.RESULT_OK) {
+	public void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+		if (resultCode != Activity.RESULT_OK)
+        {
 			Log.d(PaintroidApplication.TAG,
 					"onActivityResult: result not ok, most likely a dialog hast been canceled");
 			return;
 		}
 
-		switch (requestCode) {
+		switch (requestCode)
+        {
 		case REQUEST_CODE_IMPORTPNG:
 			Uri selectedGalleryImageUri = data.getData();
 			Tool tool = ToolFactory.createTool(this, ToolType.IMPORTPNG);
 			switchTool(tool);
 
 			loadBitmapFromUriAndRun(selectedGalleryImageUri,
-					new RunnableWithBitmap() {
+					new RunnableWithBitmap()
+                    {
 						@Override
-						public void run(Bitmap bitmap) {
-							if (PaintroidApplication.currentTool instanceof ImportTool) {
-								((ImportTool) PaintroidApplication.currentTool)
-										.setBitmapFromFile(bitmap);
-
-							} else {
+						public void run(Bitmap bitmap)
+                        {
+							if (PaintroidApplication.currentTool instanceof ImportTool)
+                            {
+								((ImportTool) PaintroidApplication.currentTool).setBitmapFromFile(bitmap);
+							}
+                            else
+                            {
 								Log.e(PaintroidApplication.TAG,
 										"importPngToFloatingBox: Current tool is no ImportTool as required");
 							}
 						}
 					});
-
 			break;
+
 		case REQUEST_CODE_FINISH:
 			finish();
 			break;
+
 		default:
 			super.onActivityResult(requestCode, resultCode, data);
 		}
 	}
 
-	private void importPng() {
+	private void importPng()
+    {
 		Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
 		intent.setType("image/*");
 		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
 		startActivityForResult(intent, REQUEST_CODE_IMPORTPNG);
 	}
 
-	public synchronized void switchTool(ToolType changeToToolType) {
+	public synchronized void switchTool(ToolType changeToToolType)
+    {
+        switch (changeToToolType)
+        {
+            case REDO:
+                PaintroidApplication.commandManager.redo();
+                break;
 
-		switch (changeToToolType) {
-		case REDO:
-			PaintroidApplication.commandManager.redo();
-			break;
-		case UNDO:
-			PaintroidApplication.commandManager.undo();
-			break;
-		case IMPORTPNG:
-			importPng();
-			break;
-		default:
-			Tool tool = ToolFactory.createTool(this, changeToToolType);
-			switchTool(tool);
-			break;
-		}
+            case UNDO:
+                PaintroidApplication.commandManager.undo();
+                break;
 
+            case IMPORTPNG:
+                importPng();
+                break;
+
+            default:
+                Tool tool = ToolFactory.createTool(this, changeToToolType);
+                switchTool(tool);
+                break;
+        }
 	}
 
-	public synchronized void switchTool(Tool tool) {
-		Paint tempPaint = new Paint(
-				PaintroidApplication.currentTool.getDrawPaint());
-		if (tool != null) {
+	public synchronized void switchTool(Tool tool)
+    {
+		Paint tempPaint = new Paint(PaintroidApplication.currentTool.getDrawPaint());
+		if (tool != null)
+        {
 			mTopBar.setTool(tool);
 			mBottomBar.setTool(tool);
 			PaintroidApplication.currentTool = tool;
@@ -391,28 +437,36 @@ public class MainActivity extends OptionsMenuActivity {
 		}
 	}
 
-	private void showSecurityQuestionBeforeExit() {
-		if (PaintroidApplication.isSaved
-				|| !PaintroidApplication.commandManager.hasCommands()
-				&& PaintroidApplication.isPlainImage) {
+	private void showSecurityQuestionBeforeExit()
+    {
+		if (PaintroidApplication.isSaved || !PaintroidApplication.commandManager.hasCommands()
+				&& PaintroidApplication.isPlainImage)
+        {
 			finish();
 			return;
-		} else {
+		}
+        else
+        {
 			AlertDialog.Builder builder = new CustomAlertDialogBuilder(this);
-			if (PaintroidApplication.openedFromCatroid) {
+			if (PaintroidApplication.openedFromCatroid)
+            {
 				builder.setTitle(R.string.closing_catroid_security_question_title);
 				builder.setMessage(R.string.closing_security_question);
 				builder.setPositiveButton(R.string.save_button_text,
-						new DialogInterface.OnClickListener() {
+						new DialogInterface.OnClickListener()
+                        {
 							@Override
-							public void onClick(DialogInterface dialog, int id) {
+							public void onClick(DialogInterface dialog, int id)
+                            {
 								exitToCatroid();
 							}
 						});
 				builder.setNegativeButton(R.string.discard_button_text,
-						new DialogInterface.OnClickListener() {
+						new DialogInterface.OnClickListener()
+                        {
 							@Override
-							public void onClick(DialogInterface dialog, int id) {
+							public void onClick(DialogInterface dialog, int id)
+                            {
 								finish();
 							}
 						});
@@ -420,17 +474,21 @@ public class MainActivity extends OptionsMenuActivity {
 				builder.setTitle(R.string.closing_security_question_title);
 				builder.setMessage(R.string.closing_security_question);
 				builder.setPositiveButton(R.string.save_button_text,
-						new DialogInterface.OnClickListener() {
+						new DialogInterface.OnClickListener()
+                        {
 							@Override
-							public void onClick(DialogInterface dialog, int id) {
+							public void onClick(DialogInterface dialog, int id)
+                            {
 								saveFileBeforeExit();
 								finish();
 							}
 						});
 				builder.setNegativeButton(R.string.discard_button_text,
-						new DialogInterface.OnClickListener() {
+						new DialogInterface.OnClickListener()
+                        {
 							@Override
-							public void onClick(DialogInterface dialog, int id) {
+							public void onClick(DialogInterface dialog, int id)
+                            {
 								finish();
 							}
 						});
@@ -441,62 +499,71 @@ public class MainActivity extends OptionsMenuActivity {
 		}
 	}
 
-	private void saveFileBeforeExit() {
+	private void saveFileBeforeExit()
+    {
 		saveFile();
 	}
 
-	private void exitToCatroid() {
+	private void exitToCatroid()
+    {
 		String pictureFileName = getString(R.string.temp_picture_name);
 
-		if (PaintroidApplication.catroidPicturePath != null) {
+		if (PaintroidApplication.catroidPicturePath != null)
+        {
 			pictureFileName = PaintroidApplication.catroidPicturePath;
-		} else {
+		}
+        else
+        {
 			Bundle extras = getIntent().getExtras();
-			if (extras != null) {
-				String catroidPictureName = extras
-						.getString(getString(R.string.extra_picture_name_catroid));
-				if (catroidPictureName != null
-						&& catroidPictureName.length() > 0) {
+			if (extras != null)
+            {
+				String catroidPictureName = extras.getString(getString(R.string.extra_picture_name_catroid));
+
+                if (catroidPictureName != null	&& catroidPictureName.length() > 0)
+                {
 					pictureFileName = catroidPictureName;
 				}
 			}
-			pictureFileName = FileIO.createNewEmptyPictureFile(this,
-					pictureFileName).getAbsolutePath();
+			pictureFileName = FileIO.createNewEmptyPictureFile(this,pictureFileName).getAbsolutePath();
 		}
 
 		Intent resultIntent = new Intent();
 
-		if (FileIO.saveBitmap(MainActivity.this,
-				PaintroidApplication.drawingSurface.getBitmapCopy(),
-				pictureFileName)) {
+		if (FileIO.saveBitmap(MainActivity.this
+                              , PaintroidApplication.drawingSurface.getBitmapCopy()
+                			  , pictureFileName))
+        {
 			Bundle bundle = new Bundle();
-			bundle.putString(getString(R.string.extra_picture_path_catroid),
-					pictureFileName);
+			bundle.putString(getString(R.string.extra_picture_path_catroid), pictureFileName);
 			resultIntent.putExtras(bundle);
 			setResult(RESULT_OK, resultIntent);
-		} else {
+		}
+        else
+        {
 			setResult(RESULT_CANCELED, resultIntent);
 		}
 		finish();
 	}
 
-	private void setFullScreen(boolean isFullScreen) {
+	private void setFullScreen(boolean isFullScreen)
+    {
 		PaintroidApplication.perspective.setFullscreen(isFullScreen);
-		if (isFullScreen) {
+		if (isFullScreen)
+        {
 			getSupportActionBar().hide();
 			LinearLayout bottomBarLayout = (LinearLayout) findViewById(R.id.main_bottom_bar);
 			bottomBarLayout.setVisibility(View.GONE);
 			mToolbarIsVisible = false;
 			getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-			getWindow().clearFlags(
-					WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
-		} else {
+			getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
+		}
+        else
+        {
 			getSupportActionBar().show();
 			LinearLayout bottomBarLayout = (LinearLayout) findViewById(R.id.main_bottom_bar);
 			bottomBarLayout.setVisibility(View.VISIBLE);
 			mToolbarIsVisible = true;
-			getWindow().addFlags(
-					WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
+			getWindow().addFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
 			getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		}
 	}
