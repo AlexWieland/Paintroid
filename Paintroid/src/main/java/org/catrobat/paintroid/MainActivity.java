@@ -174,7 +174,8 @@ public class MainActivity extends OptionsMenuActivity {
 						}
 					});
 
-		} else {
+		} else
+        {
 			PaintroidApplication.drawingSurface.setCurrentLayer(new Layer(0, Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)));
 			initialiseNewBitmap();
 		}

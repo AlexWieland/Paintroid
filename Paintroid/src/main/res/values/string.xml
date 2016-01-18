@@ -101,6 +101,8 @@
     <string name="menu_item_tools">Tools menu</string>
     <string name="menu_hide_menu">Fullscreen</string>
     <string name="menu_new_image_from_camera">New image from camera</string>
+    <string name="choose_from_gallery">Choose from Gallery</string>
+    <string name="take_photo">Take Photo</string>
 
     <string name="menu_terms_of_use_and_service">Terms of Use</string>
     <string name="more">More</string>

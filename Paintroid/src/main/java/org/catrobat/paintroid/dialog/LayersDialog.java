@@ -80,12 +80,12 @@ public final class LayersDialog extends BaseDialog implements OnItemClickListene
 		return mLayerButtonAdapter;
 	}
 
-	private LayersDialog(Context context, Layer first_layer) {
+	private LayersDialog(Context context, Layer first_layer)
+    {
 		super(context);
 		mContext = context;
 		mParent = (MainActivity) context;
-		mLayerButtonAdapter = new LayersAdapter(context, PaintroidApplication.openedFromCatroid
-				, first_layer);
+		mLayerButtonAdapter = new LayersAdapter(context, PaintroidApplication.openedFromCatroid, first_layer);
 		selectFirstLayer();
 	}
 
@@ -96,7 +96,8 @@ public final class LayersDialog extends BaseDialog implements OnItemClickListene
 
 	public static LayersDialog getInstance()
 	{
-		if (instance == null) {
+		if (instance == null)
+        {
 			throw new IllegalStateException(NOT_INITIALIZED_ERROR_MESSAGE);
 		}
 

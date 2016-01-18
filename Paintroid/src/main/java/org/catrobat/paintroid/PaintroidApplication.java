@@ -53,23 +53,28 @@ public class PaintroidApplication extends Application {
 	public static boolean saveCopy = false;
 
 	@Override
-	public void onCreate() {
+	public void onCreate()
+    {
 		super.onCreate();
 		applicationContext = getApplicationContext();
 		commandManager = new CommandManagerImplementation();
 	}
 
-	public static String getVersionName(Context context) {
+	public static String getVersionName(Context context)
+    {
 		String versionName = "unknown";
-		try {
+		try
+        {
 			PackageInfo packageInfo = context.getPackageManager()
-					.getPackageInfo(context.getPackageName(),
-							PackageManager.GET_META_DATA);
+                                             .getPackageInfo(context.getPackageName()
+                                                             ,PackageManager.GET_META_DATA);
 			versionName = packageInfo.versionName;
-		} catch (NameNotFoundException nameNotFoundException) {
-			Log.e(PaintroidApplication.TAG, "Name not found",
-					nameNotFoundException);
 		}
+        catch (NameNotFoundException nameNotFoundException)
+        {
+			Log.e(PaintroidApplication.TAG, "Name not found",nameNotFoundException);
+		}
+
 		return versionName;
 	}
 }

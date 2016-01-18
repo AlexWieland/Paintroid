@@ -42,6 +42,10 @@
         <item name="white">@color/color_chooser_white</item>
         <item name="transparent">@color/color_chooser_transparent</item>
     </array>
+    <array name="load_image">
+        <item name="choose_from_gallery">@string/choose_from_gallery</item>
+        <item name="take_photo">@string/take_photo</item>
+    </array>
     <array name="new_image">
         <item name="menu_new_image_empty_image">@string/menu_new_image_empty_image</item>
         <item name="menu_new_image_from_camera">@string/menu_new_image_from_camera</item>
