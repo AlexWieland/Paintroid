@@ -55,8 +55,8 @@ public class BitmapCommand extends BaseCommand {
 			if (layer.getBitmap() != null) {
 				layer.getBitmap().eraseColor(Color.TRANSPARENT);
 			}
-			PaintroidApplication.drawingSurface.setBitmap(layer.getBitmap().copy(
-					Config.ARGB_8888, true));
+//			PaintroidApplication.drawingSurface.setBitmap(layer.getBitmap().copy(
+//					Config.ARGB_8888, true));
 
 			if (mResetScaleAndTranslation
 					&& PaintroidApplication.perspective != null) {

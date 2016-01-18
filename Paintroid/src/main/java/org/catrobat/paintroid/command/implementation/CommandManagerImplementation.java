@@ -60,16 +60,20 @@ public class CommandManagerImplementation implements CommandManager, Observer {
 		return mCommandIndex < mCommandCounter;
 	}
 
-	@Override
-	public void setOriginalBitmap(Bitmap bitmap) {
+/**	@Override
+	public void createNewBitmap(Bitmap bitmap)
+    {
 		mOriginalBitmap = bitmap.copy(Config.ARGB_8888, true);
-		// If we use some custom bitmap, this first command is used to restore
-		// it (instead of clear).
-		mCommandList.removeFirst().freeResources();
 		mCommandList.addFirst(new BitmapCommand(mOriginalBitmap, false));
 	}
 
-	@Override
+    @Override
+    public void loadBitmapIntoLayer(Bitmap bitmap)
+    {
+
+    }*/
+
+    @Override
 	public synchronized void resetAndClear() {
 		if (mOriginalBitmap != null && !mOriginalBitmap.isRecycled()) {
 			mOriginalBitmap.recycle();

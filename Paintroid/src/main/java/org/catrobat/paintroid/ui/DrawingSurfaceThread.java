@@ -24,74 +24,80 @@ import org.catrobat.paintroid.PaintroidApplication;
 import android.util.Log;
 
 class DrawingSurfaceThread {
-	private Thread internalThread;
-	private Runnable threadRunnable;
-	private boolean running;
+    private Thread internalThread;
+    private Runnable threadRunnable;
+    private boolean running;
 
-	private class InternalRunnable implements Runnable {
-		@Override
-		public void run() {
-			Thread.yield();
-			internalRun();
-		}
-	}
+    private class InternalRunnable implements Runnable
+    {
+        @Override
+        public void run()
+        {
+            Thread.yield();
+            internalRun();
+        }
+    }
 
-	DrawingSurfaceThread(Runnable runnable) {
-		threadRunnable = runnable;
-		internalThread = new Thread(new InternalRunnable(),
-				"DrawingSurfaceThread");
-		internalThread.setDaemon(true);
-	}
+    DrawingSurfaceThread(Runnable runnable)
+    {
+        threadRunnable = runnable;
+        internalThread = new Thread(new InternalRunnable(), "DrawingSurfaceThread");
+        internalThread.setDaemon(true);
+    }
 
-	private void internalRun() {
-		while (running) {
-			threadRunnable.run();
-		}
-	}
+    private void internalRun()
+    {
+        while (running)
+        {
+            threadRunnable.run();
+        }
+    }
 
-	/**
-	 * Starts the internal thread only if the thread runnable is not null, the
-	 * internal thread has not been terminated and the thread is not already
-	 * alive.
-	 */
-	synchronized void start() {
-		Log.d(PaintroidApplication.TAG, "DrawingSurfaceThread.start");
-		if (running || threadRunnable == null || internalThread == null
-				|| internalThread.getState().equals(Thread.State.TERMINATED)) {
-			Log.d(PaintroidApplication.TAG,
-					"DrawingSurfaceThread.start returning");
-			return;
-		}
-		// Log.d(PaintroidApplication.TAG, "DrawingSurfaceThread.start up");
-		if (!internalThread.isAlive()) {
-			running = true;
-			internalThread.start();
-			// Log.d(PaintroidApplication.TAG, "DrawingSurfaceThread.started");
-		}
-	}
+    /**
+     * Starts the internal thread only if the thread runnable is not null, the
+     * internal thread has not been terminated and the thread is not already
+     * alive.
+     */
+    synchronized void start() {
+        Log.d(PaintroidApplication.TAG, "DrawingSurfaceThread.start");
+        if (running || threadRunnable == null || internalThread == null
+                || internalThread.getState().equals(Thread.State.TERMINATED)) {
+            Log.d(PaintroidApplication.TAG, "DrawingSurfaceThread.start returning");
+            return;
+        }
 
-	synchronized void stop() {
-		Log.d(PaintroidApplication.TAG, "DrawingSurfaceThread.stop");
-		running = false;
-		if (internalThread != null && internalThread.isAlive()) {
-			Log.w(PaintroidApplication.TAG, "DrawingSurfaceThread.join");
-			boolean retry = true;
-			while (retry) {
-				try {
-					internalThread.join();
-					retry = false;
-					Log.d(PaintroidApplication.TAG,
-							"DrawingSurfaceThread.stopped");
-				} catch (InterruptedException e) {
-					Log.e(PaintroidApplication.TAG,
-							"Interrupt while joining DrawingSurfaceThread\n", e);
-				}
-			}
-		}
-	}
+        if (!internalThread.isAlive())
+        {
+            running = true;
+            internalThread.start();
+        }
+    }
 
-	synchronized void setRunnable(Runnable runnable) {
-		Log.d(PaintroidApplication.TAG, "DrawingSurfaceThread.setRunnable");
-		threadRunnable = runnable;
-	}
+    synchronized void stop() {
+        Log.d(PaintroidApplication.TAG, "DrawingSurfaceThread.stop");
+        running = false;
+        if (internalThread != null && internalThread.isAlive())
+        {
+            Log.w(PaintroidApplication.TAG, "DrawingSurfaceThread.join");
+            boolean retry = true;
+            while (retry)
+            {
+                try
+                {
+                    internalThread.join();
+                    retry = false;
+                    Log.d(PaintroidApplication.TAG, "DrawingSurfaceThread.stopped");
+                } catch (InterruptedException e)
+                {
+                    Log.e(PaintroidApplication.TAG, "Interrupt while joining DrawingSurfaceThread\n", e);
+                }
+            }
+        }
+    }
+
+    synchronized void setRunnable(Runnable runnable)
+    {
+        Log.d(PaintroidApplication.TAG, "DrawingSurfaceThread.setRunnable");
+        threadRunnable = runnable;
+    }
 }

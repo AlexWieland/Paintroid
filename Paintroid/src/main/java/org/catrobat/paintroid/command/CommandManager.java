@@ -29,7 +29,9 @@ public interface CommandManager {
 
 	public boolean hasNextCommand();
 
-	public void setOriginalBitmap(Bitmap bitmap);
+/**	public void createNewBitmap(Bitmap bitmap);
+
+    public void loadBitmapIntoLayer(Bitmap bitmap);*/
 
 	public void resetAndClear();
 

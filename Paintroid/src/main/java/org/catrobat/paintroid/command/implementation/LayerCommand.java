@@ -11,7 +11,10 @@ public class LayerCommand extends BaseCommand {
     public enum LayerAction{
         ADD,
         REMOVE,
-        MERGE
+        MERGE,
+        INSERT_IMAGE,
+        SET_LOCK,
+        SET_VISIBILITY
     }
 
     public LayerCommand(LayerAction layerAction)
@@ -27,6 +30,19 @@ public class LayerCommand extends BaseCommand {
             case MERGE:
 
                 break;
+
+            case INSERT_IMAGE:
+
+                break;
+
+            case SET_LOCK:
+
+                break;
+
+            case SET_VISIBILITY:
+
+                break;
+
             default:
                 break;
         }
@@ -35,7 +51,6 @@ public class LayerCommand extends BaseCommand {
     public void run(Canvas canvas, Layer layer) {
         notifyStatus(NOTIFY_STATES.COMMAND_STARTED);
         setChanged();
-
         notifyStatus(NOTIFY_STATES.COMMAND_DONE);
     }
 }

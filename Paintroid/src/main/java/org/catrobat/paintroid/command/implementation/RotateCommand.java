@@ -59,7 +59,7 @@ public class RotateCommand extends BaseCommand {
 		rotateCanvas.drawBitmap(bitmap, rotateMatrix, new Paint());
 
 		if (PaintroidApplication.drawingSurface != null) {
-			PaintroidApplication.drawingSurface.setBitmap(rotatedBitmap);
+			PaintroidApplication.drawingSurface.updateBitmap(rotatedBitmap);
 		}
 
 		setChanged();

@@ -75,7 +75,7 @@ public class FlipCommand extends BaseCommand {
 
 		flipCanvas.drawBitmap(bitmap, flipMatrix, new Paint());
 		if (PaintroidApplication.drawingSurface != null) {
-			PaintroidApplication.drawingSurface.setBitmap(flipBitmap);
+			PaintroidApplication.drawingSurface.updateBitmap(flipBitmap);
 		}
 
 		notifyStatus(NOTIFY_STATES.COMMAND_DONE);

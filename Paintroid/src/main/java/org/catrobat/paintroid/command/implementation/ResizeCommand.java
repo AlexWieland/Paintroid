@@ -50,8 +50,8 @@ public class ResizeCommand extends BaseCommand {
 
 		notifyStatus(NOTIFY_STATES.COMMAND_STARTED);
 		if (mFileToStoredBitmap != null) {
-			PaintroidApplication.drawingSurface.setBitmap(FileIO
-					.getBitmapFromFile(mFileToStoredBitmap));
+			PaintroidApplication.drawingSurface.updateBitmap(FileIO
+                    .getBitmapFromFile(mFileToStoredBitmap));
 
 			notifyStatus(NOTIFY_STATES.COMMAND_DONE);
 			return;
@@ -124,7 +124,7 @@ public class ResizeCommand extends BaseCommand {
 			resizedBitmap.setPixels(pixelsToCopy, 0, copyToWidth, copyToXLeft, copyToYTop,
 					copyToWidth, copyToHeight);
 
-			PaintroidApplication.drawingSurface.setBitmap(resizedBitmap);
+			PaintroidApplication.drawingSurface.updateBitmap(resizedBitmap);
 
 //			if (mFileToStoredBitmap == null) {
 //				mBitmap = resizedBitmap.copy(Config.ARGB_8888, true);

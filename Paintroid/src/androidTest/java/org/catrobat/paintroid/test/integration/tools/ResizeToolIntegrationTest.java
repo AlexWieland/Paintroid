@@ -672,7 +672,7 @@ public class ResizeToolIntegrationTest extends BaseIntegrationTestClass {
 							0, bitmapHeight - cropSizeHeight, bitmapWidth, cropSizeHeight);
 					break;
 			}
-			PaintroidApplication.drawingSurface.setBitmap(bitmapCopy);
+			PaintroidApplication.drawingSurface.updateBitmap(bitmapCopy);
 
 			clickOnBottomParameterOne();
 
@@ -1001,7 +1001,7 @@ public class ResizeToolIntegrationTest extends BaseIntegrationTestClass {
 		mCurrentDrawingSurfaceBitmap = Bitmap.createBitmap(
 				(int) (mCurrentDrawingSurfaceBitmap.getWidth() * BITMAP_DOWNSCALE_FACTOR),
 				(int) (mCurrentDrawingSurfaceBitmap.getHeight() * BITMAP_DOWNSCALE_FACTOR), Config.ARGB_8888);
-		PaintroidApplication.drawingSurface.setBitmap(mCurrentDrawingSurfaceBitmap);
+		PaintroidApplication.drawingSurface.updateBitmap(mCurrentDrawingSurfaceBitmap);
 		mSolo.sleep(200);
 		mLineLength = (mCurrentDrawingSurfaceBitmap.getWidth() / 2);
 	}

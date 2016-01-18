@@ -155,7 +155,7 @@ public class MainActivity extends OptionsMenuActivity {
 								}
 							}
 							PaintroidApplication.drawingSurface.setCurrentLayer(new Layer(0, bitmap));
-							PaintroidApplication.drawingSurface.resetBitmap(bitmap);
+							//PaintroidApplication.drawingSurface.loadImageIntoCurrentLayer(bitmap);
 						}
 
 						private Bitmap addAlphaChannel(Bitmap src) {
@@ -224,12 +224,10 @@ public class MainActivity extends OptionsMenuActivity {
 	}
 
 	@Override
-	protected void onDestroy() {
-
+	protected void onDestroy()
+    {
 		PaintroidApplication.commandManager.resetAndClear();
-		PaintroidApplication.drawingSurface.recycleBitmap();
-		ColorPickerDialog.getInstance().setInitialColor(
-				getResources().getColor(R.color.color_chooser_black));
+		ColorPickerDialog.getInstance().setInitialColor(getResources().getColor(R.color.color_chooser_black));
 		PaintroidApplication.currentTool.changePaintStrokeCap(Cap.ROUND);
 		PaintroidApplication.currentTool.changePaintStrokeWidth(25);
 		PaintroidApplication.isPlainImage = true;
