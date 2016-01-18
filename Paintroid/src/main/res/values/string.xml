@@ -94,7 +94,7 @@
     <string name="closing_security_question">Save Changes?</string>
     <string name="closing_catroid_security_question_title">Back to Pocket Code</string>
     <string name="menu_new_image">New image</string>
-    <string name="menu_load_image">Load image</string>
+    <string name="menu_load_image">Import image</string>
     <string name="menu_save_image">Save image</string>
     <string name="menu_save_copy">Save copy</string>
     <string name="menu_new_image_empty_image">Empty Image</string>

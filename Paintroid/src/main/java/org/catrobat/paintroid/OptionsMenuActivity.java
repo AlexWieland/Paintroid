@@ -98,7 +98,7 @@ public abstract class OptionsMenuActivity extends SherlockFragmentActivity {
                 break;
 
             case R.id.menu_item_load_image:
-                loadImage();
+                importImage();
                 break;
             default:
                 return super.onOptionsItemSelected(item);
@@ -167,7 +167,7 @@ public abstract class OptionsMenuActivity extends SherlockFragmentActivity {
         PaintroidApplication.drawingSurface.loadBitmapIntoCurrentLayer(createBitmap());
     }
 
-    private void loadImage()
+    private void importImage()
     {
         AlertDialog.Builder alertChooseNewBuilder = new AlertDialog.Builder(this);
         alertChooseNewBuilder.setTitle(R.string.menu_load_image)
@@ -422,10 +422,17 @@ public abstract class OptionsMenuActivity extends SherlockFragmentActivity {
             @Override
             public void run(Bitmap bitmap)
             {
-                PaintroidApplication.drawingSurface.loadBitmapIntoCurrentLayer(bitmap);
-                PaintroidApplication.perspective.resetScaleAndTranslation();
+                PaintroidApplication.drawingSurface.loadBitmapIntoCurrentLayer(rescaleBitmap(bitmap));
             }
         });
+    }
+
+    private Bitmap rescaleBitmap(Bitmap bitmap)
+    {
+        Display display = getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        return Bitmap.createScaledBitmap(bitmap, size.x, size.y, false);
     }
 
     private Bitmap createBitmap()

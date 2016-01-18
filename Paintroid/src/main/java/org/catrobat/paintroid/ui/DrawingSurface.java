@@ -226,8 +226,7 @@ public class DrawingSurface extends SurfaceView implements 	SurfaceHolder.Callba
 
     public boolean canDrawOnSurface()
     {
-        return mCurrentLayer.getVisible() && !mCurrentLayer.getLocked()
-                && !mCurrentLayer.getBitmap().isRecycled();
+        return mCurrentLayer.getVisible() && !mCurrentLayer.getLocked();
     }
 
     public boolean isSurfaceLocked()
