@@ -9,7 +9,6 @@ public class Layer {
     private int mLayerID;
     private int mOpacity;
     private Bitmap mBitmap;
-    private Canvas mCanvas;
     private String mLayerName;
     private boolean mIsLocked;
     private boolean mIsVisible;
@@ -40,6 +39,7 @@ public class Layer {
     {
         mOpacity = newOpacity;
     }
+
     public int getOpacity()
     {
         return mOpacity;

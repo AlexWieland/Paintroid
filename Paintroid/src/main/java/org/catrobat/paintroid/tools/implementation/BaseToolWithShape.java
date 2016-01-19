@@ -34,28 +34,26 @@ import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.WindowManager;
 
-public abstract class BaseToolWithShape extends BaseTool implements
-		ToolWithShape {
-
-	protected int mPrimaryShapeColor = PaintroidApplication.applicationContext
-			.getResources().getColor(R.color.rectangle_primary_color);
-	protected int mSecondaryShapeColor = PaintroidApplication.applicationContext
-			.getResources().getColor(R.color.rectangle_secondary_color);
+public abstract class BaseToolWithShape extends BaseTool implements	ToolWithShape
+{
+	protected int mPrimaryShapeColor = PaintroidApplication.applicationContext.getResources()
+                                                    .getColor(R.color.rectangle_primary_color);
+	protected int mSecondaryShapeColor = PaintroidApplication.applicationContext.getResources()
+                                                    .getColor(R.color.rectangle_secondary_color);
 	protected PointF mToolPosition;
 	protected Paint mLinePaint;
 
-	public BaseToolWithShape(Context context, ToolType toolType) {
+	public BaseToolWithShape(Context context, ToolType toolType)
+    {
 		super(context, toolType);
-		Display display = ((WindowManager) context
-				.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+		Display display = ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
 		DisplayMetrics metrics = new DisplayMetrics();
 		display.getMetrics(metrics);
-		float actionBarHeight = OptionsMenuActivity.ACTION_BAR_HEIGHT
-				* metrics.density;
-		mToolPosition = new PointF(display.getWidth() / 2f, display.getHeight()
-				/ 2f - actionBarHeight);
-		PaintroidApplication.perspective
-				.convertFromScreenToCanvas(mToolPosition);
+		float actionBarHeight = OptionsMenuActivity.ACTION_BAR_HEIGHT * metrics.density;
+        Point size = new Point();
+        display.getSize(size);
+		mToolPosition = new PointF(size.x / 2f, size.y/ 2f - actionBarHeight);
+		PaintroidApplication.perspective.getCanvasPointFromSurfacePoint(mToolPosition);
 		mLinePaint = new Paint();
 		mLinePaint.setColor(mPrimaryShapeColor);
 	}
@@ -63,51 +61,56 @@ public abstract class BaseToolWithShape extends BaseTool implements
 	@Override
 	public abstract void drawShape(Canvas canvas);
 
-	protected float getStrokeWidthForZoom(float defaultStrokeWidth,
-			float minStrokeWidth, float maxStrokeWidth) {
+	protected float getStrokeWidthForZoom(float defaultStrokeWidth,	float minStrokeWidth, float maxStrokeWidth)
+    {
 		float displayScale = mContext.getResources().getDisplayMetrics().density;
-		float strokeWidth = (defaultStrokeWidth * displayScale)
-				/ PaintroidApplication.perspective.getScale();
-		if (strokeWidth < minStrokeWidth) {
+		float strokeWidth = (defaultStrokeWidth * displayScale) / PaintroidApplication.perspective.getScale();
+		if (strokeWidth < minStrokeWidth)
+        {
 			strokeWidth = minStrokeWidth;
-		} else if (strokeWidth > maxStrokeWidth) {
+		}
+        else if (strokeWidth > maxStrokeWidth)
+        {
 			strokeWidth = maxStrokeWidth;
 		}
 		return strokeWidth;
 	}
 
-	protected float getInverselyProportionalSizeForZoom(float defaultSize) {
+	protected float getInverselyProportionalSizeForZoom(float defaultSize)
+    {
 		float displayScale = mContext.getResources().getDisplayMetrics().density;
 		float applicationScale = PaintroidApplication.perspective.getScale();
 		return (defaultSize * displayScale) / applicationScale;
 	}
 
 	@Override
-	public Point getAutoScrollDirection(float pointX, float pointY,
-			int viewWidth, int viewHeight) {
-
+	public Point getAutoScrollDirection(float pointX, float pointY,	int viewWidth, int viewHeight)
+    {
 		int deltaX = 0;
 		int deltaY = 0;
 		PointF surfaceToolPosition = PaintroidApplication.perspective
-				.getSurfacePointFromCanvasPoint(new PointF(mToolPosition.x,
-						mToolPosition.y));
+                                        .getSurfacePointFromCanvasPoint(new PointF(mToolPosition.x,	mToolPosition.y));
 
-		if (surfaceToolPosition.x < mScrollTolerance) {
+		if (surfaceToolPosition.x < mScrollTolerance)
+        {
 			deltaX = 1;
 		}
-		if (surfaceToolPosition.x > viewWidth - mScrollTolerance) {
+
+		if (surfaceToolPosition.x > viewWidth - mScrollTolerance)
+        {
 			deltaX = -1;
 		}
 
-		if (surfaceToolPosition.y < mScrollTolerance) {
+		if (surfaceToolPosition.y < mScrollTolerance)
+        {
 			deltaY = 1;
 		}
 
-		if (surfaceToolPosition.y > viewHeight - mScrollTolerance) {
+		if (surfaceToolPosition.y > viewHeight - mScrollTolerance)
+        {
 			deltaY = -1;
 		}
 
 		return new Point(deltaX, deltaY);
 	}
-
 }

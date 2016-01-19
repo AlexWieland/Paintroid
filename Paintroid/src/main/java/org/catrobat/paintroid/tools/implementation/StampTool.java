@@ -126,7 +126,8 @@ public class StampTool extends BaseToolWithRectangleShape {
 		}
 	}
 
-	public void setBitmapFromFile(Bitmap bitmap) {
+	public void initStampBitmap(Layer layer, Bitmap bitmap)
+    {
 		super.setBitmap(bitmap);
 		mStampActive = true;
 	}
@@ -277,9 +278,11 @@ public class StampTool extends BaseToolWithRectangleShape {
 
 	@Override
 	protected void onClickInBox(Layer layer) {
-		if (!mStampActive) {
+		if (!mStampActive)
+        {
 			copy();
-		} else if (mDrawingBitmap != null && !mDrawingBitmap.isRecycled()) {
+		} else if (mDrawingBitmap != null && !mDrawingBitmap.isRecycled())
+        {
 			paste(layer);
 		}
 	}
@@ -296,12 +299,10 @@ public class StampTool extends BaseToolWithRectangleShape {
 		mAttributeButton2.setImageResource(R.drawable.icon_menu_stamp_clear);
 	}
 
-	private void paste(Layer layer) {
-		Point intPosition = new Point((int) mToolPosition.x,
-				(int) mToolPosition.y);
-		Command command = new StampCommand(intPosition,
-				mBoxWidth, mBoxHeight, mBoxRotation, layer);
-
+	private void paste(Layer layer)
+    {
+		Point intPosition = new Point((int) mToolPosition.x,(int) mToolPosition.y);
+		Command command = new StampCommand(intPosition,	mBoxWidth, mBoxHeight, mBoxRotation, layer);
 		((StampCommand) command).addObserver(this);
 		IndeterminateProgressDialog.getInstance().show();
 		PaintroidApplication.commandManager.commitCommand(command);
@@ -325,8 +326,7 @@ public class StampTool extends BaseToolWithRectangleShape {
 		return true;
 	}
 
-	protected class CreateAndSetBitmapAsyncTask extends
-			AsyncTask<Void, Integer, Void> {
+	protected class CreateAndSetBitmapAsyncTask extends	AsyncTask<Void, Integer, Void> {
 
 		@Override
 		protected void onPreExecute() {
@@ -338,8 +338,8 @@ public class StampTool extends BaseToolWithRectangleShape {
 		@Override
 		protected Void doInBackground(Void... arg0) {
 			Log.e(PaintroidApplication.TAG, "------------doInBackground");
-			if (PaintroidApplication.drawingSurface
-					.isDrawingSurfaceBitmapValid()) {
+			if (PaintroidApplication.drawingSurface.isDrawingSurfaceBitmapValid())
+            {
 				createAndSetBitmap();
 			}
 			return null;

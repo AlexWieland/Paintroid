@@ -359,39 +359,40 @@ public class MainActivity extends OptionsMenuActivity {
 			return;
 		}
 
-		switch (requestCode)
+        switch (requestCode)
         {
-		case REQUEST_CODE_IMPORTPNG:
-			Uri selectedGalleryImageUri = data.getData();
-			Tool tool = ToolFactory.createTool(this, ToolType.IMPORTPNG);
-			switchTool(tool);
-
-			loadBitmapFromUriAndRun(selectedGalleryImageUri,
-					new RunnableWithBitmap()
-                    {
-						@Override
-						public void run(Bitmap bitmap)
+            case REQUEST_CODE_IMPORTPNG:
+                Uri selectedGalleryImageUri = data.getData();
+                Tool tool = ToolFactory.createTool(this, ToolType.IMPORTPNG);
+                switchTool(tool);
+                loadBitmapFromUriAndRun(selectedGalleryImageUri,
+                        new RunnableWithBitmap()
                         {
-							if (PaintroidApplication.currentTool instanceof ImportTool)
+                            @Override
+                            public void run(Bitmap bitmap)
                             {
-								((ImportTool) PaintroidApplication.currentTool).setBitmapFromFile(bitmap);
-							}
-                            else
-                            {
-								Log.e(PaintroidApplication.TAG,
-										"importPngToFloatingBox: Current tool is no ImportTool as required");
-							}
-						}
-					});
-			break;
+                                if (PaintroidApplication.currentTool instanceof ImportTool)
+                                {
+                                    ((ImportTool) PaintroidApplication.currentTool)
+                                                    .initStampBitmap(LayersDialog.getInstance()
+                                                                        .getCurrentLayer(), bitmap);
+                                }
+                                else
+                                {
+                                    Log.e(PaintroidApplication.TAG,
+                                            "importPngToFloatingBox: Current tool is no ImportTool as required");
+                                }
+                            }
+                        });
+                break;
 
-		case REQUEST_CODE_FINISH:
-			finish();
-			break;
+            case REQUEST_CODE_FINISH:
+                finish();
+                break;
 
-		default:
-			super.onActivityResult(requestCode, resultCode, data);
-		}
+            default:
+                super.onActivityResult(requestCode, resultCode, data);
+        }
 	}
 
 	private void importPng()

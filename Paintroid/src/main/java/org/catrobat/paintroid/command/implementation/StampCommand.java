@@ -34,25 +34,30 @@ public class StampCommand extends BaseCommand {
 	protected final float mBoxRotation;
 	protected final RectF mBoxRect;
 
-	public StampCommand(Point position, float width,
-			float height, float rotation, Layer layer) {
+	public StampCommand(Point position, float width, float height, float rotation, Layer layer)
+    {
 		super(new Paint(Paint.DITHER_FLAG), layer);
 
-		if (position != null) {
+		if (position != null)
+        {
 			mCoordinates = new Point(position.x, position.y);
-		} else {
+		}
+        else
+        {
 			mCoordinates = null;
 		}
-		if(layer != null) {
-			if (layer.getBitmap() != null) {
+		if(layer != null)
+        {
+			if (layer.getBitmap() != null)
+            {
 				layer.getBitmap().copy(Bitmap.Config.ARGB_8888, false);
 			}
 		}
+
 		mBoxWidth = width;
 		mBoxHeight = height;
 		mBoxRotation = rotation;
-		mBoxRect = new RectF(-mBoxWidth / 2f, -mBoxHeight / 2f, mBoxWidth / 2f,
-				mBoxHeight / 2f);
+		mBoxRect = new RectF(-mBoxWidth / 2f, -mBoxHeight / 2f, mBoxWidth / 2f,	mBoxHeight / 2f);
 	}
 
 	@Override

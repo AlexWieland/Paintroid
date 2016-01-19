@@ -119,7 +119,7 @@ public class DrawingSurface extends SurfaceView implements 	SurfaceHolder.Callba
         stopDrawingThread();
     }
 
-    private synchronized void starDrawingThread()
+    private synchronized void  starDrawingThread()
     {
         if (mIsSurfaceDrawable)
         {
