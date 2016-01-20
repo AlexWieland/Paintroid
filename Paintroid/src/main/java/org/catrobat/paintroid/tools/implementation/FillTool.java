@@ -50,7 +50,7 @@ public class FillTool extends BaseTool {
 	}
 
 	@Override
-	public boolean handleUp(PointF coordinate, Layer layer) {
+	public boolean handleUp(PointF coordinate) {
 		int bitmapHeight = PaintroidApplication.drawingSurface
 				.getBitmapHeight();
 		int bitmapWidth = PaintroidApplication.drawingSurface.getBitmapWidth();
@@ -66,7 +66,7 @@ public class FillTool extends BaseTool {
 		}
 
 		Command command = new FillCommand(new Point((int) coordinate.x,
-				(int) coordinate.y), mBitmapPaint, layer);
+				(int) coordinate.y), mBitmapPaint,  PaintroidApplication.drawingSurface.getCurrentLayer());
 
 		IndeterminateProgressDialog.getInstance().show();
 		((FillCommand) command).addObserver(this);

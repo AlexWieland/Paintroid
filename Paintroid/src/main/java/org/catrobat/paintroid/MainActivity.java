@@ -374,8 +374,7 @@ public class MainActivity extends OptionsMenuActivity {
                                 if (PaintroidApplication.currentTool instanceof ImportTool)
                                 {
                                     ((ImportTool) PaintroidApplication.currentTool)
-                                                    .initStampBitmap(LayersDialog.getInstance()
-                                                                        .getCurrentLayer(), bitmap);
+                                                    .setBitmapFromFile(bitmap);
                                 }
                                 else
                                 {

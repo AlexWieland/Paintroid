@@ -43,7 +43,7 @@ public interface Tool {
 
 	public boolean handleMove(PointF coordinate);
 
-	public boolean handleUp(PointF coordinate, Layer layer);
+	public boolean handleUp(PointF coordinate);
 
 	public void changePaintColor(int color);
 

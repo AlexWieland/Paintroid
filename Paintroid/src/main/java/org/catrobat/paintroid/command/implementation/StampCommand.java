@@ -19,6 +19,7 @@
 
 package org.catrobat.paintroid.command.implementation;
 
+import org.catrobat.paintroid.PaintroidApplication;
 import org.catrobat.paintroid.tools.Layer;
 
 import android.graphics.Bitmap;
@@ -34,9 +35,9 @@ public class StampCommand extends BaseCommand {
 	protected final float mBoxRotation;
 	protected final RectF mBoxRect;
 
-	public StampCommand(Point position, float width, float height, float rotation, Layer layer)
+	public StampCommand(Point position, float width, float height, float rotation, Bitmap bitmap)
     {
-		super(new Paint(Paint.DITHER_FLAG), layer);
+		super(new Paint(Paint.DITHER_FLAG));
 
 		if (position != null)
         {
@@ -46,11 +47,13 @@ public class StampCommand extends BaseCommand {
         {
 			mCoordinates = null;
 		}
+
+        Layer layer = PaintroidApplication.drawingSurface.getCurrentLayer();
 		if(layer != null)
         {
 			if (layer.getBitmap() != null)
             {
-				layer.getBitmap().copy(Bitmap.Config.ARGB_8888, false);
+				layer.setBitmap(bitmap.copy(Bitmap.Config.ARGB_8888, false));
 			}
 		}
 

@@ -97,7 +97,7 @@ public class DrawTool extends BaseTool {
 	}
 
 	@Override
-	public boolean handleUp(PointF coordinate, Layer layer) {
+	public boolean handleUp(PointF coordinate) {
 		if (mInitialEventCoordinate == null || mPreviousEventCoordinate == null
 				|| coordinate == null) {
 			return false;
@@ -110,9 +110,9 @@ public class DrawTool extends BaseTool {
 		boolean returnValue;
 		if (MOVE_TOLERANCE < movedDistance.x
 				|| MOVE_TOLERANCE < movedDistance.y) {
-			returnValue = addPathCommand(coordinate, layer);
+			returnValue = addPathCommand(coordinate, PaintroidApplication.drawingSurface.getCurrentLayer());
 		} else {
-			returnValue = addPointCommand(mInitialEventCoordinate, layer);
+			returnValue = addPointCommand(mInitialEventCoordinate,  PaintroidApplication.drawingSurface.getCurrentLayer());
 		}
 		return returnValue;
 	}

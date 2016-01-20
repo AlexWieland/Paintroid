@@ -34,7 +34,7 @@ public class PathCommand extends BaseCommand {
 	protected Path mPath;
 
 	public PathCommand(Paint paint, Path path, Layer layer) {
-		super(paint, layer);
+		super(paint);
 		if (path != null) {
 			mPath = new Path(path);
 		}

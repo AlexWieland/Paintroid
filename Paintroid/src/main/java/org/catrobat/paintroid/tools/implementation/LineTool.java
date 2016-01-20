@@ -83,7 +83,7 @@ public class LineTool extends BaseTool {
 	}
 
 	@Override
-	public boolean handleUp(PointF coordinate, Layer layer) {
+	public boolean handleUp(PointF coordinate) {
 		if (mInitialEventCoordinate == null || mPreviousEventCoordinate == null
 				|| coordinate == null) {
 			return false;
@@ -91,7 +91,7 @@ public class LineTool extends BaseTool {
 		Path finalPath = new Path();
 		finalPath.moveTo(mInitialEventCoordinate.x, mInitialEventCoordinate.y);
 		finalPath.lineTo(coordinate.x, coordinate.y);
-		Command command = new PathCommand(mBitmapPaint, finalPath, layer);
+		Command command = new PathCommand(mBitmapPaint, finalPath,  PaintroidApplication.drawingSurface.getCurrentLayer());
 		PaintroidApplication.commandManager.commitCommand(command);
 		return true;
 	}

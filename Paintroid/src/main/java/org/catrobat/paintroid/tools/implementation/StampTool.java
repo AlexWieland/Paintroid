@@ -104,7 +104,7 @@ public class StampTool extends BaseToolWithRectangleShape {
 			if (!mStampActive) {
 				copy();
 			} else {
-				paste(layer);
+				paste();
 			}
 			break;
 		case BUTTON_ID_PARAMETER_BOTTOM_2:
@@ -126,7 +126,7 @@ public class StampTool extends BaseToolWithRectangleShape {
 		}
 	}
 
-	public void initStampBitmap(Layer layer, Bitmap bitmap)
+	public void setBitmapFromFile(Bitmap bitmap)
     {
 		super.setBitmap(bitmap);
 		mStampActive = true;
@@ -277,13 +277,13 @@ public class StampTool extends BaseToolWithRectangleShape {
 	}
 
 	@Override
-	protected void onClickInBox(Layer layer) {
+	protected void onClickInBox() {
 		if (!mStampActive)
         {
 			copy();
 		} else if (mDrawingBitmap != null && !mDrawingBitmap.isRecycled())
         {
-			paste(layer);
+			paste();
 		}
 	}
 
@@ -299,10 +299,10 @@ public class StampTool extends BaseToolWithRectangleShape {
 		mAttributeButton2.setImageResource(R.drawable.icon_menu_stamp_clear);
 	}
 
-	private void paste(Layer layer)
+	private void paste()
     {
 		Point intPosition = new Point((int) mToolPosition.x,(int) mToolPosition.y);
-		Command command = new StampCommand(intPosition,	mBoxWidth, mBoxHeight, mBoxRotation, layer);
+		Command command = new StampCommand(intPosition,	mBoxWidth, mBoxHeight, mBoxRotation, mDrawingBitmap);
 		((StampCommand) command).addObserver(this);
 		IndeterminateProgressDialog.getInstance().show();
 		PaintroidApplication.commandManager.commitCommand(command);

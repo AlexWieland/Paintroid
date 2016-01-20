@@ -32,7 +32,7 @@ public class PointCommand extends BaseCommand {
 	protected PointF mPoint;
 
 	public PointCommand(Paint paint, PointF point, Layer layer) {
-		super(paint, layer);
+		super(paint);
 		if (point != null) {
 			mPoint = new PointF(point.x, point.y);
 		}

@@ -94,8 +94,8 @@ public class EraserTool extends DrawTool {
 	}
 
 	@Override
-	public boolean handleUp(PointF coordinate, Layer layer) {
-		return (super.handleUp(coordinate, layer));
+	public boolean handleUp(PointF coordinate) {
+		return (super.handleUp(coordinate));
 	}
 
 	@Override

@@ -32,7 +32,7 @@ public class RotationTool extends BaseTool {
 	}
 
 	@Override
-	public boolean handleUp(PointF coordinate, Layer layer) {
+	public boolean handleUp(PointF coordinate) {
 		return false;
 	}
 

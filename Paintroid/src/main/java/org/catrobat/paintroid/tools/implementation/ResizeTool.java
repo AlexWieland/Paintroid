@@ -501,7 +501,7 @@ public class ResizeTool extends BaseToolWithRectangleShape {
 	}
 
 	@Override
-	protected void onClickInBox(Layer layer) {
+	protected void onClickInBox() {
 		executeResizeCommand();
 	}
 

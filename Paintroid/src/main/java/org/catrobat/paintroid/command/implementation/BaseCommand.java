@@ -48,8 +48,7 @@ public abstract class BaseCommand extends Observable implements Command {
 	public BaseCommand() {
 	}
 
-	public BaseCommand(Paint paint, Layer layer) {
-		mLayer = layer;
+	public BaseCommand(Paint paint) {
 		if (paint != null) {
 			mPaint = new Paint(paint);
 		} else {
@@ -68,7 +67,7 @@ public abstract class BaseCommand extends Observable implements Command {
 
 	@Override
 	public void freeResources() {
-		if(mLayer != null) {
+/*		if(mLayer != null) {
 			Bitmap bitmap = mLayer.getBitmap();
 			if ( mLayer.getBitmap() != null && ! mLayer.getBitmap().isRecycled()) {
 				mLayer.getBitmap().recycle();
@@ -79,11 +78,11 @@ public abstract class BaseCommand extends Observable implements Command {
 			}
 
 			mLayer = null;
-		}
+		}*/
 	}
 
 	public final void storeBitmap(Bitmap bitmap) {
-		File cacheDir = PaintroidApplication.applicationContext.getCacheDir();
+/*		File cacheDir = PaintroidApplication.applicationContext.getCacheDir();
 		Random random = new Random();
 		random.setSeed(System.currentTimeMillis());
 		mFileToStoredBitmap = new File(cacheDir.getAbsolutePath(),
@@ -97,7 +96,7 @@ public abstract class BaseCommand extends Observable implements Command {
 			Log.e(PaintroidApplication.TAG, "Cannot store bitmap. ", e);
 		}
 		bitmap.recycle();
-		bitmap = null;
+		bitmap = null;*/
 	}
 
 	protected void notifyStatus(NOTIFY_STATES state) {

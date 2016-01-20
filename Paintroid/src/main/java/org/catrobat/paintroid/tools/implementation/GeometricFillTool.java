@@ -138,11 +138,11 @@ public class GeometricFillTool extends BaseToolWithRectangleShape {
 	}
 
 	@Override
-	protected void onClickInBox(Layer layer) {
+	protected void onClickInBox() {
 		Point intPosition = new Point((int) mToolPosition.x,
 				(int) mToolPosition.y);
 		Command command = new StampCommand(intPosition,
-				mBoxWidth, mBoxHeight, mBoxRotation, layer);
+				mBoxWidth, mBoxHeight, mBoxRotation, mDrawingBitmap);
 		((StampCommand) command).addObserver(this);
 		IndeterminateProgressDialog.getInstance().show();
 		PaintroidApplication.commandManager.commitCommand(command);

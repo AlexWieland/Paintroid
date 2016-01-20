@@ -137,7 +137,7 @@ public class CursorTool extends BaseToolWithShape {
 	}
 
 	@Override
-	public boolean handleUp(PointF coordinate, Layer layer) {
+	public boolean handleUp(PointF coordinate) {
 
 		mMovedDistance.set(
 				mMovedDistance.x
@@ -145,7 +145,7 @@ public class CursorTool extends BaseToolWithShape {
 				mMovedDistance.y
 						+ Math.abs(coordinate.y - mPreviousEventCoordinate.y));
 
-		handleDrawMode(layer);
+		handleDrawMode(PaintroidApplication.drawingSurface.getCurrentLayer());
 
 		return true;
 	}

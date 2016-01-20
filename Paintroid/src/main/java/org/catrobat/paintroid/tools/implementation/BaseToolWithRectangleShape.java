@@ -257,7 +257,7 @@ public abstract class BaseToolWithRectangleShape extends BaseToolWithShape {
 	}
 
 	@Override
-	public boolean handleUp(PointF coordinate, Layer layer)
+	public boolean handleUp(PointF coordinate)
     {
 		mIsDown = false;
 		if (mPreviousEventCoordinate == null)
@@ -270,7 +270,7 @@ public abstract class BaseToolWithRectangleShape extends BaseToolWithShape {
         if (MOVE_TOLERANCE * 2 >= mMovedDistance.x	&& MOVE_TOLERANCE * 2 >= mMovedDistance.y
                 && isCoordinateInsideBox(coordinate))
         {
-			onClickInBox(layer);
+			onClickInBox();
 		}
 
 		return true;
@@ -902,7 +902,7 @@ public abstract class BaseToolWithRectangleShape extends BaseToolWithShape {
 		return mMaximumBoxResolution;
 	}
 
-	protected abstract void onClickInBox(Layer layer);
+	protected abstract void onClickInBox();
 
 	protected abstract void drawToolSpecifics(Canvas canvas);
 
