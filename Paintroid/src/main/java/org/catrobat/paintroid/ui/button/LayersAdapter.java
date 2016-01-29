@@ -132,6 +132,18 @@ public class LayersAdapter extends BaseAdapter {
 		}
 	}
 
+	public void tryAddLayer( Layer existingLayer) {
+
+		DrawingSurface drawingSurface = PaintroidApplication.drawingSurface;
+		Bitmap image = Bitmap.createBitmap(drawingSurface.getBitmapWidth()
+				,drawingSurface.getBitmapHeight()
+				,Bitmap.Config.ARGB_8888);
+		Layer bufferLayer = new Layer(existingLayer.getLayerID(), image);
+		bufferLayer.setName(existingLayer.getName());
+		mLayerList.add(0, bufferLayer);
+		notifyDataSetChanged();
+	}
+
 	public void removeLayer(int layer_to_remove)
 	{
 		if(mLayerList.size() > 1)

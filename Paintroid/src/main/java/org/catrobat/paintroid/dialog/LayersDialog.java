@@ -273,14 +273,14 @@ public final class LayersDialog extends BaseDialog implements OnItemClickListene
 		if(mLayerButtonAdapter.tryAddLayer())
 		{
 			refreshView();
-			Command command = new LayerCommand(LayerCommand.LayerAction.ADD);
+			Command command = new LayerCommand(LayerCommand.LayerAction.ADD, mLayerButtonAdapter.getLayer(mLayerButtonAdapter.getLayers().size()), null);
 			PaintroidApplication.commandManager.commitCommand(command);
 		}
 		else
 		{
 			Log.d(PaintroidApplication.ERROR_TAG
-					,String.format("Could not add layer. Current layer count %d"
-					,mLayerButtonAdapter.getCount()));
+					, String.format("Could not add layer. Current layer count %d"
+					, mLayerButtonAdapter.getCount()));
 		}
 	}
 
@@ -305,7 +305,7 @@ public final class LayersDialog extends BaseDialog implements OnItemClickListene
 		selectLayer(mLayerButtonAdapter.getLayer(adjacentLayerPosition));
 		refreshView();
 
-		Command command = new LayerCommand(LayerCommand.LayerAction.REMOVE);
+		Command command = new LayerCommand(LayerCommand.LayerAction.REMOVE, mCurrentLayer, null);
 		PaintroidApplication.commandManager.commitCommand(command);
 	}
 
@@ -355,12 +355,13 @@ public final class LayersDialog extends BaseDialog implements OnItemClickListene
 			{
 				mCurrentLayer.setName(input.getText().toString());
 				getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+				Command command = new LayerCommand(LayerCommand.LayerAction.RENAME, mCurrentLayer, null);
+				PaintroidApplication.commandManager.commitCommand(command);
 				refreshView();
 			}
 		});
 
-		alertBuilder.setNegativeButton(R.string.layer_cancel, new DialogInterface.OnClickListener()
-		{
+		alertBuilder.setNegativeButton(R.string.layer_cancel, new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 				getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
@@ -394,12 +395,16 @@ public final class LayersDialog extends BaseDialog implements OnItemClickListene
 	public void toggleLayerVisible()
 	{
 		mCurrentLayer.setVisible(!mCurrentLayer.getVisible());
+		Command command = new LayerCommand(LayerCommand.LayerAction.SET_VISIBILITY, mCurrentLayer, null);
+		PaintroidApplication.commandManager.commitCommand(command);
 		refreshView();
 	}
 
 	public void toggleLayerLocked()
 	{
 		mCurrentLayer.setLocked(!mCurrentLayer.getLocked());
+		Command command = new LayerCommand(LayerCommand.LayerAction.SET_LOCK, mCurrentLayer, null);
+		PaintroidApplication.commandManager.commitCommand(command);
 		refreshView();
 	}
 
@@ -426,13 +431,42 @@ public final class LayersDialog extends BaseDialog implements OnItemClickListene
 
 				mLayerButtonAdapter.removeLayer(firstLayertoMerge.getLayerID());
 
-				Command command = new LayerCommand(LayerCommand.LayerAction.MERGE);
+				Command command = new LayerCommand(LayerCommand.LayerAction.MERGE, mCurrentLayer, firstLayertoMerge);
 				PaintroidApplication.commandManager.commitCommand(command);
 
 				mergeButtonDisabled();
 				refreshView();
 			}
 		}
+	}
+
+	public void mergeLayerCalledFromCommand(int LayerToMergeID)
+	{
+		Layer LayerToMerge = mLayerButtonAdapter.getLayer(mLayerButtonAdapter.getPosition(LayerToMergeID));
+		if(mCurrentLayer.getLayerID() != LayerToMerge.getLayerID())
+		{
+			if(!mCurrentLayer.getLocked())
+			{
+				Bitmap mergedBitmap = null;
+				if (mLayerButtonAdapter.getPosition(mCurrentLayer.getLayerID())
+						< mLayerButtonAdapter.getPosition(LayerToMerge.getLayerID()))
+				{
+					mergedBitmap = overlay(LayerToMerge, mCurrentLayer);
+				}
+				else
+				{
+					mergedBitmap =  overlay(mCurrentLayer, LayerToMerge);
+				}
+
+				mCurrentLayer.setOpacity(100);
+				mCurrentLayer.setBitmap(mergedBitmap);
+				mCurrentLayer.setName(mCurrentLayer.getName());
+
+				mLayerButtonAdapter.removeLayer(LayerToMergeID);
+				refreshView();
+			}
+		}
+
 	}
 
 	public static Bitmap overlay(Layer layer1, Layer layer2)
