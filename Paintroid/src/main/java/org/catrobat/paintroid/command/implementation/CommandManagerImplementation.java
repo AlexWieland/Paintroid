@@ -40,6 +40,7 @@ public class CommandManagerImplementation implements CommandManager, Observer {
 	private int mCommandCounter;
 	private int mCommandIndex;
 	private Bitmap mOriginalBitmap;
+	private boolean isInUndoMode;
 
 	public CommandManagerImplementation() {
 		mCommandList = new LinkedList<Command>();
@@ -132,6 +133,7 @@ public class CommandManagerImplementation implements CommandManager, Observer {
 			IndeterminateProgressDialog.getInstance().show();
 			mCommandCounter--;
 			mCommandIndex = 0;
+			isInUndoMode = true;
 			UndoRedoManager.getInstance().update(
 					UndoRedoManager.StatusMode.ENABLE_REDO);
 			if (mCommandCounter <= 1) {
@@ -147,6 +149,7 @@ public class CommandManagerImplementation implements CommandManager, Observer {
 			IndeterminateProgressDialog.getInstance().show();
 			mCommandIndex = mCommandCounter;
 			mCommandCounter++;
+			isInUndoMode = false;
 			UndoRedoManager.getInstance().update(
 					UndoRedoManager.StatusMode.ENABLE_UNDO);
 			if (mCommandCounter == mCommandList.size()) {
@@ -181,5 +184,10 @@ public class CommandManagerImplementation implements CommandManager, Observer {
 	@Override
 	public int getNumberOfCommands() {
 		return mCommandCounter;
+	}
+
+	@Override
+	public boolean IsInUndoMode() {
+		return isInUndoMode;
 	}
 }

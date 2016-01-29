@@ -37,8 +37,7 @@ import android.graphics.Paint.Cap;
 import android.util.Log;
 
 public abstract class BaseCommand extends Observable implements Command {
-	protected Paint mPaint;
-	protected Layer mLayer;
+	protected Paint mPaint;;
 	protected File mFileToStoredBitmap;
 
 	public static enum NOTIFY_STATES {

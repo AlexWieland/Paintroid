@@ -29,10 +29,6 @@ public interface CommandManager {
 
 	public boolean hasNextCommand();
 
-/**	public void createNewBitmap(Bitmap bitmap);
-
-    public void loadBitmapIntoLayer(Bitmap bitmap);*/
-
 	public void resetAndClear();
 
 	public Command getNextCommand();
@@ -44,4 +40,6 @@ public interface CommandManager {
 	public void redo();
 
 	public int getNumberOfCommands();
+
+	public boolean IsInUndoMode();
 }

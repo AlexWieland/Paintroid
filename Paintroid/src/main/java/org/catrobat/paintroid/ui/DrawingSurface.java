@@ -147,7 +147,7 @@ public class DrawingSurface extends SurfaceView implements 	SurfaceHolder.Callba
             drawCheckeredPatternOnCanvas(surfaceViewCanvas);
             Command command = null;
 
-            while (canDrawOnSurface() &&
+            while (canDrawOnSurface() && PaintroidApplication.commandManager.IsInUndoMode() &&
                     (command = PaintroidApplication.commandManager.getNextCommand()) != null)
             {
                 command.run(mWorkingBitmapCanvas, mCurrentLayer);

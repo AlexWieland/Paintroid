@@ -32,10 +32,7 @@ public class BitmapCommand extends BaseCommand {
 	private boolean mResetScaleAndTranslation = true;
 
 	public BitmapCommand(Layer layer) {
-		if(layer != null)
-		{
-			mLayer = layer;
-		}
+
 //		if (bitmap != null) {
 //			mBitmap = Bitmap.createBitmap(bitmap);
 //		}
@@ -63,10 +60,6 @@ public class BitmapCommand extends BaseCommand {
 				PaintroidApplication.perspective.resetScaleAndTranslation();
 			}
 
-			mLayer = layer;
-//			if (mFileToStoredBitmap == null) {
-//				storeBitmap(bitmap);
-//			}
 		}
 	}
 }
