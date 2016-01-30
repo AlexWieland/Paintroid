@@ -19,27 +19,28 @@
 
 package org.catrobat.paintroid.command;
 
-import android.graphics.Bitmap;
-
-import org.catrobat.paintroid.tools.Layer;
+import org.catrobat.paintroid.command.implementation.CommandManagerImplementation;
 
 public interface CommandManager {
 
-	public boolean hasCommands();
+	boolean hasCommands();
 
-	public boolean hasNextCommand();
+	boolean hasNextCommand();
 
-	public void resetAndClear();
+	void resetAndClear();
 
-	public Command getNextCommand();
+	Command getNextCommand();
 
-	public boolean commitCommand(Command commandObject);
+	boolean commitCommand(Command commandObject);
 
-	public void undo();
+	void undo();
 
-	public void redo();
+	void redo();
 
-	public int getNumberOfCommands();
+	int getNumberOfCommands();
 
-	public boolean IsInUndoMode();
+    void setCommandManagerState(CommandManagerImplementation.CommandManagerState state);
+
+    CommandManagerImplementation.CommandManagerState getCommandManagerState();
+
 }

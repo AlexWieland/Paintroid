@@ -30,25 +30,23 @@ import org.catrobat.paintroid.command.UndoRedoManager;
 import org.catrobat.paintroid.command.UndoRedoManager.StatusMode;
 import org.catrobat.paintroid.dialog.IndeterminateProgressDialog;
 
-import android.graphics.Bitmap;
-import android.graphics.Bitmap.Config;
-
 public class CommandManagerImplementation implements CommandManager, Observer {
+
+    public enum CommandManagerState
+    {
+        COLLECTING_COMMANDS, UNDO, REDO
+    }
+
 	private static final int MAX_COMMANDS = 512;
 
 	private final LinkedList<Command> mCommandList;
 	private int mCommandCounter;
 	private int mCommandIndex;
-	private Bitmap mOriginalBitmap;
-	private boolean isInUndoMode;
+    private CommandManagerState mState;
 
 	public CommandManagerImplementation() {
 		mCommandList = new LinkedList<Command>();
-		// The first command in the list is needed to clear the image when
-		// rolling back commands.
-		mCommandList.add(new ClearCommand());
-		mCommandCounter = 1;
-		mCommandIndex = 1;
+        mState = CommandManagerState.COLLECTING_COMMANDS;
 	}
 
 	@Override
@@ -61,120 +59,108 @@ public class CommandManagerImplementation implements CommandManager, Observer {
 		return mCommandIndex < mCommandCounter;
 	}
 
-/**	@Override
-	public void createNewBitmap(Bitmap bitmap)
-    {
-		mOriginalBitmap = bitmap.copy(Config.ARGB_8888, true);
-		mCommandList.addFirst(new BitmapCommand(mOriginalBitmap, false));
-	}
-
-    @Override
-    public void loadBitmapIntoLayer(Bitmap bitmap)
-    {
-
-    }*/
-
     @Override
 	public synchronized void resetAndClear() {
-		if (mOriginalBitmap != null && !mOriginalBitmap.isRecycled()) {
-			mOriginalBitmap.recycle();
-			mOriginalBitmap = null;
-		}
-		for (int i = 0; i < mCommandList.size(); i++) {
-			mCommandList.get(i).freeResources();
-		}
 		mCommandList.clear();
-		mCommandList.add(new ClearCommand());
-		mCommandCounter = 1;
-		mCommandIndex = 1;
 		UndoRedoManager.getInstance().update(StatusMode.DISABLE_REDO);
 		UndoRedoManager.getInstance().update(StatusMode.DISABLE_UNDO);
 	}
 
 	@Override
 	public synchronized Command getNextCommand() {
-		if (mCommandIndex < mCommandCounter) {
+		if (mCommandIndex < mCommandCounter)
+        {
 			return mCommandList.get(mCommandIndex++);
-		} else {
+		}
+        else
+        {
 			return null;
 		}
 	}
 
 	@Override
-	public synchronized boolean commitCommand(Command command) {
-		// First remove any previously undone commands from the top of the
-		// queue.
-		if (mCommandCounter < mCommandList.size()) {
-			for (int i = mCommandList.size(); i > mCommandCounter; i--) {
-				mCommandList.removeLast().freeResources();
-			}
-			UndoRedoManager.getInstance().update(StatusMode.DISABLE_REDO);
-		}
+	public synchronized boolean commitCommand(Command command)
+    {
 
-		if (mCommandCounter == MAX_COMMANDS) {
-			// TODO handle this and don't return false. Hint: apply first
-			// command to bitmap.
-			return false;
-		} else {
-			mCommandCounter++;
-			UndoRedoManager.getInstance().update(
-					UndoRedoManager.StatusMode.ENABLE_UNDO);
-		}
+        if (mCommandCounter < mCommandList.size())
+        {
+            for (int i = mCommandList.size(); i > mCommandCounter; i--)
+            {
+                mCommandList.removeLast();
+            }
+
+            UndoRedoManager.getInstance().update(StatusMode.DISABLE_REDO);
+        }
+
+        if (mCommandCounter == MAX_COMMANDS)
+        {
+            return false;
+        }
+        else
+        {
+            mCommandCounter++;
+            UndoRedoManager.getInstance().update(UndoRedoManager.StatusMode.ENABLE_UNDO);
+        }
 
 		((BaseCommand) command).addObserver(this);
 		PaintroidApplication.isSaved = false;
-
 		return mCommandList.add(command);
 	}
 
 	@Override
 	public synchronized void undo() {
-		if (mCommandCounter > 1) {
+		if (mCommandCounter > 1)
+        {
+            setCommandManagerState(CommandManagerState.UNDO);
 			IndeterminateProgressDialog.getInstance().show();
 			mCommandCounter--;
 			mCommandIndex = 0;
-			isInUndoMode = true;
-			UndoRedoManager.getInstance().update(
-					UndoRedoManager.StatusMode.ENABLE_REDO);
-			if (mCommandCounter <= 1) {
-				UndoRedoManager.getInstance().update(
-						UndoRedoManager.StatusMode.DISABLE_UNDO);
+			UndoRedoManager.getInstance().update(UndoRedoManager.StatusMode.ENABLE_REDO);
+
+            if (mCommandCounter <= 1)
+            {
+				UndoRedoManager.getInstance().update(UndoRedoManager.StatusMode.DISABLE_UNDO);
 			}
 		}
 	}
 
 	@Override
 	public synchronized void redo() {
-		if (mCommandCounter < mCommandList.size()) {
+		if (mCommandCounter < mCommandList.size())
+        {
 			IndeterminateProgressDialog.getInstance().show();
 			mCommandIndex = mCommandCounter;
-			mCommandCounter++;
-			isInUndoMode = false;
-			UndoRedoManager.getInstance().update(
-					UndoRedoManager.StatusMode.ENABLE_UNDO);
-			if (mCommandCounter == mCommandList.size()) {
-				UndoRedoManager.getInstance().update(
-						UndoRedoManager.StatusMode.DISABLE_REDO);
+            mCommandCounter++;
+			setCommandManagerState(CommandManagerState.REDO);
+			UndoRedoManager.getInstance().update(UndoRedoManager.StatusMode.ENABLE_UNDO);
+
+            if (mCommandCounter == mCommandList.size())
+            {
+				UndoRedoManager.getInstance().update(UndoRedoManager.StatusMode.DISABLE_REDO);
 			}
 		}
 	}
 
-	private synchronized void deleteFailedCommand(Command command) {
+	private synchronized void deleteFailedCommand(Command command)
+    {
 		int indexOfCommand = mCommandList.indexOf(command);
-		((BaseCommand) mCommandList.remove(indexOfCommand)).freeResources();
+		mCommandList.remove(indexOfCommand);
 		mCommandCounter--;
 		mCommandIndex--;
-		if (mCommandCounter == 1) {
-			UndoRedoManager.getInstance().update(
-					UndoRedoManager.StatusMode.DISABLE_UNDO);
+		if (mCommandCounter == 1)
+        {
+			UndoRedoManager.getInstance().update(UndoRedoManager.StatusMode.DISABLE_UNDO);
 		}
 	}
 
 	@Override
 	public void update(Observable observable, Object data) {
-		if (data instanceof BaseCommand.NOTIFY_STATES) {
-			if (BaseCommand.NOTIFY_STATES.COMMAND_FAILED == data) {
-				if (observable instanceof Command) {
+		if (data instanceof BaseCommand.NOTIFY_STATES)
+        {
+			if (BaseCommand.NOTIFY_STATES.COMMAND_FAILED == data)
+            {
+				if (observable instanceof Command)
+                {
 					deleteFailedCommand((Command) observable);
 				}
 			}
@@ -186,8 +172,14 @@ public class CommandManagerImplementation implements CommandManager, Observer {
 		return mCommandCounter;
 	}
 
-	@Override
-	public boolean IsInUndoMode() {
-		return isInUndoMode;
-	}
+    @Override
+    public void setCommandManagerState(CommandManagerState state) {
+        mState = state;
+    }
+
+    @Override
+    public CommandManagerState getCommandManagerState() {
+        return mState;
+    }
+
 }

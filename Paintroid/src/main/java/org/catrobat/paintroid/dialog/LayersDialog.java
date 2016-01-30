@@ -46,6 +46,7 @@ import org.catrobat.paintroid.MainActivity;
 import org.catrobat.paintroid.PaintroidApplication;
 import org.catrobat.paintroid.R;
 import org.catrobat.paintroid.command.Command;
+import org.catrobat.paintroid.command.implementation.ClearCommand;
 import org.catrobat.paintroid.command.implementation.LayerCommand;
 import org.catrobat.paintroid.tools.Layer;
 import org.catrobat.paintroid.ui.button.LayersAdapter;
@@ -273,8 +274,8 @@ public final class LayersDialog extends BaseDialog implements OnItemClickListene
 		if(mLayerButtonAdapter.tryAddLayer())
 		{
 			refreshView();
-			Command command = new LayerCommand(LayerCommand.LayerAction.ADD, mLayerButtonAdapter.getLayer(mLayerButtonAdapter.getLayers().size()), null);
-			PaintroidApplication.commandManager.commitCommand(command);
+            Layer layer = mLayerButtonAdapter.getLayer(0);
+			PaintroidApplication.commandManager.commitCommand(new LayerCommand(LayerCommand.LayerAction.ADD, layer, null));
 		}
 		else
 		{

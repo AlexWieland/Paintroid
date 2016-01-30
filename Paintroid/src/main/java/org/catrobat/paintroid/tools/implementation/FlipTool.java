@@ -85,7 +85,7 @@ public class FlipTool extends BaseTool {
 			return;
 		}
 
-		Command command = new FlipCommand(flipDirection);
+		Command command = new FlipCommand(flipDirection, layer.getLayerID());
 		IndeterminateProgressDialog.getInstance().show();
 		((FlipCommand) command).addObserver(this);
 		PaintroidApplication.commandManager.commitCommand(command);

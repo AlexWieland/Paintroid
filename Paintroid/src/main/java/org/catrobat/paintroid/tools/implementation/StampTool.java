@@ -302,7 +302,7 @@ public class StampTool extends BaseToolWithRectangleShape {
 	private void paste()
     {
 		Point intPosition = new Point((int) mToolPosition.x,(int) mToolPosition.y);
-		Command command = new StampCommand(intPosition,	mBoxWidth, mBoxHeight, mBoxRotation, mDrawingBitmap);
+		Command command = new StampCommand(intPosition,	mBoxWidth, mBoxHeight, mBoxRotation, mDrawingBitmap, PaintroidApplication.drawingSurface.getCurrentLayer().getLayerID());
 		((StampCommand) command).addObserver(this);
 		IndeterminateProgressDialog.getInstance().show();
 		PaintroidApplication.commandManager.commitCommand(command);

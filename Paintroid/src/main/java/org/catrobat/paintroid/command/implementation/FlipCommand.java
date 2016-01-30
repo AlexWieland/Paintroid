@@ -36,7 +36,8 @@ public class FlipCommand extends BaseCommand {
 		FLIP_HORIZONTAL, FLIP_VERTICAL
 	};
 
-	public FlipCommand(FlipDirection flipDirection) {
+	public FlipCommand(FlipDirection flipDirection, int layerId) {
+        super(layerId);
 		mFlipDirection = flipDirection;
 	}
 

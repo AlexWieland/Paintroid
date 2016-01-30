@@ -91,7 +91,7 @@ public class LineTool extends BaseTool {
 		Path finalPath = new Path();
 		finalPath.moveTo(mInitialEventCoordinate.x, mInitialEventCoordinate.y);
 		finalPath.lineTo(coordinate.x, coordinate.y);
-		Command command = new PathCommand(mBitmapPaint, finalPath,  PaintroidApplication.drawingSurface.getCurrentLayer());
+		Command command = new PathCommand(mBitmapPaint, finalPath,  PaintroidApplication.drawingSurface.getCurrentLayer().getLayerID());
 		PaintroidApplication.commandManager.commitCommand(command);
 		return true;
 	}

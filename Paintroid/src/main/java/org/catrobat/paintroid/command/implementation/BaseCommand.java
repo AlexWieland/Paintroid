@@ -37,23 +37,34 @@ import android.graphics.Paint.Cap;
 import android.util.Log;
 
 public abstract class BaseCommand extends Observable implements Command {
-	protected Paint mPaint;;
-	protected File mFileToStoredBitmap;
+	protected Paint mPaint;
+    protected int mLayerId;
 
-	public static enum NOTIFY_STATES {
+	public enum NOTIFY_STATES {
 		COMMAND_STARTED, COMMAND_DONE, COMMAND_FAILED
-	};
-
-	public BaseCommand() {
 	}
 
-	public BaseCommand(Paint paint) {
-		if (paint != null) {
+    public BaseCommand() {
+    }
+
+	public BaseCommand(int layerId)
+    {
+       mLayerId = layerId;
+	}
+
+    public BaseCommand(Paint paint, int layerId)
+    {
+
+        this(layerId);
+
+        if (paint != null)
+        {
 			mPaint = new Paint(paint);
-		} else {
+		}
+        else
+        {
 			Log.w(PaintroidApplication.TAG,
-					"Object is null falling back to default object in "
-							+ this.toString());
+					"Object is null falling back to default object in "	+ this.toString());
 			mPaint = new Paint();
 			mPaint.setColor(Color.BLACK);
 			mPaint.setStrokeWidth(1);
@@ -61,42 +72,13 @@ public abstract class BaseCommand extends Observable implements Command {
 		}
 	}
 
-	@Override
+    public int getLayerId()
+    {
+        return mLayerId;
+    }
+
+    @Override
 	public abstract void run(Canvas canvas, Layer layer);
-
-	@Override
-	public void freeResources() {
-/*		if(mLayer != null) {
-			Bitmap bitmap = mLayer.getBitmap();
-			if ( mLayer.getBitmap() != null && ! mLayer.getBitmap().isRecycled()) {
-				mLayer.getBitmap().recycle();
-				mLayer.setBitmap(null);
-			}
-			if (mFileToStoredBitmap != null && mFileToStoredBitmap.exists()) {
-				mFileToStoredBitmap.delete();
-			}
-
-			mLayer = null;
-		}*/
-	}
-
-	public final void storeBitmap(Bitmap bitmap) {
-/*		File cacheDir = PaintroidApplication.applicationContext.getCacheDir();
-		Random random = new Random();
-		random.setSeed(System.currentTimeMillis());
-		mFileToStoredBitmap = new File(cacheDir.getAbsolutePath(),
-				Long.toString(random.nextLong()));
-		try {
-			FileOutputStream fos = new FileOutputStream(mFileToStoredBitmap);
-			bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
-			fos.flush();
-			fos.close();
-		} catch (IOException e) {
-			Log.e(PaintroidApplication.TAG, "Cannot store bitmap. ", e);
-		}
-		bitmap.recycle();
-		bitmap = null;*/
-	}
 
 	protected void notifyStatus(NOTIFY_STATES state) {
 		setChanged();

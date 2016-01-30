@@ -72,7 +72,7 @@ public class RotationTool extends BaseTool {
 			return;
 		}
 
-		Command command = new RotateCommand(rotateDirection);
+		Command command = new RotateCommand(rotateDirection, layer.getLayerID());
 		IndeterminateProgressDialog.getInstance().show();
 		((RotateCommand) command).addObserver(this);
 		PaintroidApplication.commandManager.commitCommand(command);

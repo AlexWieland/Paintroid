@@ -21,6 +21,8 @@ package org.catrobat.paintroid.ui;
 
 import org.catrobat.paintroid.PaintroidApplication;
 import org.catrobat.paintroid.command.Command;
+import org.catrobat.paintroid.command.implementation.BaseCommand;
+import org.catrobat.paintroid.command.implementation.CommandManagerImplementation;
 import org.catrobat.paintroid.command.implementation.LayerCommand;
 import org.catrobat.paintroid.dialog.IndeterminateProgressDialog;
 import org.catrobat.paintroid.dialog.LayersDialog;
@@ -96,6 +98,10 @@ public class DrawingSurface extends SurfaceView implements 	SurfaceHolder.Callba
     {
         Log.w(PaintroidApplication.TAG, "DrawingSurfaceView.surfaceChanged");
         PaintroidApplication.perspective.setSurfaceHolder(holder);
+        if (mCurrentLayer.getBitmap() != null && mDrawingThread != null)
+        {
+            starDrawingThread();
+        }
     }
 
     @Override
@@ -104,11 +110,6 @@ public class DrawingSurface extends SurfaceView implements 	SurfaceHolder.Callba
         Log.w(PaintroidApplication.TAG, "DrawingSurfaceView.surfaceCreated");
         mDrawingThread = new DrawingSurfaceThread(new DrawLoop());
         mIsSurfaceDrawable = true;
-
-        if (mCurrentLayer.getBitmap() != null && mDrawingThread != null)
-        {
-            starDrawingThread();
-        }
     }
 
     @Override
@@ -145,18 +146,10 @@ public class DrawingSurface extends SurfaceView implements 	SurfaceHolder.Callba
             }
 
             drawCheckeredPatternOnCanvas(surfaceViewCanvas);
-            Command command = null;
-
-            while (canDrawOnSurface() && PaintroidApplication.commandManager.IsInUndoMode() &&
-                    (command = PaintroidApplication.commandManager.getNextCommand()) != null)
+            if(PaintroidApplication.commandManager.getCommandManagerState()
+                    == CommandManagerImplementation.CommandManagerState.UNDO)
             {
-                command.run(mWorkingBitmapCanvas, mCurrentLayer);
-                PaintroidApplication.currentTool.resetInternalState(StateChange.RESET_INTERNAL_STATE);
-
-                if (!PaintroidApplication.commandManager.hasNextCommand())
-                {
-                    IndeterminateProgressDialog.getInstance().dismiss();
-                }
+                performUndo();
             }
 
             if (mCurrentLayer != null)
@@ -171,6 +164,28 @@ public class DrawingSurface extends SurfaceView implements 	SurfaceHolder.Callba
                     + catchAllException.toString());
             catchAllException.printStackTrace();
         }
+    }
+
+    private void performUndo()
+    {
+        Command command = null;
+
+        while (canDrawOnSurface() &&
+                (command = PaintroidApplication.commandManager.getNextCommand()) != null)
+        {
+            if(((BaseCommand)command).getLayerId() == mCurrentLayer.getLayerID())
+            {
+                command.run(mWorkingBitmapCanvas, mCurrentLayer);
+                PaintroidApplication.currentTool.resetInternalState(StateChange.RESET_INTERNAL_STATE);
+
+                if (!PaintroidApplication.commandManager.hasNextCommand()) {
+                    IndeterminateProgressDialog.getInstance().dismiss();
+                }
+            }
+        }
+
+        PaintroidApplication.commandManager.setCommandManagerState
+                (CommandManagerImplementation.CommandManagerState.COLLECTING_COMMANDS);
     }
 
     private void drawCheckeredPatternOnCanvas(Canvas canvas)
@@ -247,8 +262,7 @@ public class DrawingSurface extends SurfaceView implements 	SurfaceHolder.Callba
             mCurrentLayer.setBitmap(bitmap);
             mWorkingBitmapCanvas.setBitmap(bitmap);
             mWorkingBitmapRect.set(0, 0, bitmap.getWidth(), bitmap.getHeight());
-            PaintroidApplication.commandManager
-                                .commitCommand(new LayerCommand(LayerCommand.LayerAction.INSERT_IMAGE));
+            //PaintroidApplication.commandManager.commitCommand(new LayerCommand(LayerCommand.LayerAction.INSERT_IMAGE));
         }
     }
 

@@ -33,8 +33,8 @@ import android.util.Log;
 public class PathCommand extends BaseCommand {
 	protected Path mPath;
 
-	public PathCommand(Paint paint, Path path, Layer layer) {
-		super(paint);
+	public PathCommand(Paint paint, Path path, int layerId) {
+		super(paint, layerId);
 		if (path != null) {
 			mPath = new Path(path);
 		}

@@ -18,8 +18,10 @@ public class RotateCommand extends BaseCommand {
 		ROTATE_LEFT, ROTATE_RIGHT
 	};
 
-	public RotateCommand(RotateDirection rotateDirection) {
-		mRotateDirection = rotateDirection;
+	public RotateCommand(RotateDirection rotateDirection, int layerId)
+    {
+        super(layerId);
+        mRotateDirection = rotateDirection;
 	}
 
 	@Override

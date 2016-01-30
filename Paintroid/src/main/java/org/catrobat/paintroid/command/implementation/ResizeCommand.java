@@ -37,7 +37,8 @@ public class ResizeCommand extends BaseCommand {
 
 	public ResizeCommand(int resizeCoordinateXLeft, int resizeCoordinateYTop,
 						 int resizeCoordinateXRight, int resizeCoordinateYBottom,
-						 int maximumBitmapResolution) {
+						 int maximumBitmapResolution)
+    {
 		mResizeCoordinateXLeft = resizeCoordinateXLeft;
 		mResizeCoordinateYTop = resizeCoordinateYTop;
 		mResizeCoordinateXRight = resizeCoordinateXRight;
@@ -49,13 +50,13 @@ public class ResizeCommand extends BaseCommand {
 	public void run(Canvas canvas, Layer layer) {
 
 		notifyStatus(NOTIFY_STATES.COMMAND_STARTED);
-		if (mFileToStoredBitmap != null) {
+/*		if (mFileToStoredBitmap != null) {
 			PaintroidApplication.drawingSurface.updateBitmap(FileIO
                     .getBitmapFromFile(mFileToStoredBitmap));
 
 			notifyStatus(NOTIFY_STATES.COMMAND_DONE);
 			return;
-		}
+		}*/
 		try {
 
 			if (mResizeCoordinateXRight < mResizeCoordinateXLeft) {

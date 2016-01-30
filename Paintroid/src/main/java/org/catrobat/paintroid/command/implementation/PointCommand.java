@@ -31,8 +31,8 @@ import android.util.Log;
 public class PointCommand extends BaseCommand {
 	protected PointF mPoint;
 
-	public PointCommand(Paint paint, PointF point, Layer layer) {
-		super(paint);
+	public PointCommand(Paint paint, PointF point, int layerId) {
+		super(paint, layerId);
 		if (point != null) {
 			mPoint = new PointF(point.x, point.y);
 		}

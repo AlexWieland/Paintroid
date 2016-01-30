@@ -35,8 +35,8 @@ public class FillCommand extends BaseCommand {
 	private static final int EMPTY_COMMAND_LIST_LENGTH = 1;
 	private Point mClickedPixel;
 
-	public FillCommand(Point clickedPixel, Paint currentPaint, Layer layer) {
-		super(currentPaint);
+	public FillCommand(Point clickedPixel, Paint currentPaint, int layerId) {
+		super(currentPaint, layerId);
 		mClickedPixel = clickedPixel;
 	}
 

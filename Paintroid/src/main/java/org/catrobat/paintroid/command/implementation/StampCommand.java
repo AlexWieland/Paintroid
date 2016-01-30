@@ -35,9 +35,9 @@ public class StampCommand extends BaseCommand {
 	protected final float mBoxRotation;
 	protected final RectF mBoxRect;
 
-	public StampCommand(Point position, float width, float height, float rotation, Bitmap bitmap)
+	public StampCommand(Point position, float width, float height, float rotation, Bitmap bitmap, int layerId)
     {
-		super(new Paint(Paint.DITHER_FLAG));
+		super(new Paint(Paint.DITHER_FLAG), layerId);
 
 		if (position != null)
         {

@@ -66,7 +66,7 @@ public class FillTool extends BaseTool {
 		}
 
 		Command command = new FillCommand(new Point((int) coordinate.x,
-				(int) coordinate.y), mBitmapPaint,  PaintroidApplication.drawingSurface.getCurrentLayer());
+				(int) coordinate.y), mBitmapPaint,  PaintroidApplication.drawingSurface.getCurrentLayer().getLayerID());
 
 		IndeterminateProgressDialog.getInstance().show();
 		((FillCommand) command).addObserver(this);
