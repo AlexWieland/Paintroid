@@ -19,6 +19,8 @@
 
 package org.catrobat.paintroid.command.implementation;
 
+import android.graphics.Canvas;
+
 import java.util.LinkedList;
 import java.util.Observable;
 import java.util.Observer;
@@ -29,128 +31,93 @@ import org.catrobat.paintroid.command.CommandManager;
 import org.catrobat.paintroid.command.UndoRedoManager;
 import org.catrobat.paintroid.command.UndoRedoManager.StatusMode;
 import org.catrobat.paintroid.dialog.IndeterminateProgressDialog;
+import org.catrobat.paintroid.tools.Layer;
+import org.catrobat.paintroid.tools.Tool;
 
-public class CommandManagerImplementation implements CommandManager, Observer {
-
-    public enum CommandManagerState
-    {
-        COLLECTING_COMMANDS, UNDO, REDO
-    }
-
+public class CommandManagerImplementation implements CommandManager, Observer
+{
 	private static final int MAX_COMMANDS = 512;
 
 	private final LinkedList<Command> mCommandList;
-	private int mCommandCounter;
-	private int mCommandIndex;
-    private CommandManagerState mState;
+    private LinkedList<Command> mUndo;
 
 	public CommandManagerImplementation() {
 		mCommandList = new LinkedList<Command>();
-        mState = CommandManagerState.COLLECTING_COMMANDS;
+        mUndo = new LinkedList<Command>();
 	}
 
-	@Override
-	public boolean hasCommands() {
-		return mCommandCounter > 1;
-	}
-
-	@Override
-	public synchronized boolean hasNextCommand() {
-		return mCommandIndex < mCommandCounter;
-	}
+    @Override
+    public boolean hasCommands() {
+        return mCommandList.size() > 0;
+    }
 
     @Override
 	public synchronized void resetAndClear() {
 		mCommandList.clear();
+        mUndo.clear();
 		UndoRedoManager.getInstance().update(StatusMode.DISABLE_REDO);
 		UndoRedoManager.getInstance().update(StatusMode.DISABLE_UNDO);
 	}
 
 	@Override
-	public synchronized Command getNextCommand() {
-		if (mCommandIndex < mCommandCounter)
-        {
-			return mCommandList.get(mCommandIndex++);
-		}
-        else
-        {
-			return null;
-		}
-	}
-
-	@Override
 	public synchronized boolean commitCommand(Command command)
     {
+        mUndo.clear();
 
-        if (mCommandCounter < mCommandList.size())
-        {
-            for (int i = mCommandList.size(); i > mCommandCounter; i--)
-            {
-                mCommandList.removeLast();
-            }
-
-            UndoRedoManager.getInstance().update(StatusMode.DISABLE_REDO);
-        }
-
-        if (mCommandCounter == MAX_COMMANDS)
+        if (mCommandList.size() == MAX_COMMANDS)
         {
             return false;
         }
-        else
+
+        ((BaseCommand)command).addObserver(this);
+        mCommandList.addLast(command);
+        return true;
+	}
+
+	@Override
+	public void undo()
+    {
+        Canvas canvas = PaintroidApplication.drawingSurface.getWorkingCanvas();
+        synchronized (canvas)
         {
-            mCommandCounter++;
-            UndoRedoManager.getInstance().update(UndoRedoManager.StatusMode.ENABLE_UNDO);
+            if(mCommandList.size() != 0)
+            {
+                Command command = mCommandList.removeLast();
+                mUndo.addFirst(command);
+                redraw(canvas);
+            }
         }
-
-		((BaseCommand) command).addObserver(this);
-		PaintroidApplication.isSaved = false;
-		return mCommandList.add(command);
 	}
 
 	@Override
-	public synchronized void undo() {
-		if (mCommandCounter > 1)
+	public synchronized void redo()
+    {
+        Canvas canvas = PaintroidApplication.drawingSurface.getWorkingCanvas();
+        synchronized (canvas)
         {
-            setCommandManagerState(CommandManagerState.UNDO);
-			IndeterminateProgressDialog.getInstance().show();
-			mCommandCounter--;
-			mCommandIndex = 0;
-			UndoRedoManager.getInstance().update(UndoRedoManager.StatusMode.ENABLE_REDO);
-
-            if (mCommandCounter <= 1)
+            if(mUndo.size() != 0)
             {
-				UndoRedoManager.getInstance().update(UndoRedoManager.StatusMode.DISABLE_UNDO);
-			}
-		}
+                Command command = mUndo.removeFirst();
+                mCommandList.addLast(command);
+                redraw(canvas);
+            }
+        }
 	}
 
-	@Override
-	public synchronized void redo() {
-		if (mCommandCounter < mCommandList.size())
-        {
-			IndeterminateProgressDialog.getInstance().show();
-			mCommandIndex = mCommandCounter;
-            mCommandCounter++;
-			setCommandManagerState(CommandManagerState.REDO);
-			UndoRedoManager.getInstance().update(UndoRedoManager.StatusMode.ENABLE_UNDO);
+    private void redraw(Canvas canvas)
+    {
+        Layer layer =  PaintroidApplication.drawingSurface.getCurrentLayer();
 
-            if (mCommandCounter == mCommandList.size())
-            {
-				UndoRedoManager.getInstance().update(UndoRedoManager.StatusMode.DISABLE_REDO);
-			}
-		}
-	}
+        for (Command cmd: mCommandList)
+        {
+            cmd.run(canvas, layer);
+            PaintroidApplication.currentTool.resetInternalState(Tool.StateChange.RESET_INTERNAL_STATE);
+        }
+    }
 
 	private synchronized void deleteFailedCommand(Command command)
     {
-		int indexOfCommand = mCommandList.indexOf(command);
-		mCommandList.remove(indexOfCommand);
-		mCommandCounter--;
-		mCommandIndex--;
-		if (mCommandCounter == 1)
-        {
-			UndoRedoManager.getInstance().update(UndoRedoManager.StatusMode.DISABLE_UNDO);
-		}
+
 	}
 
 	@Override
@@ -166,20 +133,4 @@ public class CommandManagerImplementation implements CommandManager, Observer {
 			}
 		}
 	}
-
-	@Override
-	public int getNumberOfCommands() {
-		return mCommandCounter;
-	}
-
-    @Override
-    public void setCommandManagerState(CommandManagerState state) {
-        mState = state;
-    }
-
-    @Override
-    public CommandManagerState getCommandManagerState() {
-        return mState;
-    }
-
 }

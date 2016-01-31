@@ -51,7 +51,7 @@ public class FillCommand extends BaseCommand {
 		}
 
 		if (PaintroidApplication.savedPictureUri == null
-				&& PaintroidApplication.commandManager.getNumberOfCommands() == EMPTY_COMMAND_LIST_LENGTH + 1) {
+				/*&& PaintroidApplication.commandManager.getNumberOfCommands() == EMPTY_COMMAND_LIST_LENGTH + 1*/) {
 			canvas.drawColor(mPaint.getColor());
 			Log.w(PaintroidApplication.TAG,
 					"Fill Command color: " + mPaint.getColor());

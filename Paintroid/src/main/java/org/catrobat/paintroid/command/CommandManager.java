@@ -25,22 +25,11 @@ public interface CommandManager {
 
 	boolean hasCommands();
 
-	boolean hasNextCommand();
-
 	void resetAndClear();
-
-	Command getNextCommand();
 
 	boolean commitCommand(Command commandObject);
 
 	void undo();
 
 	void redo();
-
-	int getNumberOfCommands();
-
-    void setCommandManagerState(CommandManagerImplementation.CommandManagerState state);
-
-    CommandManagerImplementation.CommandManagerState getCommandManagerState();
-
 }
