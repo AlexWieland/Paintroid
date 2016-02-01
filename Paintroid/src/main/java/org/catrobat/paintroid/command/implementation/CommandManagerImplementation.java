@@ -113,6 +113,8 @@ public class CommandManagerImplementation implements CommandManager, Observer
             cmd.run(canvas, layer);
             PaintroidApplication.currentTool.resetInternalState(Tool.StateChange.RESET_INTERNAL_STATE);
         }
+
+        PaintroidApplication.drawingSurface.getDrawListener().redraw();
     }
 
 	private synchronized void deleteFailedCommand(Command command)

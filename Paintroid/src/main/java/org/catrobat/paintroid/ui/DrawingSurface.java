@@ -212,6 +212,11 @@ public class DrawingSurface extends SurfaceView implements 	SurfaceHolder.Callba
         }
     }
 
+    public DrawingSurfaceListener.DrawListener getDrawListener()
+    {
+        return mDrawListener;
+    }
+
     public Layer getCurrentLayer()
     {
         return mCurrentLayer;
