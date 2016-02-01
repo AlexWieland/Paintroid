@@ -137,15 +137,14 @@ public class MainActivity extends OptionsMenuActivity {
 		}
 
 		PaintroidApplication.drawingSurface = (DrawingSurface) findViewById(R.id.drawingSurfaceView);
-        PaintroidApplication.perspective = new Perspective(((SurfaceView) PaintroidApplication
-                                                                    .drawingSurface).getHolder());
-        mDrawingSurfaceListener = new DrawingSurfaceListener();
-        PaintroidApplication.drawingSurface.setOnTouchListener(mDrawingSurfaceListener);
+
+        PaintroidApplication.drawingSurface.initDrawSurfaceListener();
+
 
         mTopBar = new TopBar(this, PaintroidApplication.openedFromCatroid);
         mBottomBar = new BottomBar(this);
 
-        LayersDialog.init(this, new Layer(0,  Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)));
+        LayersDialog.init(this, new Layer(0, Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)));
 
 		if (PaintroidApplication.openedFromCatroid && catroidPicturePath != null
 				&& catroidPicturePath.length() > 0)
@@ -195,8 +194,6 @@ public class MainActivity extends OptionsMenuActivity {
 			PaintroidApplication.drawingSurface.setCurrentLayer(LayersDialog.getInstance().getCurrentLayer());
 			initialiseNewBitmap();
 		}
-
-		mDrawingSurfaceListener.setCurrentLayer(PaintroidApplication.drawingSurface.getCurrentLayer());
 	}
 
 	@Override

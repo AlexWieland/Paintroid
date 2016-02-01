@@ -48,6 +48,8 @@ public class DrawingSurfaceListener implements OnTouchListener {
 	private MoveThread moveThread;
 	private Layer mCurrentLayer;
 
+    private DrawListener mDrawListener;
+
 	public DrawingSurfaceListener() {
 		mPerspective = PaintroidApplication.perspective;
 		mPointerMean = new PointF(0, 0);
@@ -100,6 +102,7 @@ public class DrawingSurfaceListener implements OnTouchListener {
 
 			case MotionEvent.ACTION_MOVE:
 
+                mDrawListener.redraw();
                 if (event.getPointerCount() == 1)
                 {
 					if (System.nanoTime() < (mZoomTimeStamp + BLOCKING_TIME))
@@ -165,10 +168,22 @@ public class DrawingSurfaceListener implements OnTouchListener {
 				}
 				mPointerDistance = 0;
 				mPointerMean.set(0, 0);
+                mDrawListener.redraw();
 				break;
+            default:
+                return  false;
 		}
 		return true;
 	}
+
+    public interface DrawListener
+    {
+        void redraw();
+    }
+
+    public void setDrawListener(DrawListener drawListener) {
+        mDrawListener = drawListener;
+    }
 
 	private class MoveThread extends Thread {
 

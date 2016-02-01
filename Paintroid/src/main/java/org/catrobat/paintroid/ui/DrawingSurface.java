@@ -20,14 +20,9 @@
 package org.catrobat.paintroid.ui;
 
 import org.catrobat.paintroid.PaintroidApplication;
-import org.catrobat.paintroid.command.Command;
-import org.catrobat.paintroid.command.implementation.BaseCommand;
-import org.catrobat.paintroid.command.implementation.CommandManagerImplementation;
-import org.catrobat.paintroid.command.implementation.LayerCommand;
-import org.catrobat.paintroid.dialog.IndeterminateProgressDialog;
 import org.catrobat.paintroid.dialog.LayersDialog;
+import org.catrobat.paintroid.listener.DrawingSurfaceListener;
 import org.catrobat.paintroid.tools.Layer;
-import org.catrobat.paintroid.tools.Tool.StateChange;
 import org.catrobat.paintroid.tools.implementation.BaseTool;
 import org.catrobat.paintroid.ui.button.LayersAdapter;
 
@@ -40,20 +35,29 @@ import android.graphics.PointF;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
-import android.os.Build;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
-public class DrawingSurface extends SurfaceView implements 	SurfaceHolder.Callback {
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
-    /*protected static final String BUNDLE_INSTANCE_STATE = "BUNDLE_INSTANCE_STATE";
-	protected static final String BUNDLE_PERSPECTIVE = "BUNDLE_PERSPECTIVE";*/
+public class DrawingSurface extends SurfaceView implements 	SurfaceHolder.Callback {
 
     protected static final int BACKGROUND_COLOR = Color.LTGRAY;
     private static final int DRAW_THREAD_TIMEOUT = 20;
     private static final int SDK_VERSION = 18;
+
+    private final Lock mDrawLock;
+    private final Condition mDrawCondition;
+    private boolean mDrawFlag;
+    private DrawThread mDrawThread;
+    private SurfaceHolder mHolder;
+    private SurfaceViewDrawListener mDrawListener;
+    private DrawingSurfaceListener mDrawingSurfaceListener;
+
 
     private Layer mCurrentLayer;
     private Canvas mWorkingBitmapCanvas;
@@ -63,23 +67,31 @@ public class DrawingSurface extends SurfaceView implements 	SurfaceHolder.Callba
     public Bitmap mTestBitmap;
 
     protected boolean mIsSurfaceDrawable;
-    private DrawingSurfaceThread mDrawingThread;
 
-
-    public DrawingSurface(Context context, AttributeSet attrSet) {
+    public DrawingSurface(Context context, AttributeSet attrSet)
+    {
         super(context, attrSet);
+        mHolder = getHolder();
+        mHolder.addCallback(this);
+        mDrawListener = new SurfaceViewDrawListener();
+
+        mDrawLock = new ReentrantLock();
+        mDrawCondition = mDrawLock.newCondition();
+        mDrawFlag = true;
+
         init();
     }
 
-    public DrawingSurface(Context context) {
-        super(context);
-        init();
+    public void initDrawSurfaceListener()
+    {
+        PaintroidApplication.perspective = new Perspective(mHolder);
+        mDrawingSurfaceListener = new DrawingSurfaceListener();
+        setOnTouchListener(mDrawingSurfaceListener);
+        mDrawingSurfaceListener.setDrawListener(mDrawListener);
     }
 
     private void init()
     {
-        getHolder().addCallback(this);
-
         mWorkingBitmapRect = new Rect();
         mWorkingBitmapCanvas = new Canvas();
 
@@ -93,6 +105,7 @@ public class DrawingSurface extends SurfaceView implements 	SurfaceHolder.Callba
 
     }
 
+
     public Canvas getWorkingCanvas()
     {
         return  mWorkingBitmapCanvas;
@@ -103,18 +116,20 @@ public class DrawingSurface extends SurfaceView implements 	SurfaceHolder.Callba
     {
         Log.w(PaintroidApplication.TAG, "DrawingSurfaceView.surfaceChanged");
         PaintroidApplication.perspective.setSurfaceHolder(holder);
-        if (mCurrentLayer.getBitmap() != null && mDrawingThread != null)
-        {
-            starDrawingThread();
-        }
     }
 
     @Override
     public void surfaceCreated(SurfaceHolder holder)
     {
         Log.w(PaintroidApplication.TAG, "DrawingSurfaceView.surfaceCreated");
-        mDrawingThread = new DrawingSurfaceThread(new DrawLoop());
         mIsSurfaceDrawable = true;
+        PaintroidApplication.perspective.setSurfaceHolder(holder);
+        if (mDrawThread != null) {
+            mDrawThread.stopThread();
+            mDrawThread.mInstance = null;
+        }
+        mDrawThread = new DrawThread(this);
+        mDrawThread.start();
     }
 
     @Override
@@ -122,26 +137,10 @@ public class DrawingSurface extends SurfaceView implements 	SurfaceHolder.Callba
     {
         Log.w(PaintroidApplication.TAG, "DrawingSurfaceView.surfaceDestroyed");
         mIsSurfaceDrawable = false;
-        stopDrawingThread();
+        mDrawThread.stopThread();
     }
 
-    private synchronized void  starDrawingThread()
-    {
-        if (mIsSurfaceDrawable)
-        {
-            mDrawingThread.start();
-        }
-    }
-
-    private synchronized void stopDrawingThread()
-    {
-        if (mDrawingThread != null)
-        {
-            mDrawingThread.stop();
-        }
-    }
-
-    private synchronized void doDraw(Canvas surfaceViewCanvas)
+    public void doDraw(Canvas surfaceViewCanvas)
     {
         try
         {
@@ -209,6 +208,7 @@ public class DrawingSurface extends SurfaceView implements 	SurfaceHolder.Callba
         {
             mWorkingBitmapCanvas.setBitmap(mCurrentLayer.getBitmap());
             mWorkingBitmapRect.set(0, 0, mCurrentLayer.getBitmap().getWidth(), mCurrentLayer.getBitmap().getHeight());
+            mDrawingSurfaceListener.setCurrentLayer(layer);
         }
     }
 
@@ -333,44 +333,74 @@ public class DrawingSurface extends SurfaceView implements 	SurfaceHolder.Callba
         return 0;
     }
 
-    private class DrawLoop implements Runnable {
-        @Override
-        public void run()
+    private static class DrawThread extends Thread {
+
+        private boolean mRun = true;
+        private DrawingSurface mInstance;
+
+        public DrawThread(DrawingSurface instance) {
+            mInstance = instance;
+        }
+
+        public void stopThread()
         {
-            SurfaceHolder holder = getHolder();
-            Canvas canvas = null;
+            mRun = false;
+            if (mInstance != null && mInstance.mDrawListener != null) {
+                mInstance.mDrawListener.redraw();
+            }
+        }
 
-            if (Build.VERSION.SDK_INT >= SDK_VERSION) // TODO: set build flag
-            {
+        @Override
+        public void run() {
+            while (mRun && mInstance != null) {
                 try
                 {
-                    Thread.sleep(DRAW_THREAD_TIMEOUT);
-                }
-                catch (InterruptedException e)
+                    mInstance.mDrawLock.lock();
+                    if (mRun)
+                    {
+                        while (!mInstance.mDrawFlag)
+                        {
+                            mInstance.mDrawCondition.await();
+                        }
+
+                        Canvas canvas = mInstance.mHolder.lockCanvas(mInstance.mHolder.getSurfaceFrame());
+
+                        if (canvas != null)
+                        {
+                            mInstance.doDraw(canvas);
+                            mInstance.mDrawListener.hadRedraw();
+                            mInstance.mHolder.unlockCanvasAndPost(canvas);
+                        }
+                    }
+                } catch (InterruptedException e)
                 {
-                    Log.w(PaintroidApplication.TAG, "DrawingSurface: sleeping thread was interrupted");
+                } finally
+                {
+                    mInstance.mDrawLock.unlock();
                 }
             }
+            mInstance = null;
+        }
+    }
 
-            synchronized (holder)
-            {
-                try
-                {
-                    canvas = holder.lockCanvas();
+    private class SurfaceViewDrawListener implements DrawingSurfaceListener.DrawListener
+    {
+        public SurfaceViewDrawListener() {
+        }
 
-                    if (canvas != null && mIsSurfaceDrawable)
-                    {
-                        doDraw(canvas);
-                    }
-                }
-                finally
-                {
-                    if (canvas != null)
-                    {
-                        holder.unlockCanvasAndPost(canvas);
-                    }
-                }
-            }
+        @Override
+        public void redraw() {
+            mDrawLock.lock();
+            mDrawFlag = true;
+            mDrawCondition.signalAll();
+            mDrawLock.unlock();
+        }
+
+        public void hadRedraw()
+        {
+            mDrawLock.lock();
+            mDrawFlag = false;
+            mDrawLock.unlock();
         }
     }
 }
