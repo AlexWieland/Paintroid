@@ -33,6 +33,7 @@ import org.catrobat.paintroid.command.UndoRedoManager.StatusMode;
 import org.catrobat.paintroid.dialog.IndeterminateProgressDialog;
 import org.catrobat.paintroid.tools.Layer;
 import org.catrobat.paintroid.tools.Tool;
+import org.catrobat.paintroid.ui.DrawSurfaceTrigger;
 
 public class CommandManagerImplementation implements CommandManager, Observer
 {
@@ -41,7 +42,8 @@ public class CommandManagerImplementation implements CommandManager, Observer
 	private final LinkedList<Command> mCommandList;
     private LinkedList<Command> mUndo;
 
-	public CommandManagerImplementation() {
+	public CommandManagerImplementation()
+    {
 		mCommandList = new LinkedList<Command>();
         mUndo = new LinkedList<Command>();
 	}
@@ -80,7 +82,7 @@ public class CommandManagerImplementation implements CommandManager, Observer
         Canvas canvas = PaintroidApplication.drawingSurface.getWorkingCanvas();
         synchronized (canvas)
         {
-            if(mCommandList.size() != 0)
+            if(mCommandList.size() > 1)
             {
                 Command command = mCommandList.removeLast();
                 mUndo.addFirst(command);
