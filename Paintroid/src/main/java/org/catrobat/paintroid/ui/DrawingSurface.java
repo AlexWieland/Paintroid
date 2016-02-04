@@ -55,7 +55,7 @@ public class DrawingSurface extends SurfaceView implements 	SurfaceHolder.Callba
     private boolean mDrawFlag;
     private DrawThread mDrawThread;
     private SurfaceHolder mHolder;
-    private SurfaceViewDrawListener mDrawListener;
+    private SurfaceViewDrawTrigger mSurfaceViewDrawTrigger;
     private DrawingSurfaceListener mDrawingSurfaceListener;
 
 
@@ -73,7 +73,7 @@ public class DrawingSurface extends SurfaceView implements 	SurfaceHolder.Callba
         super(context, attrSet);
         mHolder = getHolder();
         mHolder.addCallback(this);
-        mDrawListener = new SurfaceViewDrawListener();
+        mSurfaceViewDrawTrigger = new SurfaceViewDrawTrigger();
 
         mDrawLock = new ReentrantLock();
         mDrawCondition = mDrawLock.newCondition();
@@ -85,9 +85,9 @@ public class DrawingSurface extends SurfaceView implements 	SurfaceHolder.Callba
     public void initDrawSurfaceListener()
     {
         PaintroidApplication.perspective = new Perspective(mHolder);
-        mDrawingSurfaceListener = new DrawingSurfaceListener();
+        mDrawingSurfaceListener = new DrawingSurfaceListener(mSurfaceViewDrawTrigger);
         setOnTouchListener(mDrawingSurfaceListener);
-        mDrawingSurfaceListener.setDrawListener(mDrawListener);
+        mDrawingSurfaceListener.setDrawListener(mSurfaceViewDrawTrigger);
     }
 
     private void init()
@@ -102,9 +102,12 @@ public class DrawingSurface extends SurfaceView implements 	SurfaceHolder.Callba
         mClearPaint = new Paint();
         mClearPaint.setColor(Color.TRANSPARENT);
         mClearPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
-
     }
 
+    public DrawSurfaceTrigger getSurfaceViewDrawTrigger()
+    {
+        return  mSurfaceViewDrawTrigger;
+    }
 
     public Canvas getWorkingCanvas()
     {
@@ -210,11 +213,6 @@ public class DrawingSurface extends SurfaceView implements 	SurfaceHolder.Callba
             mWorkingBitmapRect.set(0, 0, mCurrentLayer.getBitmap().getWidth(), mCurrentLayer.getBitmap().getHeight());
             mDrawingSurfaceListener.setCurrentLayer(layer);
         }
-    }
-
-    public DrawingSurfaceListener.DrawListener getDrawListener()
-    {
-        return mDrawListener;
     }
 
     public Layer getCurrentLayer()
@@ -340,27 +338,32 @@ public class DrawingSurface extends SurfaceView implements 	SurfaceHolder.Callba
 
     private static class DrawThread extends Thread {
 
-        private boolean mRun = true;
+        private boolean mRun;
         private DrawingSurface mInstance;
 
-        public DrawThread(DrawingSurface instance) {
+        public DrawThread(DrawingSurface instance)
+        {
+            mRun = true;
             mInstance = instance;
         }
 
         public void stopThread()
         {
             mRun = false;
-            if (mInstance != null && mInstance.mDrawListener != null) {
-                mInstance.mDrawListener.redraw();
+            if (mInstance != null && mInstance.mSurfaceViewDrawTrigger != null) {
+                mInstance.mSurfaceViewDrawTrigger.redraw();
             }
         }
 
         @Override
-        public void run() {
-            while (mRun && mInstance != null) {
+        public void run()
+        {
+            while (mRun && mInstance != null)
+            {
                 try
                 {
                     mInstance.mDrawLock.lock();
+
                     if (mRun)
                     {
                         while (!mInstance.mDrawFlag)
@@ -373,34 +376,40 @@ public class DrawingSurface extends SurfaceView implements 	SurfaceHolder.Callba
                         if (canvas != null)
                         {
                             mInstance.doDraw(canvas);
-                            mInstance.mDrawListener.hadRedraw();
+                            mInstance.mSurfaceViewDrawTrigger.hadRedraw();
                             mInstance.mHolder.unlockCanvasAndPost(canvas);
                         }
                     }
-                } catch (InterruptedException e)
+                }
+                catch (InterruptedException e)
                 {
-                } finally
+                    Log.d(this.getName(), e.getMessage());
+                }
+                finally
                 {
                     mInstance.mDrawLock.unlock();
                 }
             }
+
             mInstance = null;
         }
     }
 
-    private class SurfaceViewDrawListener implements DrawingSurfaceListener.DrawListener
+    private class SurfaceViewDrawTrigger implements DrawSurfaceTrigger
     {
-        public SurfaceViewDrawListener() {
+        public SurfaceViewDrawTrigger() {
         }
 
         @Override
-        public void redraw() {
+        public void redraw()
+        {
             mDrawLock.lock();
             mDrawFlag = true;
             mDrawCondition.signalAll();
             mDrawLock.unlock();
         }
 
+        @Override
         public void hadRedraw()
         {
             mDrawLock.lock();

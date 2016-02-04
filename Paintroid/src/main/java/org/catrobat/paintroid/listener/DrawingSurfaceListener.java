@@ -25,6 +25,7 @@ import org.catrobat.paintroid.PaintroidApplication;
 import org.catrobat.paintroid.tools.Layer;
 import org.catrobat.paintroid.tools.Tool.StateChange;
 import org.catrobat.paintroid.tools.ToolType;
+import org.catrobat.paintroid.ui.DrawSurfaceTrigger;
 import org.catrobat.paintroid.ui.Perspective;
 
 import android.graphics.Point;
@@ -48,12 +49,13 @@ public class DrawingSurfaceListener implements OnTouchListener {
 	private MoveThread moveThread;
 	private Layer mCurrentLayer;
 
-    private DrawListener mDrawListener;
+    private DrawSurfaceTrigger mDrawSurfaceTrigger;
 
-	public DrawingSurfaceListener() {
+	public DrawingSurfaceListener(DrawSurfaceTrigger drawSurfaceTrigger) {
 		mPerspective = PaintroidApplication.perspective;
 		mPointerMean = new PointF(0, 0);
 		mTouchMode = TouchMode.DRAW;
+        mDrawSurfaceTrigger = drawSurfaceTrigger;
 	}
 
 	private float calculatePointerDistance(MotionEvent event) {
@@ -102,7 +104,7 @@ public class DrawingSurfaceListener implements OnTouchListener {
 
 			case MotionEvent.ACTION_MOVE:
 
-                mDrawListener.redraw();
+                mDrawSurfaceTrigger.redraw();
                 if (event.getPointerCount() == 1)
                 {
 					if (System.nanoTime() < (mZoomTimeStamp + BLOCKING_TIME))
@@ -168,7 +170,7 @@ public class DrawingSurfaceListener implements OnTouchListener {
 				}
 				mPointerDistance = 0;
 				mPointerMean.set(0, 0);
-                mDrawListener.redraw();
+                mDrawSurfaceTrigger.redraw();
 				break;
             default:
                 return  false;
@@ -176,13 +178,8 @@ public class DrawingSurfaceListener implements OnTouchListener {
 		return true;
 	}
 
-    public interface DrawListener
-    {
-        void redraw();
-    }
-
-    public void setDrawListener(DrawListener drawListener) {
-        mDrawListener = drawListener;
+    public void setDrawListener(DrawSurfaceTrigger drawListener) {
+        mDrawSurfaceTrigger = drawListener;
     }
 
 	private class MoveThread extends Thread {
