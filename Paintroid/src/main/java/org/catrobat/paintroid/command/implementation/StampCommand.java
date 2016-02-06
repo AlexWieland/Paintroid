@@ -64,14 +64,14 @@ public class StampCommand extends BaseCommand {
 	}
 
 	@Override
-	public void run(Canvas canvas, Layer layer) {
+	public void run(Canvas canvas) {
 
 		notifyStatus(NOTIFY_STATES.COMMAND_STARTED);
 //		if (mFileToStoredBitmap != null) {
 //			mBitmap = FileIO.getBitmapFromFile(mFileToStoredBitmap);
 //		}
 
-		Bitmap bitmap = layer.getBitmap();
+/*		Bitmap bitmap = layer.getBitmap();
 
 		if (bitmap == null) {
 			setChanged();
@@ -84,7 +84,7 @@ public class StampCommand extends BaseCommand {
 		canvas.rotate(mBoxRotation);
 		canvas.drawBitmap(bitmap, null, mBoxRect, mPaint);
 
-		canvas.restore();
+		canvas.restore();*/
 
 //		if (mFileToStoredBitmap == null) {
 //			storeBitmap();

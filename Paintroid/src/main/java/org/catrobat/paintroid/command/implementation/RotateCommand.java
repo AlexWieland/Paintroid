@@ -25,7 +25,7 @@ public class RotateCommand extends BaseCommand {
 	}
 
 	@Override
-	public void run(Canvas canvas, Layer layer) {
+	public void run(Canvas canvas) {
 		setChanged();
 		notifyStatus(NOTIFY_STATES.COMMAND_STARTED);
 		if (mRotateDirection == null) {
@@ -53,6 +53,7 @@ public class RotateCommand extends BaseCommand {
 			return;
 		}
 
+/*
 		Bitmap bitmap = layer.getBitmap();
 		Bitmap rotatedBitmap = Bitmap.createBitmap(bitmap, 0, 0,
 				bitmap.getWidth(), bitmap.getHeight(), rotateMatrix, true);
@@ -63,6 +64,7 @@ public class RotateCommand extends BaseCommand {
 		if (PaintroidApplication.drawingSurface != null) {
 			PaintroidApplication.drawingSurface.updateBitmap(rotatedBitmap);
 		}
+*/
 
 		setChanged();
 

@@ -22,7 +22,6 @@ package org.catrobat.paintroid.ui.button;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,7 +32,8 @@ import android.widget.TextView;
 
 import org.catrobat.paintroid.PaintroidApplication;
 import org.catrobat.paintroid.R;
-import org.catrobat.paintroid.command.implementation.ClearCommand;
+import org.catrobat.paintroid.command.implementation.LayerCommand;
+import org.catrobat.paintroid.command.implementation.LayerCommandOld;
 import org.catrobat.paintroid.tools.Layer;
 import org.catrobat.paintroid.ui.DrawingSurface;
 
@@ -56,8 +56,7 @@ public class LayersAdapter extends BaseAdapter {
 	private void initLayers(boolean fromCatrobat, Layer first_layer)
 	{
 		mLayerList = new ArrayList<Layer>();
-		mLayerList.add(0,first_layer);
-        PaintroidApplication.commandManager.commitCommand(new ClearCommand(Color.TRANSPARENT, first_layer.getLayerID()));
+		mLayerList.add(0, first_layer);
 		mLayerCounter++;
 	}
 
@@ -124,9 +123,9 @@ public class LayersAdapter extends BaseAdapter {
 											   ,drawingSurface.getBitmapHeight()
 										       ,Bitmap.Config.ARGB_8888);
 
-            Layer layer = new Layer(mLayerCounter, image);
-			mLayerList.add(0,layer);
-            PaintroidApplication.commandManager.commitCommand(new ClearCommand(Color.TRANSPARENT, layer.getLayerID()));
+            Layer layer = new Layer(mLayerCounter, image, PaintroidApplication.drawingSurface.getWorkingCanvas());
+			mLayerList.add(0, layer);
+            PaintroidApplication.commandManager.commitAddLayerCommand(new LayerCommand(layer));
 			mLayerCounter++;
 			notifyDataSetChanged();
 			return true;
@@ -140,14 +139,14 @@ public class LayersAdapter extends BaseAdapter {
 	public void tryAddLayer(Layer existingLayer)
     {
 
-/*		DrawingSurface drawingSurface = PaintroidApplication.drawingSurface;
+		DrawingSurface drawingSurface = PaintroidApplication.drawingSurface;
 		Bitmap image = Bitmap.createBitmap(drawingSurface.getBitmapWidth()
-				,drawingSurface.getBitmapHeight()
-				,Bitmap.Config.ARGB_8888);
-		Layer bufferLayer = new Layer(existingLayer.getLayerID(), image);
+				                            ,drawingSurface.getBitmapHeight()
+				                            ,Bitmap.Config.ARGB_8888);
+		Layer bufferLayer = new Layer(existingLayer.getLayerID(), image, PaintroidApplication.drawingSurface.getWorkingCanvas());
 		bufferLayer.setName(existingLayer.getName());
-		mLayerList.add(bufferLayer);
-		notifyDataSetChanged();*/
+		mLayerList.add(0,bufferLayer);
+		notifyDataSetChanged();
 	}
 
 	public void removeLayer(int layer_to_remove)
@@ -237,7 +236,7 @@ public class LayersAdapter extends BaseAdapter {
 		if(mLayerList.size() < mMaxLayer)
 		{
 			Bitmap image = getLayer(currentLayer).getBitmap();
-			mLayerList.add(0,new Layer(mLayerCounter, image.copy(image.getConfig(), true)));
+			mLayerList.add(0,new Layer(mLayerCounter, image.copy(image.getConfig(), true), PaintroidApplication.drawingSurface.getWorkingCanvas()));
 
 			notifyDataSetChanged();
 			return true;

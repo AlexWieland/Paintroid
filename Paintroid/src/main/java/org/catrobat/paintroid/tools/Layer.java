@@ -13,6 +13,7 @@ public class Layer {
     private boolean mIsLocked;
     private boolean mIsVisible;
     private boolean mIsSelected;
+    private Canvas mLayerCanvas;
 
 
     public void setSelected(boolean toSet)
@@ -25,9 +26,10 @@ public class Layer {
         return mIsSelected;
     }
 
-    public Layer(int layer_id, Bitmap bitmap) {
+    public Layer(int layer_id, Bitmap bitmap, Canvas canvas) {
         mLayerID = layer_id;
         mBitmap = bitmap;
+       mLayerCanvas = canvas;
         setSelected(false);
         mLayerName = LAYER_PREFIX + layer_id;
         mIsLocked = false;
@@ -96,6 +98,12 @@ public class Layer {
     public void setBitmap(Bitmap bitmap)
     {
         mBitmap = bitmap;
+        mLayerCanvas.setBitmap(bitmap);
+    }
+
+    public Canvas getLayerCanvas()
+    {
+        return mLayerCanvas;
     }
 
     public Layer getLayer()

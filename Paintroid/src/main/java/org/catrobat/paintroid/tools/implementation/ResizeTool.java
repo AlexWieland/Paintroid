@@ -25,6 +25,7 @@ import org.catrobat.paintroid.PaintroidApplication;
 import org.catrobat.paintroid.R;
 import org.catrobat.paintroid.command.Command;
 import org.catrobat.paintroid.command.implementation.BaseCommand;
+import org.catrobat.paintroid.command.implementation.LayerCommand;
 import org.catrobat.paintroid.command.implementation.ResizeCommand;
 import org.catrobat.paintroid.dialog.IndeterminateProgressDialog;
 import org.catrobat.paintroid.tools.Layer;
@@ -246,7 +247,8 @@ public class ResizeTool extends BaseToolWithRectangleShape {
 						(int) mMaximumBoxResolution);
 
 				((ResizeCommand) command).addObserver(this);
-				PaintroidApplication.commandManager.commitCommand(command);
+                Layer currentLayer = PaintroidApplication.drawingSurface.getCurrentLayer();
+                PaintroidApplication.commandManager.commitCommandToLayer(new LayerCommand(currentLayer), command);
 			} else {
 				mCropRunFinished = true;
 				displayToastInformation(R.string.resize_nothing_to_resize);

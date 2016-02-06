@@ -47,7 +47,7 @@ public class ResizeCommand extends BaseCommand {
 	}
 
 	@Override
-	public void run(Canvas canvas, Layer layer) {
+	public void run(Canvas canvas) {
 
 		notifyStatus(NOTIFY_STATES.COMMAND_STARTED);
 /*		if (mFileToStoredBitmap != null) {
@@ -59,7 +59,7 @@ public class ResizeCommand extends BaseCommand {
 		}*/
 		try {
 
-			if (mResizeCoordinateXRight < mResizeCoordinateXLeft) {
+		/*	if (mResizeCoordinateXRight < mResizeCoordinateXLeft) {
 				Log.e(PaintroidApplication.TAG,
 						"coordinate X right must be larger than coordinate X left");
 
@@ -125,7 +125,7 @@ public class ResizeCommand extends BaseCommand {
 			resizedBitmap.setPixels(pixelsToCopy, 0, copyToWidth, copyToXLeft, copyToYTop,
 					copyToWidth, copyToHeight);
 
-			PaintroidApplication.drawingSurface.updateBitmap(resizedBitmap);
+			PaintroidApplication.drawingSurface.updateBitmap(resizedBitmap);*/
 
 //			if (mFileToStoredBitmap == null) {
 //				mBitmap = resizedBitmap.copy(Config.ARGB_8888, true);

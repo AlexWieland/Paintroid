@@ -19,17 +19,69 @@
 
 package org.catrobat.paintroid.command;
 
-import org.catrobat.paintroid.command.implementation.CommandManagerImplementation;
+import org.catrobat.paintroid.command.implementation.LayerCommand;
 
-public interface CommandManager {
+/**
+ * Describes undo/redo command manager responsible for applications layer management.
+ */
+public interface CommandManager
+{
 
-	boolean hasCommands();
+    /**
+     * Adds the new command (draw path, erase, draw shape) to corresponding layer.
+     * @param command command to commit to layer.
+     * @param layerCommand contains layer to which command should be commited.
+     */
+	void commitCommandToLayer(LayerCommand layerCommand, Command command);
 
-	void resetAndClear();
+    /**
+     * Adds new layer to application.
+     * @param layerCommand contains layer to add.
+     */
+    void commitAddLayerCommand(LayerCommand layerCommand);
 
-	boolean commitCommand(Command commandObject);
+    /**
+     * Removes corresponding layer from application.
+     * @param layerCommand contains layer to remove.
+     */
+    void commitRemoveLayerCommand(LayerCommand layerCommand);
 
+    /**
+     * Merges two layers.
+     * @param layerCommand contains layer to be merged.
+     */
+    void commitMergeLayerCommand(LayerCommand layerCommand);
+
+    /**
+     * Changes visibility of corresponding layer.
+     * @param layerCommand contains layer which visibility should be changed.
+     */
+    void commitLayerVisibilityCommand(LayerCommand layerCommand);
+
+    /**
+     * Locks the corresponding layer.
+     * @param layerCommand contains layer which should be (un)locked.
+     */
+    void commitLayerLockCommand(LayerCommand layerCommand);
+
+    /**
+     * Renames corresponding layer.
+     * @param layerCommand contains layer to rename.
+     */
+    void commitRenameLayerCommand(LayerCommand layerCommand);
+
+    /**
+     * Undo last command applied to specific layer.
+     */
 	void undo();
 
+    /**
+     * Redo last command applied to specific layer.
+     */
 	void redo();
+
+    /**
+     * Clears manager command lists.
+     */
+    void resetAndClear();
 }

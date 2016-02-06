@@ -25,6 +25,5 @@ import org.catrobat.paintroid.tools.Layer;
 
 public interface Command {
 
-	void run(Canvas canvas, Layer layer);
-
+	void run(Canvas canvas);
 }

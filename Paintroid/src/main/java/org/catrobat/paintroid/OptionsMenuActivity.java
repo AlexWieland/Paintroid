@@ -22,8 +22,7 @@ package org.catrobat.paintroid;
 import java.io.File;
 
 import org.catrobat.paintroid.command.Command;
-import org.catrobat.paintroid.command.implementation.LayerCommand;
-import org.catrobat.paintroid.command.implementation.PointCommand;
+import org.catrobat.paintroid.command.implementation.LayerCommandOld;
 import org.catrobat.paintroid.dialog.IndeterminateProgressDialog;
 import org.catrobat.paintroid.dialog.InfoDialog;
 import org.catrobat.paintroid.dialog.InfoDialog.DialogType;
@@ -37,7 +36,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.net.Uri;
@@ -110,7 +108,7 @@ public abstract class OptionsMenuActivity extends SherlockFragmentActivity {
 
     private void onCreateEmptyImage()
     {
-        if (!PaintroidApplication.commandManager.hasCommands() && PaintroidApplication.isPlainImage
+        if (PaintroidApplication.isPlainImage //!PaintroidApplication.commandManager.hasCommands() &&
                 && !PaintroidApplication.openedFromCatroid)
         {
             initialiseNewBitmap();
@@ -335,8 +333,8 @@ public abstract class OptionsMenuActivity extends SherlockFragmentActivity {
                     PaintroidApplication.isPlainImage = false;
                     PaintroidApplication.isSaved = false;
                     PaintroidApplication.savedPictureUri = null;
-                    Command commandLoad = new LayerCommand(LayerCommand.LayerAction.INSERT_IMAGE, LayersDialog.getInstance().getCurrentLayer(), null);
-                    PaintroidApplication.commandManager.commitCommand(commandLoad);
+                    Command commandLoad = new LayerCommandOld(LayerCommandOld.LayerAction.INSERT_IMAGE, LayersDialog.getInstance().getCurrentLayer(), null);
+                    //PaintroidApplication.commandManager.commitCommand(commandLoad);
                     break;
 
                 case REQUEST_CODE_TAKE_PICTURE:
@@ -344,8 +342,8 @@ public abstract class OptionsMenuActivity extends SherlockFragmentActivity {
                     PaintroidApplication.isPlainImage = false;
                     PaintroidApplication.isSaved = false;
                     PaintroidApplication.savedPictureUri = null;
-                    Command commandCamera = new LayerCommand(LayerCommand.LayerAction.INSERT_IMAGE, LayersDialog.getInstance().getCurrentLayer(), null);
-                    PaintroidApplication.commandManager.commitCommand(commandCamera);
+                    Command commandCamera = new LayerCommandOld(LayerCommandOld.LayerAction.INSERT_IMAGE, LayersDialog.getInstance().getCurrentLayer(), null);
+                    //PaintroidApplication.commandManager.commitCommand(commandCamera);
                     break;
             }
         }

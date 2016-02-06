@@ -22,6 +22,7 @@ package org.catrobat.paintroid.tools.implementation;
 import org.catrobat.paintroid.PaintroidApplication;
 import org.catrobat.paintroid.R;
 import org.catrobat.paintroid.command.Command;
+import org.catrobat.paintroid.command.implementation.LayerCommand;
 import org.catrobat.paintroid.command.implementation.StampCommand;
 import org.catrobat.paintroid.dialog.IndeterminateProgressDialog;
 import org.catrobat.paintroid.tools.Layer;
@@ -305,7 +306,8 @@ public class StampTool extends BaseToolWithRectangleShape {
 		Command command = new StampCommand(intPosition,	mBoxWidth, mBoxHeight, mBoxRotation, mDrawingBitmap, PaintroidApplication.drawingSurface.getCurrentLayer().getLayerID());
 		((StampCommand) command).addObserver(this);
 		IndeterminateProgressDialog.getInstance().show();
-		PaintroidApplication.commandManager.commitCommand(command);
+        Layer currentLayer = PaintroidApplication.drawingSurface.getCurrentLayer();
+        PaintroidApplication.commandManager.commitCommandToLayer(new LayerCommand(currentLayer), command);
 	}
 
 	@Override

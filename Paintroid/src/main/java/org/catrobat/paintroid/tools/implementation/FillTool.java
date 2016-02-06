@@ -23,6 +23,7 @@ import org.catrobat.paintroid.PaintroidApplication;
 import org.catrobat.paintroid.R;
 import org.catrobat.paintroid.command.Command;
 import org.catrobat.paintroid.command.implementation.FillCommand;
+import org.catrobat.paintroid.command.implementation.LayerCommand;
 import org.catrobat.paintroid.dialog.IndeterminateProgressDialog;
 import org.catrobat.paintroid.tools.Layer;
 import org.catrobat.paintroid.tools.ToolType;
@@ -65,13 +66,13 @@ public class FillTool extends BaseTool {
 			return false;
 		}
 
+        Layer currentLayer = PaintroidApplication.drawingSurface.getCurrentLayer();
 		Command command = new FillCommand(new Point((int) coordinate.x,
-				(int) coordinate.y), mBitmapPaint,  PaintroidApplication.drawingSurface.getCurrentLayer().getLayerID());
+				(int) coordinate.y), mBitmapPaint,  currentLayer.getLayerID());
 
 		IndeterminateProgressDialog.getInstance().show();
 		((FillCommand) command).addObserver(this);
-		PaintroidApplication.commandManager.commitCommand(command);
-
+        PaintroidApplication.commandManager.commitCommandToLayer(new LayerCommand(currentLayer), command);
 		return true;
 	}
 

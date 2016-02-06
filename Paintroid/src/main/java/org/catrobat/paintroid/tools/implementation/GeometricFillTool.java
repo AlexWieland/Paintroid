@@ -22,6 +22,7 @@ package org.catrobat.paintroid.tools.implementation;
 import org.catrobat.paintroid.PaintroidApplication;
 import org.catrobat.paintroid.R;
 import org.catrobat.paintroid.command.Command;
+import org.catrobat.paintroid.command.implementation.LayerCommand;
 import org.catrobat.paintroid.command.implementation.StampCommand;
 import org.catrobat.paintroid.dialog.IndeterminateProgressDialog;
 import org.catrobat.paintroid.dialog.colorpicker.ColorPickerDialog.OnColorPickedListener;
@@ -141,11 +142,14 @@ public class GeometricFillTool extends BaseToolWithRectangleShape {
 	protected void onClickInBox() {
 		Point intPosition = new Point((int) mToolPosition.x,
 				(int) mToolPosition.y);
+
+        Layer currentLayer = PaintroidApplication.drawingSurface.getCurrentLayer();
+
 		Command command = new StampCommand(intPosition,
-				mBoxWidth, mBoxHeight, mBoxRotation, mDrawingBitmap, PaintroidApplication.drawingSurface.getCurrentLayer().getLayerID());
+				mBoxWidth, mBoxHeight, mBoxRotation, mDrawingBitmap, currentLayer.getLayerID());
 		((StampCommand) command).addObserver(this);
 		IndeterminateProgressDialog.getInstance().show();
-		PaintroidApplication.commandManager.commitCommand(command);
+        PaintroidApplication.commandManager.commitCommandToLayer(new LayerCommand(currentLayer), command);
 	}
 
 	@Override

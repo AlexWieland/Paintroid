@@ -34,14 +34,14 @@ public class ClearCommand extends BaseCommand {
 	}
 
 	@Override
-	public void run(Canvas canvas, Layer layer)
+	public void run(Canvas canvas)
     {
-		if (layer != null)
+/*		if (layer != null)
         {
 			if(layer.getBitmap() != null)
             {
 				layer.getBitmap().eraseColor(mColor);
 			}
-		}
+		}*/
 	}
 }

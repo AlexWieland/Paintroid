@@ -46,10 +46,12 @@ import org.catrobat.paintroid.MainActivity;
 import org.catrobat.paintroid.PaintroidApplication;
 import org.catrobat.paintroid.R;
 import org.catrobat.paintroid.command.Command;
-import org.catrobat.paintroid.command.implementation.ClearCommand;
 import org.catrobat.paintroid.command.implementation.LayerCommand;
+import org.catrobat.paintroid.command.implementation.LayerCommandOld;
 import org.catrobat.paintroid.tools.Layer;
 import org.catrobat.paintroid.ui.button.LayersAdapter;
+
+import java.util.ArrayList;
 
 public final class LayersDialog extends BaseDialog implements OnItemClickListener
 		,OnItemLongClickListener
@@ -275,7 +277,6 @@ public final class LayersDialog extends BaseDialog implements OnItemClickListene
 		{
 			refreshView();
             Layer layer = mLayerButtonAdapter.getLayer(0);
-			PaintroidApplication.commandManager.commitCommand(new LayerCommand(LayerCommand.LayerAction.ADD, layer, null));
 		}
 		else
 		{
@@ -303,11 +304,10 @@ public final class LayersDialog extends BaseDialog implements OnItemClickListene
 		}
 
 		mLayerButtonAdapter.removeLayer(mCurrentLayer.getLayerID());
+        PaintroidApplication.commandManager.commitRemoveLayerCommand(new LayerCommand(mCurrentLayer));
+
 		selectLayer(mLayerButtonAdapter.getLayer(adjacentLayerPosition));
 		refreshView();
-
-		Command command = new LayerCommand(LayerCommand.LayerAction.REMOVE, mCurrentLayer, null);
-		PaintroidApplication.commandManager.commitCommand(command);
 	}
 
 	public void selectLayer(Layer layer)
@@ -356,8 +356,7 @@ public final class LayersDialog extends BaseDialog implements OnItemClickListene
 			{
 				mCurrentLayer.setName(input.getText().toString());
 				getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
-				Command command = new LayerCommand(LayerCommand.LayerAction.RENAME, mCurrentLayer, null);
-				PaintroidApplication.commandManager.commitCommand(command);
+				PaintroidApplication.commandManager.commitRenameLayerCommand(new LayerCommand(mCurrentLayer));
 				refreshView();
 			}
 		});
@@ -396,16 +395,14 @@ public final class LayersDialog extends BaseDialog implements OnItemClickListene
 	public void toggleLayerVisible()
 	{
 		mCurrentLayer.setVisible(!mCurrentLayer.getVisible());
-		Command command = new LayerCommand(LayerCommand.LayerAction.SET_VISIBILITY, mCurrentLayer, null);
-		PaintroidApplication.commandManager.commitCommand(command);
+		PaintroidApplication.commandManager.commitLayerVisibilityCommand(new LayerCommand(mCurrentLayer));
 		refreshView();
 	}
 
 	public void toggleLayerLocked()
 	{
 		mCurrentLayer.setLocked(!mCurrentLayer.getLocked());
-		Command command = new LayerCommand(LayerCommand.LayerAction.SET_LOCK, mCurrentLayer, null);
-		PaintroidApplication.commandManager.commitCommand(command);
+		PaintroidApplication.commandManager.commitLayerLockCommand(new LayerCommand(mCurrentLayer));
 		refreshView();
 	}
 
@@ -432,8 +429,10 @@ public final class LayersDialog extends BaseDialog implements OnItemClickListene
 
 				mLayerButtonAdapter.removeLayer(firstLayertoMerge.getLayerID());
 
-				Command command = new LayerCommand(LayerCommand.LayerAction.MERGE, mCurrentLayer, firstLayertoMerge);
-				PaintroidApplication.commandManager.commitCommand(command);
+                ArrayList<Integer> layerToMergeIds = new ArrayList<Integer>();
+                layerToMergeIds.add(mCurrentLayer.getLayerID());
+                layerToMergeIds.add(firstLayertoMerge.getLayerID());
+				PaintroidApplication.commandManager.commitMergeLayerCommand(new LayerCommand(layerToMergeIds));
 
 				mergeButtonDisabled();
 				refreshView();

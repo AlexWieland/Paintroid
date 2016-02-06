@@ -29,37 +29,36 @@ import android.graphics.Color;
 
 public class BitmapCommand extends BaseCommand {
 
-	private boolean mResetScaleAndTranslation = true;
+    private boolean mResetScaleAndTranslation = true;
 
-	public BitmapCommand(Layer layer) {
+    public BitmapCommand(Layer layer) {
 
 //		if (bitmap != null) {
 //			mBitmap = Bitmap.createBitmap(bitmap);
 //		}
-	}
+    }
 
-	public BitmapCommand(Bitmap bitmap, boolean resetScaleAndTranslation) {
+    public BitmapCommand(Bitmap bitmap, boolean resetScaleAndTranslation) {
 //		this(bitmap);
-		mResetScaleAndTranslation = resetScaleAndTranslation;
-	}
+        mResetScaleAndTranslation = resetScaleAndTranslation;
+    }
 
-	@Override
-	public void run(Canvas canvas, Layer layer) {
+    @Override
+    public void run(Canvas canvas) {
 //		if (layer == null && mFileToStoredBitmap != null) {
 //			layer.setBitmap(FileIO.getBitmapFromFile(mFileToStoredBitmap));
 //		}
-		if (layer != null) {
+/*		if (layer != null) {
 			if (layer.getBitmap() != null) {
 				layer.getBitmap().eraseColor(Color.TRANSPARENT);
-			}
+			}*/
 //			PaintroidApplication.drawingSurface.setBitmap(layer.getBitmap().copy(
 //					Config.ARGB_8888, true));
 
-			if (mResetScaleAndTranslation
-					&& PaintroidApplication.perspective != null) {
-				PaintroidApplication.perspective.resetScaleAndTranslation();
-			}
+        if (mResetScaleAndTranslation
+                && PaintroidApplication.perspective != null) {
+            PaintroidApplication.perspective.resetScaleAndTranslation();
+        }
 
-		}
-	}
+    }
 }

@@ -42,7 +42,7 @@ public class FlipCommand extends BaseCommand {
 	}
 
 	@Override
-	public void run(Canvas canvas, Layer layer) {
+	public void run(Canvas canvas) {
 
 		notifyStatus(NOTIFY_STATES.COMMAND_STARTED);
 		if (mFlipDirection == null) {
@@ -52,6 +52,7 @@ public class FlipCommand extends BaseCommand {
 		}
 
 		Matrix flipMatrix = new Matrix();
+/*
 		Bitmap bitmap = layer.getBitmap();
 		switch (mFlipDirection) {
 		case FLIP_HORIZONTAL:
@@ -78,6 +79,7 @@ public class FlipCommand extends BaseCommand {
 		if (PaintroidApplication.drawingSurface != null) {
 			PaintroidApplication.drawingSurface.updateBitmap(flipBitmap);
 		}
+*/
 
 		notifyStatus(NOTIFY_STATES.COMMAND_DONE);
 	}

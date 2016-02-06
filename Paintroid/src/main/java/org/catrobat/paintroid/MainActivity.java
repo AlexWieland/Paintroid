@@ -21,6 +21,8 @@ package org.catrobat.paintroid;
 
 import java.io.File;
 
+import org.catrobat.paintroid.command.implementation.CommandManagerImplementation;
+import org.catrobat.paintroid.command.implementation.LayerCommand;
 import org.catrobat.paintroid.dialog.BrushPickerDialog;
 import org.catrobat.paintroid.dialog.CustomAlertDialogBuilder;
 import org.catrobat.paintroid.dialog.DialogAbout;
@@ -137,14 +139,19 @@ public class MainActivity extends OptionsMenuActivity {
 		}
 
 		PaintroidApplication.drawingSurface = (DrawingSurface) findViewById(R.id.drawingSurfaceView);
-
         PaintroidApplication.drawingSurface.initDrawSurfaceListener();
-
 
         mTopBar = new TopBar(this, PaintroidApplication.openedFromCatroid);
         mBottomBar = new BottomBar(this);
 
-        LayersDialog.init(this, new Layer(0, Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)));
+        LayersDialog.init(this, new Layer(0, Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)
+                                            , PaintroidApplication.drawingSurface.getWorkingCanvas()));
+
+        PaintroidApplication.commandManager = new CommandManagerImplementation
+                (PaintroidApplication.drawingSurface.getSurfaceViewDrawTrigger()
+                        , LayersDialog.getInstance().getAdapter());
+
+        PaintroidApplication.commandManager.commitAddLayerCommand(new LayerCommand(LayersDialog.getInstance().getAdapter().getLayer(0)));
 
 		if (PaintroidApplication.openedFromCatroid && catroidPicturePath != null
 				&& catroidPicturePath.length() > 0)
@@ -436,7 +443,7 @@ public class MainActivity extends OptionsMenuActivity {
 
 	private void showSecurityQuestionBeforeExit()
     {
-		if (PaintroidApplication.isSaved || !PaintroidApplication.commandManager.hasCommands()
+		if (PaintroidApplication.isSaved //|| !PaintroidApplication.commandManager.hasCommands()
 				&& PaintroidApplication.isPlainImage)
         {
 			finish();

@@ -22,6 +22,7 @@ package org.catrobat.paintroid.tools.implementation;
 import org.catrobat.paintroid.PaintroidApplication;
 import org.catrobat.paintroid.R;
 import org.catrobat.paintroid.command.Command;
+import org.catrobat.paintroid.command.implementation.LayerCommand;
 import org.catrobat.paintroid.command.implementation.PathCommand;
 import org.catrobat.paintroid.tools.Layer;
 import org.catrobat.paintroid.tools.ToolType;
@@ -91,8 +92,9 @@ public class LineTool extends BaseTool {
 		Path finalPath = new Path();
 		finalPath.moveTo(mInitialEventCoordinate.x, mInitialEventCoordinate.y);
 		finalPath.lineTo(coordinate.x, coordinate.y);
-		Command command = new PathCommand(mBitmapPaint, finalPath,  PaintroidApplication.drawingSurface.getCurrentLayer().getLayerID());
-		PaintroidApplication.commandManager.commitCommand(command);
+        Layer currentLayer = PaintroidApplication.drawingSurface.getCurrentLayer();
+		Command command = new PathCommand(mBitmapPaint, finalPath, currentLayer.getLayerID());
+        PaintroidApplication.commandManager.commitCommandToLayer(new LayerCommand(currentLayer), command);
 		return true;
 	}
 

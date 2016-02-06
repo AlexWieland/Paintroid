@@ -41,7 +41,7 @@ public class FillCommand extends BaseCommand {
 	}
 
 	@Override
-	public void run(Canvas canvas, Layer layer) {
+	public void run(Canvas canvas) {
 
 		notifyStatus(NOTIFY_STATES.COMMAND_STARTED);
 		if (mClickedPixel == null) {
@@ -56,7 +56,7 @@ public class FillCommand extends BaseCommand {
 			Log.w(PaintroidApplication.TAG,
 					"Fill Command color: " + mPaint.getColor());
 		} else {
-			Bitmap bitmap = layer.getBitmap();
+/*			Bitmap bitmap = layer.getBitmap();
 			int colorToReplace = bitmap.getPixel(mClickedPixel.x,
 					mClickedPixel.y);
 			int pixels[] = new int[bitmap.getWidth() * bitmap.getHeight()];
@@ -68,7 +68,7 @@ public class FillCommand extends BaseCommand {
 					mPaint.getColor(), SELECTION_THRESHOLD);
 
 			bitmap.setPixels(pixels, 0, bitmap.getWidth(), 0, 0,
-					bitmap.getWidth(), bitmap.getHeight());
+					bitmap.getWidth(), bitmap.getHeight());*/
 		}
 
 		notifyStatus(NOTIFY_STATES.COMMAND_DONE);

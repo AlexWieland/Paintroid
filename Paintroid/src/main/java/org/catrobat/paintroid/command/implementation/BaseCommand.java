@@ -78,7 +78,7 @@ public abstract class BaseCommand extends Observable implements Command {
     }
 
     @Override
-	public abstract void run(Canvas canvas, Layer layer);
+	public abstract void run(Canvas canvas);
 
 	protected void notifyStatus(NOTIFY_STATES state) {
 		setChanged();

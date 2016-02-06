@@ -39,7 +39,7 @@ public class PointCommand extends BaseCommand {
 	}
 
 	@Override
-	public void run(Canvas canvas, Layer layer) {
+	public void run(Canvas canvas) {
 		if (canvas == null || mPoint == null) {
 			Log.w(PaintroidApplication.TAG,
 					"Object must not be null in PointCommand.");

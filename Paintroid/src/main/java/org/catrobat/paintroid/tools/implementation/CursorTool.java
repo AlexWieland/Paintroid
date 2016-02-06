@@ -22,6 +22,7 @@ package org.catrobat.paintroid.tools.implementation;
 import org.catrobat.paintroid.PaintroidApplication;
 import org.catrobat.paintroid.R;
 import org.catrobat.paintroid.command.Command;
+import org.catrobat.paintroid.command.implementation.LayerCommand;
 import org.catrobat.paintroid.command.implementation.PathCommand;
 import org.catrobat.paintroid.command.implementation.PointCommand;
 import org.catrobat.paintroid.tools.Layer;
@@ -269,12 +270,14 @@ public class CursorTool extends BaseToolWithShape {
 	protected boolean addPathCommand(PointF coordinate, Layer layer) {
 		pathToDraw.lineTo(coordinate.x, coordinate.y);
 		Command command = new PathCommand(mBitmapPaint, pathToDraw, layer.getLayerID());
-		return PaintroidApplication.commandManager.commitCommand(command);
+		PaintroidApplication.commandManager.commitCommandToLayer(new LayerCommand(layer), command);
+        return true;
 	}
 
 	protected boolean addPointCommand(PointF coordinate, Layer layer) {
 		Command command = new PointCommand(mBitmapPaint, coordinate, layer.getLayerID());
-		return PaintroidApplication.commandManager.commitCommand(command);
+        PaintroidApplication.commandManager.commitCommandToLayer(new LayerCommand(layer), command);
+        return true;
 	}
 
 	@Override
