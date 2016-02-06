@@ -16,7 +16,7 @@ public class LayerCommand
 
     public LayerCommand(Layer currentLayer)
     {
-        this.mCurrentLayer = currentLayer;
+        mCurrentLayer = currentLayer;
     }
 
     public LayerCommand(ArrayList<Integer> layersToMerge)

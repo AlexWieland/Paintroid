@@ -19,29 +19,25 @@
 
 package org.catrobat.paintroid.command.implementation;
 
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 
-import org.catrobat.paintroid.tools.Layer;
-
 public class ClearCommand extends BaseCommand {
-	private int mColor;
+    protected int mColor;
 
-	public ClearCommand(int color, int layerId)
-    {
-        super(layerId);
+    public ClearCommand() {
+        mColor = Color.TRANSPARENT;
+    }
+
+    public ClearCommand(int color) {
         mColor = color;
-	}
+    }
 
-	@Override
-	public void run(Canvas canvas)
-    {
-/*		if (layer != null)
-        {
-			if(layer.getBitmap() != null)
-            {
-				layer.getBitmap().eraseColor(mColor);
-			}
-		}*/
-	}
+    @Override
+    public void run(Canvas canvas, Bitmap bitmap) {
+        if (bitmap != null) {
+            bitmap.eraseColor(mColor);
+        }
+    }
 }

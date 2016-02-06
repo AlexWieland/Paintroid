@@ -20,7 +20,6 @@
 package org.catrobat.paintroid.command.implementation;
 
 import org.catrobat.paintroid.PaintroidApplication;
-import org.catrobat.paintroid.tools.Layer;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -30,57 +29,54 @@ import android.util.Log;
 
 public class FlipCommand extends BaseCommand {
 
-	private FlipDirection mFlipDirection;
+    private FlipDirection mFlipDirection;
 
-	public static enum FlipDirection {
-		FLIP_HORIZONTAL, FLIP_VERTICAL
-	};
+    public static enum FlipDirection {
+        FLIP_HORIZONTAL, FLIP_VERTICAL
+    };
 
-	public FlipCommand(FlipDirection flipDirection, int layerId) {
-        super(layerId);
-		mFlipDirection = flipDirection;
-	}
+    public FlipCommand(FlipDirection flipDirection) {
+        mFlipDirection = flipDirection;
+    }
 
-	@Override
-	public void run(Canvas canvas) {
+    @Override
+    public void run(Canvas canvas, Bitmap bitmap) {
 
-		notifyStatus(NOTIFY_STATES.COMMAND_STARTED);
-		if (mFlipDirection == null) {
+        notifyStatus(NOTIFY_STATES.COMMAND_STARTED);
+        if (mFlipDirection == null) {
 
-			notifyStatus(NOTIFY_STATES.COMMAND_FAILED);
-			return;
-		}
+            notifyStatus(NOTIFY_STATES.COMMAND_FAILED);
+            return;
+        }
 
-		Matrix flipMatrix = new Matrix();
-/*
-		Bitmap bitmap = layer.getBitmap();
-		switch (mFlipDirection) {
-		case FLIP_HORIZONTAL:
-			flipMatrix.setScale(1, -1);
-			flipMatrix.postTranslate(0, bitmap.getHeight());
-			Log.i(PaintroidApplication.TAG, "flip horizontal");
-			break;
-		case FLIP_VERTICAL:
-			flipMatrix.setScale(-1, 1);
-			flipMatrix.postTranslate(bitmap.getWidth(), 0);
-			Log.i(PaintroidApplication.TAG, "flip vertical");
-			break;
-		default:
+        Matrix flipMatrix = new Matrix();
 
-			notifyStatus(NOTIFY_STATES.COMMAND_FAILED);
-			return;
-		}
+        switch (mFlipDirection) {
+            case FLIP_HORIZONTAL:
+                flipMatrix.setScale(1, -1);
+                flipMatrix.postTranslate(0, bitmap.getHeight());
+                Log.i(PaintroidApplication.TAG, "flip horizontal");
+                break;
+            case FLIP_VERTICAL:
+                flipMatrix.setScale(-1, 1);
+                flipMatrix.postTranslate(bitmap.getWidth(), 0);
+                Log.i(PaintroidApplication.TAG, "flip vertical");
+                break;
+            default:
 
-		Bitmap flipBitmap = Bitmap.createBitmap(bitmap.getWidth(),
-				bitmap.getHeight(), bitmap.getConfig());
-		Canvas flipCanvas = new Canvas(flipBitmap);
+                notifyStatus(NOTIFY_STATES.COMMAND_FAILED);
+                return;
+        }
 
-		flipCanvas.drawBitmap(bitmap, flipMatrix, new Paint());
-		if (PaintroidApplication.drawingSurface != null) {
-			PaintroidApplication.drawingSurface.updateBitmap(flipBitmap);
-		}
-*/
+        Bitmap flipBitmap = Bitmap.createBitmap(bitmap.getWidth(),
+                bitmap.getHeight(), bitmap.getConfig());
+        Canvas flipCanvas = new Canvas(flipBitmap);
 
-		notifyStatus(NOTIFY_STATES.COMMAND_DONE);
-	}
+        flipCanvas.drawBitmap(bitmap, flipMatrix, new Paint());
+        if (PaintroidApplication.drawingSurface != null) {
+            //PaintroidApplication.drawingSurface.setBitmap(flipBitmap);
+        }
+
+        notifyStatus(NOTIFY_STATES.COMMAND_DONE);
+    }
 }

@@ -20,7 +20,6 @@
 package org.catrobat.paintroid.command.implementation;
 
 import org.catrobat.paintroid.PaintroidApplication;
-import org.catrobat.paintroid.tools.Layer;
 import org.catrobat.paintroid.tools.helper.floodfill.QueueLinearFloodFiller;
 
 import android.graphics.Bitmap;
@@ -31,46 +30,46 @@ import android.util.Log;
 
 public class FillCommand extends BaseCommand {
 
-	private static final float SELECTION_THRESHOLD = 50.0f;
-	private static final int EMPTY_COMMAND_LIST_LENGTH = 1;
-	private Point mClickedPixel;
+    private static final float SELECTION_THRESHOLD = 50.0f;
+    private static final int EMPTY_COMMAND_LIST_LENGTH = 1;
+    private Point mClickedPixel;
 
-	public FillCommand(Point clickedPixel, Paint currentPaint, int layerId) {
-		super(currentPaint, layerId);
-		mClickedPixel = clickedPixel;
-	}
+    public FillCommand(Point clickedPixel, Paint currentPaint) {
+        super(currentPaint);
+        mClickedPixel = clickedPixel;
+    }
 
-	@Override
-	public void run(Canvas canvas) {
+    @Override
+    public void run(Canvas canvas, Bitmap bitmap) {
 
-		notifyStatus(NOTIFY_STATES.COMMAND_STARTED);
-		if (mClickedPixel == null) {
-			setChanged();
-			notifyStatus(NOTIFY_STATES.COMMAND_FAILED);
-			return;
-		}
+        notifyStatus(NOTIFY_STATES.COMMAND_STARTED);
+        if (mClickedPixel == null) {
+            setChanged();
+            notifyStatus(NOTIFY_STATES.COMMAND_FAILED);
+            return;
+        }
 
-		if (PaintroidApplication.savedPictureUri == null
-				/*&& PaintroidApplication.commandManager.getNumberOfCommands() == EMPTY_COMMAND_LIST_LENGTH + 1*/) {
-			canvas.drawColor(mPaint.getColor());
-			Log.w(PaintroidApplication.TAG,
-					"Fill Command color: " + mPaint.getColor());
-		} else {
-/*			Bitmap bitmap = layer.getBitmap();
-			int colorToReplace = bitmap.getPixel(mClickedPixel.x,
-					mClickedPixel.y);
-			int pixels[] = new int[bitmap.getWidth() * bitmap.getHeight()];
-			bitmap.getPixels(pixels, 0, bitmap.getWidth(), 0, 0,
-					bitmap.getWidth(), bitmap.getHeight());
+        if (PaintroidApplication.savedPictureUri == null)
+        {
+                /*&& PaintroidApplication.commandManager.getNumberOfCommands() == EMPTY_COMMAND_LIST_LENGTH + 1*/
+            canvas.drawColor(mPaint.getColor());
+            Log.w(PaintroidApplication.TAG,
+                    "Fill Command color: " + mPaint.getColor());
+        } else {
+            int colorToReplace = bitmap.getPixel(mClickedPixel.x,
+                    mClickedPixel.y);
+            int pixels[] = new int[bitmap.getWidth() * bitmap.getHeight()];
+            bitmap.getPixels(pixels, 0, bitmap.getWidth(), 0, 0,
+                    bitmap.getWidth(), bitmap.getHeight());
 
-			QueueLinearFloodFiller.floodFill(pixels, bitmap.getWidth(),
-					bitmap.getHeight(), mClickedPixel, colorToReplace,
-					mPaint.getColor(), SELECTION_THRESHOLD);
+            QueueLinearFloodFiller.floodFill(pixels, bitmap.getWidth(),
+                    bitmap.getHeight(), mClickedPixel, colorToReplace,
+                    mPaint.getColor(), SELECTION_THRESHOLD);
 
-			bitmap.setPixels(pixels, 0, bitmap.getWidth(), 0, 0,
-					bitmap.getWidth(), bitmap.getHeight());*/
-		}
+            bitmap.setPixels(pixels, 0, bitmap.getWidth(), 0, 0,
+                    bitmap.getWidth(), bitmap.getHeight());
+        }
 
-		notifyStatus(NOTIFY_STATES.COMMAND_DONE);
-	}
+        notifyStatus(NOTIFY_STATES.COMMAND_DONE);
+    }
 }

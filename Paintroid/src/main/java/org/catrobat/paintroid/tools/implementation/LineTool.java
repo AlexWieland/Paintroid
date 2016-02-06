@@ -36,100 +36,100 @@ import android.graphics.PointF;
 
 public class LineTool extends BaseTool {
 
-	protected PointF mInitialEventCoordinate;
-	protected PointF mCurrentCoordinate;
+    protected PointF mInitialEventCoordinate;
+    protected PointF mCurrentCoordinate;
 
-	public LineTool(Context context, ToolType toolType) {
-		super(context, toolType);
-	}
+    public LineTool(Context context, ToolType toolType) {
+        super(context, toolType);
+    }
 
-	@Override
-	public void draw(Canvas canvas) {
-		if (mInitialEventCoordinate == null || mCurrentCoordinate == null) {
-			return;
-		}
+    @Override
+    public void draw(Canvas canvas) {
+        if (mInitialEventCoordinate == null || mCurrentCoordinate == null) {
+            return;
+        }
 
-		changePaintColor(mCanvasPaint.getColor());
+        changePaintColor(mCanvasPaint.getColor());
 
-		if (mCanvasPaint.getAlpha() == 0x00) {
-			mCanvasPaint.setColor(Color.BLACK);
-			canvas.drawLine(mInitialEventCoordinate.x,
-					mInitialEventCoordinate.y, mCurrentCoordinate.x,
-					mCurrentCoordinate.y, mCanvasPaint);
-			mCanvasPaint.setColor(Color.TRANSPARENT);
-		} else {
-			canvas.drawLine(mInitialEventCoordinate.x,
-					mInitialEventCoordinate.y, mCurrentCoordinate.x,
-					mCurrentCoordinate.y, mBitmapPaint);
+        if (mCanvasPaint.getAlpha() == 0x00) {
+            mCanvasPaint.setColor(Color.BLACK);
+            canvas.drawLine(mInitialEventCoordinate.x,
+                    mInitialEventCoordinate.y, mCurrentCoordinate.x,
+                    mCurrentCoordinate.y, mCanvasPaint);
+            mCanvasPaint.setColor(Color.TRANSPARENT);
+        } else {
+            canvas.drawLine(mInitialEventCoordinate.x,
+                    mInitialEventCoordinate.y, mCurrentCoordinate.x,
+                    mCurrentCoordinate.y, mBitmapPaint);
 
-		}
-	}
+        }
+    }
 
-	@Override
-	public boolean handleDown(PointF coordinate) {
-		if (coordinate == null) {
-			return false;
-		}
-		mInitialEventCoordinate = new PointF(coordinate.x, coordinate.y);
-		mPreviousEventCoordinate = new PointF(coordinate.x, coordinate.y);
+    @Override
+    public boolean handleDown(PointF coordinate) {
+        if (coordinate == null) {
+            return false;
+        }
+        mInitialEventCoordinate = new PointF(coordinate.x, coordinate.y);
+        mPreviousEventCoordinate = new PointF(coordinate.x, coordinate.y);
 
-		return true;
-	}
+        return true;
+    }
 
-	@Override
-	public boolean handleMove(PointF coordinate) {
-		mCurrentCoordinate = new PointF(coordinate.x, coordinate.y);
+    @Override
+    public boolean handleMove(PointF coordinate) {
+        mCurrentCoordinate = new PointF(coordinate.x, coordinate.y);
 
-		return true;
-	}
+        return true;
+    }
 
-	@Override
-	public boolean handleUp(PointF coordinate) {
-		if (mInitialEventCoordinate == null || mPreviousEventCoordinate == null
-				|| coordinate == null) {
-			return false;
-		}
-		Path finalPath = new Path();
-		finalPath.moveTo(mInitialEventCoordinate.x, mInitialEventCoordinate.y);
-		finalPath.lineTo(coordinate.x, coordinate.y);
-        Layer currentLayer = PaintroidApplication.drawingSurface.getCurrentLayer();
-		Command command = new PathCommand(mBitmapPaint, finalPath, currentLayer.getLayerID());
-        PaintroidApplication.commandManager.commitCommandToLayer(new LayerCommand(currentLayer), command);
-		return true;
-	}
+    @Override
+    public boolean handleUp(PointF coordinate) {
+        if (mInitialEventCoordinate == null || mPreviousEventCoordinate == null
+                || coordinate == null) {
+            return false;
+        }
+        Path finalPath = new Path();
+        finalPath.moveTo(mInitialEventCoordinate.x, mInitialEventCoordinate.y);
+        finalPath.lineTo(coordinate.x, coordinate.y);
+        Command command = new PathCommand(mBitmapPaint, finalPath);
+        Layer layer = PaintroidApplication.drawingSurface.getCurrentLayer();
+        PaintroidApplication.commandManager.commitCommandToLayer(new LayerCommand(layer), command);
+        return true;
+    }
 
-	@Override
-	public int getAttributeButtonResource(ToolButtonIDs buttonNumber) {
-		switch (buttonNumber) {
-		case BUTTON_ID_PARAMETER_TOP:
-			return getStrokeColorResource();
-		case BUTTON_ID_PARAMETER_BOTTOM_1:
-			return R.drawable.icon_menu_strokes;
-		case BUTTON_ID_PARAMETER_BOTTOM_2:
-			return R.drawable.icon_menu_color_palette;
-		default:
-			return super.getAttributeButtonResource(buttonNumber);
-		}
-	}
+    @Override
+    public int getAttributeButtonResource(ToolButtonIDs buttonNumber) {
+        switch (buttonNumber) {
+            case BUTTON_ID_PARAMETER_TOP:
+                return getStrokeColorResource();
+            case BUTTON_ID_PARAMETER_BOTTOM_1:
+                return R.drawable.icon_menu_strokes;
+            case BUTTON_ID_PARAMETER_BOTTOM_2:
+                return R.drawable.icon_menu_color_palette;
+            default:
+                return super.getAttributeButtonResource(buttonNumber);
+        }
+    }
 
-	@Override
-	public void attributeButtonClick(ToolButtonIDs buttonNumber, Layer layer) {
-		switch (buttonNumber) {
-		case BUTTON_ID_PARAMETER_BOTTOM_1:
-			showBrushPicker();
-			break;
-		case BUTTON_ID_PARAMETER_BOTTOM_2:
-		case BUTTON_ID_PARAMETER_TOP:
-			showColorPicker();
-			break;
-		default:
-			break;
-		}
-	}
+    @Override
+    public void attributeButtonClick(ToolButtonIDs buttonNumber) {
+        switch (buttonNumber) {
+            case BUTTON_ID_PARAMETER_BOTTOM_1:
+                showBrushPicker();
+                break;
+            case BUTTON_ID_PARAMETER_BOTTOM_2:
+            case BUTTON_ID_PARAMETER_TOP:
+                showColorPicker();
+                break;
+            default:
+                break;
+        }
+    }
 
-	@Override
-	public void resetInternalState() {
-		mInitialEventCoordinate = null;
-		mCurrentCoordinate = null;
-	}
+    @Override
+    public void resetInternalState() {
+        mInitialEventCoordinate = null;
+        mCurrentCoordinate = null;
+    }
 }

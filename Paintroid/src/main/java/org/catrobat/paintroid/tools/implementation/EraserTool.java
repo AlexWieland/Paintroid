@@ -20,7 +20,6 @@
 package org.catrobat.paintroid.tools.implementation;
 
 import org.catrobat.paintroid.PaintroidApplication;
-import org.catrobat.paintroid.tools.Layer;
 import org.catrobat.paintroid.tools.ToolType;
 import org.catrobat.paintroid.ui.TopBar.ToolButtonIDs;
 
@@ -32,85 +31,85 @@ import android.graphics.PointF;
 
 public class EraserTool extends DrawTool {
 
-	protected Paint mPreviousPaint;
+    protected Paint mPreviousPaint;
 
-	public EraserTool(Context context, ToolType toolType) {
-		super(context, toolType);
+    public EraserTool(Context context, ToolType toolType) {
+        super(context, toolType);
 
-		mPreviousPaint = new Paint(
-				PaintroidApplication.currentTool.getDrawPaint());
+        mPreviousPaint = new Paint(
+                PaintroidApplication.currentTool.getDrawPaint());
 
-		changePaintColor(Color.TRANSPARENT);
+        changePaintColor(Color.TRANSPARENT);
 
-		mCanvasPaint.setStrokeCap(mPreviousPaint.getStrokeCap());
-		mCanvasPaint.setStrokeWidth(mPreviousPaint.getStrokeWidth());
+        mCanvasPaint.setStrokeCap(mPreviousPaint.getStrokeCap());
+        mCanvasPaint.setStrokeWidth(mPreviousPaint.getStrokeWidth());
 
-	}
+    }
 
-	@Override
-	public void draw(Canvas canvas) {
-		super.draw(canvas);
-	}
+    @Override
+    public void draw(Canvas canvas) {
+        super.draw(canvas);
+    }
 
-	@Override
-	public boolean handleDown(PointF coordinate) {
-		return (super.handleDown(coordinate));
-	}
+    @Override
+    public boolean handleDown(PointF coordinate) {
+        return (super.handleDown(coordinate));
+    }
 
-	@Override
-	public int getAttributeButtonResource(ToolButtonIDs buttonNumber) {
-		switch (buttonNumber) {
-		case BUTTON_ID_PARAMETER_BOTTOM_2:
-			return NO_BUTTON_RESOURCE;
-		default:
-			return super.getAttributeButtonResource(buttonNumber);
-		}
-	}
+    @Override
+    public int getAttributeButtonResource(ToolButtonIDs buttonNumber) {
+        switch (buttonNumber) {
+            case BUTTON_ID_PARAMETER_BOTTOM_2:
+                return NO_BUTTON_RESOURCE;
+            default:
+                return super.getAttributeButtonResource(buttonNumber);
+        }
+    }
 
-	@Override
-	public int getAttributeButtonColor(ToolButtonIDs buttonNumber) {
-		switch (buttonNumber) {
-		case BUTTON_ID_TOOL:
-		case BUTTON_ID_PARAMETER_TOP:
-			return super.getAttributeButtonColor(buttonNumber);
-		default:
-			return Color.TRANSPARENT;
-		}
-	}
+    @Override
+    public int getAttributeButtonColor(ToolButtonIDs buttonNumber) {
+        switch (buttonNumber) {
+            case BUTTON_ID_TOOL:
+            case BUTTON_ID_PARAMETER_TOP:
+                return super.getAttributeButtonColor(buttonNumber);
+            default:
+                return Color.TRANSPARENT;
+        }
+    }
 
-	@Override
-	public void attributeButtonClick(ToolButtonIDs buttonNumber, Layer layer) {
-		switch (buttonNumber) {
-		case BUTTON_ID_PARAMETER_BOTTOM_1:
-			super.attributeButtonClick(buttonNumber, layer);
-		default:
-			break;
-		}
-	}
+    @Override
+    public void attributeButtonClick(ToolButtonIDs buttonNumber) {
+        switch (buttonNumber) {
+            case BUTTON_ID_PARAMETER_BOTTOM_1:
+                super.attributeButtonClick(buttonNumber);
+            default:
+                break;
+        }
+    }
 
-	@Override
-	public boolean handleMove(PointF coordinate) {
-		return (super.handleMove(coordinate));
-	}
+    @Override
+    public boolean handleMove(PointF coordinate) {
+        return (super.handleMove(coordinate));
+    }
 
-	@Override
-	public boolean handleUp(PointF coordinate) {
-		return (super.handleUp(coordinate));
-	}
+    @Override
+    public boolean handleUp(PointF coordinate) {
+        return (super.handleUp(coordinate));
+    }
 
-	@Override
-	public void resetInternalState(StateChange stateChange) {
-		super.resetInternalState(stateChange);
-	}
+    @Override
+    public void resetInternalState(StateChange stateChange) {
+        super.resetInternalState(stateChange);
+    }
 
-	@Override
-	public Paint getDrawPaint() {
-		return new Paint(this.mPreviousPaint);
-	}
+    @Override
+    public Paint getDrawPaint() {
+        return new Paint(this.mPreviousPaint);
+    }
 
-	@Override
-	public void setDrawPaint(Paint paint) {
-		changePaintColor(Color.TRANSPARENT);
-		// previous paint object has already been saved in constructor
-	}
+    @Override
+    public void setDrawPaint(Paint paint) {
+        changePaintColor(Color.TRANSPARENT);
+        // previous paint object has already been saved in constructor
+    }
 }

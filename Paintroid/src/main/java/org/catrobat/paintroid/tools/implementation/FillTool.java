@@ -36,76 +36,77 @@ import android.graphics.PointF;
 
 public class FillTool extends BaseTool {
 
-	public FillTool(Context context, ToolType toolType) {
-		super(context, toolType);
-	}
+    public FillTool(Context context, ToolType toolType) {
+        super(context, toolType);
+    }
 
-	@Override
-	public boolean handleDown(PointF coordinate) {
-		return false;
-	}
+    @Override
+    public boolean handleDown(PointF coordinate) {
+        return false;
+    }
 
-	@Override
-	public boolean handleMove(PointF coordinate) {
-		return false;
-	}
+    @Override
+    public boolean handleMove(PointF coordinate) {
+        return false;
+    }
 
-	@Override
-	public boolean handleUp(PointF coordinate) {
-		int bitmapHeight = PaintroidApplication.drawingSurface
-				.getBitmapHeight();
-		int bitmapWidth = PaintroidApplication.drawingSurface.getBitmapWidth();
+    @Override
+    public boolean handleUp(PointF coordinate) {
+        int bitmapHeight = PaintroidApplication.drawingSurface
+                .getBitmapHeight();
+        int bitmapWidth = PaintroidApplication.drawingSurface.getBitmapWidth();
 
-		if ((coordinate.x > bitmapWidth) || (coordinate.y > bitmapHeight)
-				|| (coordinate.x < 0) || (coordinate.y < 0)) {
-			return false;
-		}
+        if ((coordinate.x > bitmapWidth) || (coordinate.y > bitmapHeight)
+                || (coordinate.x < 0) || (coordinate.y < 0)) {
+            return false;
+        }
 
-		if (mBitmapPaint.getColor() == PaintroidApplication.drawingSurface
-				.getPixel(coordinate)) {
-			return false;
-		}
+        if (mBitmapPaint.getColor() == PaintroidApplication.drawingSurface
+                .getPixel(coordinate)) {
+            return false;
+        }
 
-        Layer currentLayer = PaintroidApplication.drawingSurface.getCurrentLayer();
-		Command command = new FillCommand(new Point((int) coordinate.x,
-				(int) coordinate.y), mBitmapPaint,  currentLayer.getLayerID());
+        Command command = new FillCommand(new Point((int) coordinate.x,
+                (int) coordinate.y), mBitmapPaint);
 
-		IndeterminateProgressDialog.getInstance().show();
-		((FillCommand) command).addObserver(this);
-        PaintroidApplication.commandManager.commitCommandToLayer(new LayerCommand(currentLayer), command);
-		return true;
-	}
+        IndeterminateProgressDialog.getInstance().show();
+        ((FillCommand) command).addObserver(this);
+        Layer layer = PaintroidApplication.drawingSurface.getCurrentLayer();
+        PaintroidApplication.commandManager.commitCommandToLayer(new LayerCommand(layer), command);
 
-	@Override
-	public int getAttributeButtonResource(ToolButtonIDs buttonNumber) {
-		switch (buttonNumber) {
-		case BUTTON_ID_PARAMETER_TOP:
-			return getStrokeColorResource();
-		case BUTTON_ID_PARAMETER_BOTTOM_2:
-			return R.drawable.icon_menu_color_palette;
-		default:
-			return super.getAttributeButtonResource(buttonNumber);
-		}
-	}
+        return true;
+    }
 
-	@Override
-	public void attributeButtonClick(ToolButtonIDs buttonNumber, Layer layer) {
-		switch (buttonNumber) {
-		case BUTTON_ID_PARAMETER_TOP:
-		case BUTTON_ID_PARAMETER_BOTTOM_2:
-			showColorPicker();
-			break;
-		default:
-			super.attributeButtonClick(buttonNumber, layer);
-			break;
-		}
-	}
+    @Override
+    public int getAttributeButtonResource(ToolButtonIDs buttonNumber) {
+        switch (buttonNumber) {
+            case BUTTON_ID_PARAMETER_TOP:
+                return getStrokeColorResource();
+            case BUTTON_ID_PARAMETER_BOTTOM_2:
+                return R.drawable.icon_menu_color_palette;
+            default:
+                return super.getAttributeButtonResource(buttonNumber);
+        }
+    }
 
-	@Override
-	public void resetInternalState() {
-	}
+    @Override
+    public void attributeButtonClick(ToolButtonIDs buttonNumber) {
+        switch (buttonNumber) {
+            case BUTTON_ID_PARAMETER_TOP:
+            case BUTTON_ID_PARAMETER_BOTTOM_2:
+                showColorPicker();
+                break;
+            default:
+                super.attributeButtonClick(buttonNumber);
+                break;
+        }
+    }
 
-	@Override
-	public void draw(Canvas canvas) {
-	}
+    @Override
+    public void resetInternalState() {
+    }
+
+    @Override
+    public void draw(Canvas canvas) {
+    }
 }

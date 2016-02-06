@@ -1,7 +1,6 @@
 package org.catrobat.paintroid.command.implementation;
 
 import org.catrobat.paintroid.PaintroidApplication;
-import org.catrobat.paintroid.tools.Layer;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -11,65 +10,60 @@ import android.util.Log;
 
 public class RotateCommand extends BaseCommand {
 
-	private final static float ANGLE = 90;
-	private RotateDirection mRotateDirection;
+    private final static float ANGLE = 90;
+    private RotateDirection mRotateDirection;
 
-	public static enum RotateDirection {
-		ROTATE_LEFT, ROTATE_RIGHT
-	};
+    public static enum RotateDirection {
+        ROTATE_LEFT, ROTATE_RIGHT
+    };
 
-	public RotateCommand(RotateDirection rotateDirection, int layerId)
-    {
-        super(layerId);
+    public RotateCommand(RotateDirection rotateDirection) {
         mRotateDirection = rotateDirection;
-	}
+    }
 
-	@Override
-	public void run(Canvas canvas) {
-		setChanged();
-		notifyStatus(NOTIFY_STATES.COMMAND_STARTED);
-		if (mRotateDirection == null) {
-			setChanged();
-			notifyStatus(NOTIFY_STATES.COMMAND_FAILED);
-			return;
-		}
+    @Override
+    public void run(Canvas canvas, Bitmap bitmap) {
+        setChanged();
+        notifyStatus(NOTIFY_STATES.COMMAND_STARTED);
+        if (mRotateDirection == null) {
+            setChanged();
+            notifyStatus(NOTIFY_STATES.COMMAND_FAILED);
+            return;
+        }
 
-		Matrix rotateMatrix = new Matrix();
+        Matrix rotateMatrix = new Matrix();
 
-		switch (mRotateDirection) {
-		case ROTATE_RIGHT:
-			rotateMatrix.postRotate(ANGLE);
-			Log.i(PaintroidApplication.TAG, "rotate right");
-			break;
+        switch (mRotateDirection) {
+            case ROTATE_RIGHT:
+                rotateMatrix.postRotate(ANGLE);
+                Log.i(PaintroidApplication.TAG, "rotate right");
+                break;
 
-		case ROTATE_LEFT:
-			rotateMatrix.postRotate(-ANGLE);
-			Log.i(PaintroidApplication.TAG, "rotate left");
-			break;
+            case ROTATE_LEFT:
+                rotateMatrix.postRotate(-ANGLE);
+                Log.i(PaintroidApplication.TAG, "rotate left");
+                break;
 
-		default:
-			setChanged();
-			notifyStatus(NOTIFY_STATES.COMMAND_FAILED);
-			return;
-		}
+            default:
+                setChanged();
+                notifyStatus(NOTIFY_STATES.COMMAND_FAILED);
+                return;
+        }
 
-/*
-		Bitmap bitmap = layer.getBitmap();
-		Bitmap rotatedBitmap = Bitmap.createBitmap(bitmap, 0, 0,
-				bitmap.getWidth(), bitmap.getHeight(), rotateMatrix, true);
-		Canvas rotateCanvas = new Canvas(rotatedBitmap);
+        Bitmap rotatedBitmap = Bitmap.createBitmap(bitmap, 0, 0,
+                bitmap.getWidth(), bitmap.getHeight(), rotateMatrix, true);
+        Canvas rotateCanvas = new Canvas(rotatedBitmap);
 
-		rotateCanvas.drawBitmap(bitmap, rotateMatrix, new Paint());
+        rotateCanvas.drawBitmap(bitmap, rotateMatrix, new Paint());
 
-		if (PaintroidApplication.drawingSurface != null) {
-			PaintroidApplication.drawingSurface.updateBitmap(rotatedBitmap);
-		}
-*/
+        if (PaintroidApplication.drawingSurface != null) {
+//            PaintroidApplication.drawingSurface.setBitmap(rotatedBitmap);
+        }
 
-		setChanged();
+        setChanged();
 
-		PaintroidApplication.perspective.resetScaleAndTranslation();
-		notifyStatus(NOTIFY_STATES.COMMAND_DONE);
+        PaintroidApplication.perspective.resetScaleAndTranslation();
+        notifyStatus(NOTIFY_STATES.COMMAND_DONE);
 
-	}
+    }
 }

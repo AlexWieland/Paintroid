@@ -27,6 +27,11 @@ public class LayerCommandOld extends BaseCommand
     private Layer mLayerActualActivity;
     private Layer mLayerToMerge;
 
+    @Override
+    public void run(Canvas canvas, Bitmap bitmap) {
+
+    }
+
     public enum LayerAction{
         CLEAR,
         ADD,

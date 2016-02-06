@@ -29,44 +29,44 @@ import android.graphics.PointF;
 
 public interface Tool {
 
-	// standard stroke widths in pixels
-	public static final int stroke1 = 1;
-	public static final int stroke5 = 5;
-	public static final int stroke15 = 15;
-	public static final int stroke25 = 25;
+    // standard stroke widths in pixels
+    public static final int stroke1 = 1;
+    public static final int stroke5 = 5;
+    public static final int stroke15 = 15;
+    public static final int stroke25 = 25;
 
-	public enum StateChange {
-		ALL, RESET_INTERNAL_STATE, NEW_IMAGE_LOADED, MOVE_CANCELED
-	}
+    public enum StateChange {
+        ALL, RESET_INTERNAL_STATE, NEW_IMAGE_LOADED, MOVE_CANCELED
+    }
 
-	public boolean handleDown(PointF coordinate);
+    public boolean handleDown(PointF coordinate);
 
-	public boolean handleMove(PointF coordinate);
+    public boolean handleMove(PointF coordinate);
 
-	public boolean handleUp(PointF coordinate);
+    public boolean handleUp(PointF coordinate);
 
-	public void changePaintColor(int color);
+    public void changePaintColor(int color);
 
-	public void changePaintStrokeWidth(int strokeWidth);
+    public void changePaintStrokeWidth(int strokeWidth);
 
-	public void changePaintStrokeCap(Cap cap);
+    public void changePaintStrokeCap(Cap cap);
 
-	public void setDrawPaint(Paint paint);
+    public void setDrawPaint(Paint paint);
 
-	public Paint getDrawPaint();
+    public Paint getDrawPaint();
 
-	public void draw(Canvas canvas);
+    public void draw(Canvas canvas);
 
-	public ToolType getToolType();
+    public ToolType getToolType();
 
-	public int getAttributeButtonResource(ToolButtonIDs buttonNumber);
+    public int getAttributeButtonResource(ToolButtonIDs buttonNumber);
 
-	public int getAttributeButtonColor(ToolButtonIDs buttonNumber);
+    public int getAttributeButtonColor(ToolButtonIDs buttonNumber);
 
-	public void attributeButtonClick(ToolButtonIDs buttonNumber, Layer layer);
+    public void attributeButtonClick(ToolButtonIDs buttonNumber);
 
-	public void resetInternalState(StateChange stateChange);
+    public void resetInternalState(StateChange stateChange);
 
-	public Point getAutoScrollDirection(float pointX, float pointY,
-			int screenWidth, int screenHeight);
+    public Point getAutoScrollDirection(float pointX, float pointY,
+                                        int screenWidth, int screenHeight);
 }

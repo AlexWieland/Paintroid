@@ -27,7 +27,6 @@ import java.util.Random;
 
 import org.catrobat.paintroid.PaintroidApplication;
 import org.catrobat.paintroid.command.Command;
-import org.catrobat.paintroid.tools.Layer;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -37,51 +36,65 @@ import android.graphics.Paint.Cap;
 import android.util.Log;
 
 public abstract class BaseCommand extends Observable implements Command {
-	protected Paint mPaint;
-    protected int mLayerId;
+    protected Paint mPaint;
+    protected Bitmap mBitmap;
+    protected File mFileToStoredBitmap;
 
-	public enum NOTIFY_STATES {
-		COMMAND_STARTED, COMMAND_DONE, COMMAND_FAILED
-	}
+    public static enum NOTIFY_STATES {
+        COMMAND_STARTED, COMMAND_DONE, COMMAND_FAILED
+    };
 
     public BaseCommand() {
     }
 
-	public BaseCommand(int layerId)
-    {
-       mLayerId = layerId;
-	}
-
-    public BaseCommand(Paint paint, int layerId)
-    {
-
-        this(layerId);
-
-        if (paint != null)
-        {
-			mPaint = new Paint(paint);
-		}
-        else
-        {
-			Log.w(PaintroidApplication.TAG,
-					"Object is null falling back to default object in "	+ this.toString());
-			mPaint = new Paint();
-			mPaint.setColor(Color.BLACK);
-			mPaint.setStrokeWidth(1);
-			mPaint.setStrokeCap(Cap.SQUARE);
-		}
-	}
-
-    public int getLayerId()
-    {
-        return mLayerId;
+    public BaseCommand(Paint paint) {
+        if (paint != null) {
+            mPaint = new Paint(paint);
+        } else {
+            Log.w(PaintroidApplication.TAG,
+                    "Object is null falling back to default object in "
+                            + this.toString());
+            mPaint = new Paint();
+            mPaint.setColor(Color.BLACK);
+            mPaint.setStrokeWidth(1);
+            mPaint.setStrokeCap(Cap.SQUARE);
+        }
     }
 
     @Override
-	public abstract void run(Canvas canvas);
+    public abstract void run(Canvas canvas, Bitmap bitmap);
 
-	protected void notifyStatus(NOTIFY_STATES state) {
-		setChanged();
-		notifyObservers(state);
-	}
+    @Override
+    public void freeResources() {
+        if (mBitmap != null && !mBitmap.isRecycled()) {
+            mBitmap.recycle();
+            mBitmap = null;
+        }
+        if (mFileToStoredBitmap != null && mFileToStoredBitmap.exists()) {
+            mFileToStoredBitmap.delete();
+        }
+    }
+
+    public final void storeBitmap() {
+        File cacheDir = PaintroidApplication.applicationContext.getCacheDir();
+        Random random = new Random();
+        random.setSeed(System.currentTimeMillis());
+        mFileToStoredBitmap = new File(cacheDir.getAbsolutePath(),
+                Long.toString(random.nextLong()));
+        try {
+            FileOutputStream fos = new FileOutputStream(mFileToStoredBitmap);
+            mBitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
+            fos.flush();
+            fos.close();
+        } catch (IOException e) {
+            Log.e(PaintroidApplication.TAG, "Cannot store bitmap. ", e);
+        }
+        mBitmap.recycle();
+        mBitmap = null;
+    }
+
+    protected void notifyStatus(NOTIFY_STATES state) {
+        setChanged();
+        notifyObservers(state);
+    }
 }

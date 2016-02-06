@@ -36,134 +36,134 @@ import android.graphics.Path;
 import android.graphics.PointF;
 
 public class DrawTool extends BaseTool {
-	// TODO put in PaintroidApplication and scale dynamically depending on
-	// screen resolution.
-	public static final int STROKE_1 = 1;
-	public static final int STROKE_5 = 5;
-	public static final int STROKE_15 = 15;
-	public static final int STROKE_25 = 25;
+    // TODO put in PaintroidApplication and scale dynamically depending on
+    // screen resolution.
+    public static final int STROKE_1 = 1;
+    public static final int STROKE_5 = 5;
+    public static final int STROKE_15 = 15;
+    public static final int STROKE_25 = 25;
 
-	protected final Path pathToDraw;
-	protected PointF mInitialEventCoordinate;
-	protected final PointF movedDistance;
+    protected final Path pathToDraw;
+    protected PointF mInitialEventCoordinate;
+    protected final PointF movedDistance;
 
-	public DrawTool(Context context, ToolType toolType) {
-		super(context, toolType);
-		pathToDraw = new Path();
-		pathToDraw.incReserve(1);
-		movedDistance = new PointF(0f, 0f);
-	}
+    public DrawTool(Context context, ToolType toolType) {
+        super(context, toolType);
+        pathToDraw = new Path();
+        pathToDraw.incReserve(1);
+        movedDistance = new PointF(0f, 0f);
+    }
 
-	@Override
-	public void draw(Canvas canvas) {
-		changePaintColor(mCanvasPaint.getColor());
-		if (mCanvasPaint.getColor() == Color.TRANSPARENT) {
-			mCanvasPaint.setColor(Color.BLACK);
-			canvas.drawPath(pathToDraw, mCanvasPaint);
-			mCanvasPaint.setColor(Color.TRANSPARENT);
-		} else {
-			canvas.drawPath(pathToDraw, mBitmapPaint);
-		}
-	}
+    @Override
+    public void draw(Canvas canvas) {
+        changePaintColor(mCanvasPaint.getColor());
+        if (mCanvasPaint.getColor() == Color.TRANSPARENT) {
+            mCanvasPaint.setColor(Color.BLACK);
+            canvas.drawPath(pathToDraw, mCanvasPaint);
+            mCanvasPaint.setColor(Color.TRANSPARENT);
+        } else {
+            canvas.drawPath(pathToDraw, mBitmapPaint);
+        }
+    }
 
-	@Override
-	public boolean handleDown(PointF coordinate) {
-		if (coordinate == null) {
-			return false;
-		}
-		mInitialEventCoordinate = new PointF(coordinate.x, coordinate.y);
-		mPreviousEventCoordinate = new PointF(coordinate.x, coordinate.y);
-		pathToDraw.moveTo(coordinate.x, coordinate.y);
-		movedDistance.set(0, 0);
-		return true;
-	}
+    @Override
+    public boolean handleDown(PointF coordinate) {
+        if (coordinate == null) {
+            return false;
+        }
+        mInitialEventCoordinate = new PointF(coordinate.x, coordinate.y);
+        mPreviousEventCoordinate = new PointF(coordinate.x, coordinate.y);
+        pathToDraw.moveTo(coordinate.x, coordinate.y);
+        movedDistance.set(0, 0);
+        return true;
+    }
 
-	@Override
-	public boolean handleMove(PointF coordinate) {
-		if (mInitialEventCoordinate == null || mPreviousEventCoordinate == null
-				|| coordinate == null) {
-			return false;
-		}
-		pathToDraw.quadTo(mPreviousEventCoordinate.x,
-				mPreviousEventCoordinate.y, coordinate.x, coordinate.y);
-		pathToDraw.incReserve(1);
-		movedDistance.set(
-				movedDistance.x
-						+ Math.abs(coordinate.x - mPreviousEventCoordinate.x),
-				movedDistance.y
-						+ Math.abs(coordinate.y - mPreviousEventCoordinate.y));
-		mPreviousEventCoordinate.set(coordinate.x, coordinate.y);
+    @Override
+    public boolean handleMove(PointF coordinate) {
+        if (mInitialEventCoordinate == null || mPreviousEventCoordinate == null
+                || coordinate == null) {
+            return false;
+        }
+        pathToDraw.quadTo(mPreviousEventCoordinate.x,
+                mPreviousEventCoordinate.y, coordinate.x, coordinate.y);
+        pathToDraw.incReserve(1);
+        movedDistance.set(
+                movedDistance.x
+                        + Math.abs(coordinate.x - mPreviousEventCoordinate.x),
+                movedDistance.y
+                        + Math.abs(coordinate.y - mPreviousEventCoordinate.y));
+        mPreviousEventCoordinate.set(coordinate.x, coordinate.y);
 
-		return true;
-	}
+        return true;
+    }
 
-	@Override
-	public boolean handleUp(PointF coordinate) {
-		if (mInitialEventCoordinate == null || mPreviousEventCoordinate == null
-				|| coordinate == null) {
-			return false;
-		}
-		movedDistance.set(
-				movedDistance.x
-						+ Math.abs(coordinate.x - mPreviousEventCoordinate.x),
-				movedDistance.y
-						+ Math.abs(coordinate.y - mPreviousEventCoordinate.y));
-		boolean returnValue;
-		if (MOVE_TOLERANCE < movedDistance.x
-				|| MOVE_TOLERANCE < movedDistance.y) {
-			returnValue = addPathCommand(coordinate, PaintroidApplication.drawingSurface.getCurrentLayer());
-		} else {
-			returnValue = addPointCommand(mInitialEventCoordinate,  PaintroidApplication.drawingSurface.getCurrentLayer());
-		}
-		return returnValue;
-	}
+    @Override
+    public boolean handleUp(PointF coordinate) {
+        if (mInitialEventCoordinate == null || mPreviousEventCoordinate == null
+                || coordinate == null) {
+            return false;
+        }
+        movedDistance.set(
+                movedDistance.x
+                        + Math.abs(coordinate.x - mPreviousEventCoordinate.x),
+                movedDistance.y
+                        + Math.abs(coordinate.y - mPreviousEventCoordinate.y));
+        boolean returnValue;
+        if (MOVE_TOLERANCE < movedDistance.x
+                || MOVE_TOLERANCE < movedDistance.y) {
+            returnValue = addPathCommand(coordinate, PaintroidApplication.drawingSurface.getCurrentLayer());
+        } else {
+            returnValue = addPointCommand(mInitialEventCoordinate, PaintroidApplication.drawingSurface.getCurrentLayer());
+        }
+        return returnValue;
+    }
 
-	protected boolean addPathCommand(PointF coordinate, Layer layer) {
-		pathToDraw.lineTo(coordinate.x, coordinate.y);
-		Command command = new PathCommand(mBitmapPaint, pathToDraw, layer.getLayerID());
+    protected boolean addPathCommand(PointF coordinate, Layer layer) {
+        pathToDraw.lineTo(coordinate.x, coordinate.y);
+        Command command = new PathCommand(mBitmapPaint, pathToDraw);
         PaintroidApplication.commandManager.commitCommandToLayer(new LayerCommand(layer), command);
-		return true;
-	}
+        return true;
+    }
 
-	protected boolean addPointCommand(PointF coordinate, Layer layer) {
-		Command command = new PointCommand(mBitmapPaint, coordinate, layer.getLayerID());
+    protected boolean addPointCommand(PointF coordinate, Layer layer) {
+        Command command = new PointCommand(mBitmapPaint, coordinate);
         PaintroidApplication.commandManager.commitCommandToLayer(new LayerCommand(layer), command);
-		return true;
-	}
+        return true;
+    }
 
-	@Override
-	public int getAttributeButtonResource(ToolButtonIDs buttonNumber) {
-		switch (buttonNumber) {
-		case BUTTON_ID_PARAMETER_TOP:
-			return getStrokeColorResource();
-		case BUTTON_ID_PARAMETER_BOTTOM_1:
-			return R.drawable.icon_menu_strokes;
-		case BUTTON_ID_PARAMETER_BOTTOM_2:
-			return R.drawable.icon_menu_color_palette;
-		default:
-			return super.getAttributeButtonResource(buttonNumber);
-		}
-	}
+    @Override
+    public int getAttributeButtonResource(ToolButtonIDs buttonNumber) {
+        switch (buttonNumber) {
+            case BUTTON_ID_PARAMETER_TOP:
+                return getStrokeColorResource();
+            case BUTTON_ID_PARAMETER_BOTTOM_1:
+                return R.drawable.icon_menu_strokes;
+            case BUTTON_ID_PARAMETER_BOTTOM_2:
+                return R.drawable.icon_menu_color_palette;
+            default:
+                return super.getAttributeButtonResource(buttonNumber);
+        }
+    }
 
-	@Override
-	public void attributeButtonClick(ToolButtonIDs buttonNumber, Layer layer) {
-		switch (buttonNumber) {
-		case BUTTON_ID_PARAMETER_BOTTOM_1:
-			showBrushPicker();
-			break;
-		case BUTTON_ID_PARAMETER_BOTTOM_2:
-		case BUTTON_ID_PARAMETER_TOP:
-			showColorPicker();
-			break;
-		default:
-			break;
-		}
-	}
+    @Override
+    public void attributeButtonClick(ToolButtonIDs buttonNumber) {
+        switch (buttonNumber) {
+            case BUTTON_ID_PARAMETER_BOTTOM_1:
+                showBrushPicker();
+                break;
+            case BUTTON_ID_PARAMETER_BOTTOM_2:
+            case BUTTON_ID_PARAMETER_TOP:
+                showColorPicker();
+                break;
+            default:
+                break;
+        }
+    }
 
-	@Override
-	public void resetInternalState() {
-		pathToDraw.rewind();
-		mInitialEventCoordinate = null;
-		mPreviousEventCoordinate = null;
-	}
+    @Override
+    public void resetInternalState() {
+        pathToDraw.rewind();
+        mInitialEventCoordinate = null;
+        mPreviousEventCoordinate = null;
+    }
 }

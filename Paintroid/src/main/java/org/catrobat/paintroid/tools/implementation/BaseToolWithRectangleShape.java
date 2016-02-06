@@ -40,414 +40,387 @@ import android.view.WindowManager;
 
 import org.catrobat.paintroid.PaintroidApplication;
 import org.catrobat.paintroid.R;
-import org.catrobat.paintroid.tools.Layer;
 import org.catrobat.paintroid.tools.ToolType;
 
 public abstract class BaseToolWithRectangleShape extends BaseToolWithShape {
 
-	protected static final float MAXIMUM_BORDER_RATIO = 2f;
+    protected static final float MAXIMUM_BORDER_RATIO = 2f;
 
-	protected static final int DEFAULT_RECTANGLE_MARGIN = 100;
-	protected static final float DEFAULT_TOOL_STROKE_WIDTH = 3f;
-	protected static final float MINIMAL_TOOL_STROKE_WIDTH = 1f;
-	protected static final float MAXIMAL_TOOL_STROKE_WIDTH = 8f;
-	protected static final int DEFAULT_ROTATION_SYMBOL_DISTANCE = 20;
-	protected static final int DEFAULT_ROTATION_SYMBOL_WIDTH = 30;
-	protected static final int DEFAULT_BOX_RESIZE_MARGIN = 20;
-	protected static final float DEFAULT_MAXIMUM_BOX_RESOLUTION = 0;
+    protected static final int DEFAULT_RECTANGLE_MARGIN = 100;
+    protected static final float DEFAULT_TOOL_STROKE_WIDTH = 3f;
+    protected static final float MINIMAL_TOOL_STROKE_WIDTH = 1f;
+    protected static final float MAXIMAL_TOOL_STROKE_WIDTH = 8f;
+    protected static final int DEFAULT_ROTATION_SYMBOL_DISTANCE = 20;
+    protected static final int DEFAULT_ROTATION_SYMBOL_WIDTH = 30;
+    protected static final int DEFAULT_BOX_RESIZE_MARGIN = 20;
+    protected static final float DEFAULT_MAXIMUM_BOX_RESOLUTION = 0;
 
-	protected static final float PRIMARY_SHAPE_EFFECT_INTERVAL_OFF = 20;
-	protected static final float PRIMARY_SHAPE_EFFECT_INTERVAL_ON = 10;
-	protected static final float PRIMARY_SHAPE_EFFECT_PHASE = 20;
+    protected static final float PRIMARY_SHAPE_EFFECT_INTERVAL_OFF = 20;
+    protected static final float PRIMARY_SHAPE_EFFECT_INTERVAL_ON = 10;
+    protected static final float PRIMARY_SHAPE_EFFECT_PHASE = 20;
 
-	protected static final float SECONDARY_SHAPE_EFFECT_INTERVAL_OFF = 10;
-	protected static final float SECONDARY_SHAPE_EFFECT_INTERVAL_ON = 20;
-	protected static final float SECONDARY_SHAPE_EFFECT_PHASE = 0;
+    protected static final float SECONDARY_SHAPE_EFFECT_INTERVAL_OFF = 10;
+    protected static final float SECONDARY_SHAPE_EFFECT_INTERVAL_ON = 20;
+    protected static final float SECONDARY_SHAPE_EFFECT_PHASE = 0;
 
-	protected static final Cap DEFAULT_STROKE_CAP = Cap.SQUARE;
-	protected static final boolean DEFAULT_ANTIALISING_ON = true;
-	protected static final PorterDuffXfermode TRANSPARENCY_XFER_MODE = new PorterDuffXfermode(
-			PorterDuff.Mode.CLEAR);
+    protected static final Cap DEFAULT_STROKE_CAP = Cap.SQUARE;
+    protected static final boolean DEFAULT_ANTIALISING_ON = true;
+    protected static final PorterDuffXfermode TRANSPARENCY_XFER_MODE = new PorterDuffXfermode(
+            PorterDuff.Mode.CLEAR);
 
-	private static final boolean DEFAULT_RESPECT_BORDERS = false;
-	private static final boolean DEFAULT_ROTATION_ENABLED = false;
-	private static final boolean DEFAULT_BACKGROUND_SHADOW_ENABLED = true;
-	private static final boolean DEFAULT_RESIZE_POINTS_VISIBLE = true;
-	private static final boolean DEFAULT_STATUS_ICON_ENABLED = false;
-	private static final boolean DEFAULT_RESPECT_MAXIMUM_BORDER_RATIO = true;
-	private static final boolean DEFAULT_RESPECT_MAXIMUM_BOX_RESOLUTION = false;
+    private static final boolean DEFAULT_RESPECT_BORDERS = false;
+    private static final boolean DEFAULT_ROTATION_ENABLED = false;
+    private static final boolean DEFAULT_BACKGROUND_SHADOW_ENABLED = true;
+    private static final boolean DEFAULT_RESIZE_POINTS_VISIBLE = true;
+    private static final boolean DEFAULT_STATUS_ICON_ENABLED = false;
+    private static final boolean DEFAULT_RESPECT_MAXIMUM_BORDER_RATIO = true;
+    private static final boolean DEFAULT_RESPECT_MAXIMUM_BOX_RESOLUTION = false;
 
-	private static final int RESIZE_CIRCLE_SIZE = getDensitySpecificValue(4);
-	private static final int ROTATION_ARROW_ARC_STROKE_WIDTH = getDensitySpecificValue(2);
-	private static final int ROTATION_ARROW_ARC_RADIUS = getDensitySpecificValue(8);
-	private static final int ROTATION_ARROW_HEAD_SIZE = getDensitySpecificValue(3);
-	private static final int ROTATION_ARROW_OFFSET = getDensitySpecificValue(3);
+    private static final int RESIZE_CIRCLE_SIZE = getDensitySpecificValue(4);
+    private static final int ROTATION_ARROW_ARC_STROKE_WIDTH = getDensitySpecificValue(2);
+    private static final int ROTATION_ARROW_ARC_RADIUS = getDensitySpecificValue(8);
+    private static final int ROTATION_ARROW_HEAD_SIZE = getDensitySpecificValue(3);
+    private static final int ROTATION_ARROW_OFFSET = getDensitySpecificValue(3);
 
-	protected float mBoxWidth;
-	protected float mBoxHeight;
-	protected float mBoxRotation; // in degree
-	protected float mBoxResizeMargin;
-	protected float mRotationSymbolDistance;
-	protected float mRotationSymbolWidth;
-	protected float mToolStrokeWidth;
-	protected ResizeAction mResizeAction;
-	protected FloatingBoxAction mCurrentAction;
-	protected RotatePosition mRotatePosition;
-	protected Bitmap mDrawingBitmap;
-	protected float mMaximumBoxResolution;
+    protected float mBoxWidth;
+    protected float mBoxHeight;
+    protected float mBoxRotation; // in degree
+    protected float mBoxResizeMargin;
+    protected float mRotationSymbolDistance;
+    protected float mRotationSymbolWidth;
+    protected float mToolStrokeWidth;
+    protected ResizeAction mResizeAction;
+    protected FloatingBoxAction mCurrentAction;
+    protected RotatePosition mRotatePosition;
+    protected Bitmap mDrawingBitmap;
+    protected float mMaximumBoxResolution;
 
-	private boolean mRespectImageBounds;
-	private boolean mRotationEnabled;
-	private boolean mBackgroundShadowEnabled;
-	private boolean mResizePointsVisible;
-	private boolean mStatusIconEnabled;
-	private boolean mRespectMaximumBorderRatio;
-	private boolean mRespectMaximumBoxResolution;
+    private boolean mRespectImageBounds;
+    private boolean mRotationEnabled;
+    private boolean mBackgroundShadowEnabled;
+    private boolean mResizePointsVisible;
+    private boolean mStatusIconEnabled;
+    private boolean mRespectMaximumBorderRatio;
+    private boolean mRespectMaximumBoxResolution;
 
-	private boolean mIsDown = false;
+    private boolean mIsDown = false;
 
-	private enum FloatingBoxAction {
-		NONE, MOVE, RESIZE, ROTATE;
-	}
+    private enum FloatingBoxAction {
+        NONE, MOVE, RESIZE, ROTATE;
+    }
 
-	private enum ResizeAction {
-		NONE, TOP, RIGHT, BOTTOM, LEFT, TOPLEFT, TOPRIGHT, BOTTOMLEFT, BOTTOMRIGHT;
-	}
+    private enum ResizeAction {
+        NONE, TOP, RIGHT, BOTTOM, LEFT, TOPLEFT, TOPRIGHT, BOTTOMLEFT, BOTTOMRIGHT;
+    }
 
-	private enum RotatePosition {
-		TOP_LEFT, TOP_RIGHT, BOTTOM_LEFT, BOTTOM_RIGHT;
-	}
+    private enum RotatePosition {
+        TOP_LEFT, TOP_RIGHT, BOTTOM_LEFT, BOTTOM_RIGHT;
+    }
 
-	private static int getDensitySpecificValue(int value)
-    {
-		DisplayMetrics metrics = PaintroidApplication.applicationContext.getResources().getDisplayMetrics();
-		int baseDensity = DisplayMetrics.DENSITY_MEDIUM;
-		int density = metrics.densityDpi;
+    private static int getDensitySpecificValue(int value) {
+        DisplayMetrics metrics = PaintroidApplication.applicationContext
+                .getResources().getDisplayMetrics();
+        int baseDensity = DisplayMetrics.DENSITY_MEDIUM;
+        int density = metrics.densityDpi;
+        if (density < DisplayMetrics.DENSITY_MEDIUM) {
+            density = DisplayMetrics.DENSITY_MEDIUM;
+        }
+        return value * density / baseDensity;
+    }
 
-        if (density < DisplayMetrics.DENSITY_MEDIUM)
-        {
-			density = DisplayMetrics.DENSITY_MEDIUM;
-		}
+    public BaseToolWithRectangleShape(Context context, ToolType toolType) {
+        super(context, toolType);
+        mToolType = toolType;
+        Display display = ((WindowManager) context
+                .getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+        mBoxWidth = display.getWidth()
+                / PaintroidApplication.perspective.getScale()
+                - getInverselyProportionalSizeForZoom(DEFAULT_RECTANGLE_MARGIN)
+                * 2;
+        mBoxHeight = mBoxWidth;
 
-		return value * density / baseDensity;
-	}
+        if (DEFAULT_RESPECT_MAXIMUM_BORDER_RATIO && (
+                (mBoxHeight > (PaintroidApplication.drawingSurface
+                        .getBitmapHeight() * MAXIMUM_BORDER_RATIO))
+                        || mBoxWidth > (PaintroidApplication.drawingSurface
+                        .getBitmapWidth() * MAXIMUM_BORDER_RATIO))) {
+            mBoxHeight = (PaintroidApplication.drawingSurface.getBitmapHeight() * MAXIMUM_BORDER_RATIO);
+            mBoxWidth = (PaintroidApplication.drawingSurface.getBitmapWidth() * MAXIMUM_BORDER_RATIO);
+        }
 
-	public BaseToolWithRectangleShape(Context context, ToolType toolType)
-    {
-		super(context, toolType);
-		mToolType = toolType;
-		Display display = ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
-        Point size = new Point();
-        display.getSize(size);
-		mBoxWidth = (size.x / PaintroidApplication.perspective.getScale())
-				    - getInverselyProportionalSizeForZoom(DEFAULT_RECTANGLE_MARGIN) * 2;
+        mRotatePosition = RotatePosition.TOP_LEFT;
+        mResizeAction = ResizeAction.NONE;
 
-		mBoxHeight = mBoxWidth;
+        mRespectImageBounds = DEFAULT_RESPECT_BORDERS;
+        mRotationEnabled = DEFAULT_ROTATION_ENABLED;
+        mBackgroundShadowEnabled = DEFAULT_BACKGROUND_SHADOW_ENABLED;
+        mResizePointsVisible = DEFAULT_RESIZE_POINTS_VISIBLE;
+        mStatusIconEnabled = DEFAULT_STATUS_ICON_ENABLED;
+        mRespectMaximumBorderRatio = DEFAULT_RESPECT_MAXIMUM_BORDER_RATIO;
+        mRespectMaximumBoxResolution = DEFAULT_RESPECT_MAXIMUM_BOX_RESOLUTION;
+        mMaximumBoxResolution = DEFAULT_MAXIMUM_BOX_RESOLUTION;
 
-        if (DEFAULT_RESPECT_MAXIMUM_BORDER_RATIO
-            &&((mBoxHeight > (PaintroidApplication.drawingSurface.getBitmapHeight() * MAXIMUM_BORDER_RATIO))
-			|| mBoxWidth > (PaintroidApplication.drawingSurface.getBitmapWidth() * MAXIMUM_BORDER_RATIO)))
-        {
-			mBoxHeight = (PaintroidApplication.drawingSurface.getBitmapHeight() * MAXIMUM_BORDER_RATIO);
-			mBoxWidth = (PaintroidApplication.drawingSurface.getBitmapWidth() * MAXIMUM_BORDER_RATIO);
-		}
+        initLinePaint();
+        initScaleDependedValues();
+    }
 
-		mRotatePosition = RotatePosition.TOP_LEFT;
-		mResizeAction = ResizeAction.NONE;
+    public BaseToolWithRectangleShape(Context context, ToolType toolType,
+                                      Bitmap drawingBitmap) {
+        this(context, toolType);
+        mDrawingBitmap = drawingBitmap;
 
-		mRespectImageBounds = DEFAULT_RESPECT_BORDERS;
-		mRotationEnabled = DEFAULT_ROTATION_ENABLED;
-		mBackgroundShadowEnabled = DEFAULT_BACKGROUND_SHADOW_ENABLED;
-		mResizePointsVisible = DEFAULT_RESIZE_POINTS_VISIBLE;
-		mStatusIconEnabled = DEFAULT_STATUS_ICON_ENABLED;
-		mRespectMaximumBorderRatio = DEFAULT_RESPECT_MAXIMUM_BORDER_RATIO;
-		mRespectMaximumBoxResolution = DEFAULT_RESPECT_MAXIMUM_BOX_RESOLUTION;
-		mMaximumBoxResolution = DEFAULT_MAXIMUM_BOX_RESOLUTION;
+    }
 
-		initLinePaint();
-		initScaleDependedValues();
-	}
+    private void initLinePaint() {
+        mLinePaint = new Paint();
+        mLinePaint.setDither(true);
+        mLinePaint.setStyle(Paint.Style.STROKE);
+        mLinePaint.setStrokeJoin(Paint.Join.ROUND);
+    }
 
-	public BaseToolWithRectangleShape(Context context, ToolType toolType, Bitmap drawingBitmap)
-    {
-		this(context, toolType);
-		mDrawingBitmap = drawingBitmap;
-	}
+    private void initScaleDependedValues() {
+        mToolStrokeWidth = getStrokeWidthForZoom(DEFAULT_TOOL_STROKE_WIDTH,
+                MINIMAL_TOOL_STROKE_WIDTH, MAXIMAL_TOOL_STROKE_WIDTH);
+        mBoxResizeMargin = getInverselyProportionalSizeForZoom(DEFAULT_BOX_RESIZE_MARGIN);
+        mRotationSymbolDistance = getInverselyProportionalSizeForZoom(DEFAULT_ROTATION_SYMBOL_DISTANCE) * 2;
+        mRotationSymbolWidth = getInverselyProportionalSizeForZoom(DEFAULT_ROTATION_SYMBOL_WIDTH);
+    }
 
-	private void initLinePaint()
-    {
-		mLinePaint = new Paint();
-		mLinePaint.setDither(true);
-		mLinePaint.setStyle(Paint.Style.STROKE);
-		mLinePaint.setStrokeJoin(Paint.Join.ROUND);
-	}
+    public void setBitmap(Bitmap bitmap) {
+        if (bitmap != null) {
+            mDrawingBitmap = bitmap;
 
-	private void initScaleDependedValues()
-    {
-		mToolStrokeWidth = getStrokeWidthForZoom(DEFAULT_TOOL_STROKE_WIDTH
-                                                ,MINIMAL_TOOL_STROKE_WIDTH
-                                                , MAXIMAL_TOOL_STROKE_WIDTH);
-		mBoxResizeMargin = getInverselyProportionalSizeForZoom(DEFAULT_BOX_RESIZE_MARGIN);
-		mRotationSymbolDistance = getInverselyProportionalSizeForZoom(DEFAULT_ROTATION_SYMBOL_DISTANCE) * 2;
-		mRotationSymbolWidth = getInverselyProportionalSizeForZoom(DEFAULT_ROTATION_SYMBOL_WIDTH);
-	}
+            float bitmapWidth = bitmap.getWidth();
+            float bitmapHeight = bitmap.getHeight();
+            float ratio = bitmapWidth / bitmapHeight;
 
-	public void setBitmap(Bitmap bitmap)
-    {
-		if (bitmap != null)
-        {
-			mDrawingBitmap = bitmap;
+            if (ratio > 1) {
+                mBoxWidth *= ratio;
+            } else {
+                mBoxHeight /= ratio;
+            }
+        }
+    }
 
-			float bitmapWidth = mDrawingBitmap.getWidth();
-			float bitmapHeight = mDrawingBitmap.getHeight();
-			float ratio = bitmapWidth / bitmapHeight;
+    @Override
+    public boolean handleDown(PointF coordinate) {
+        mIsDown = true;
+        mMovedDistance.set(0, 0);
+        mPreviousEventCoordinate = new PointF(coordinate.x, coordinate.y);
+        mCurrentAction = getAction(coordinate.x, coordinate.y);
+        return true;
+    }
 
-			if (ratio > 1)
-            {
-				mBoxWidth *= ratio;
-			}
-            else
-            {
-				mBoxHeight /= ratio;
-			}
-		}
-	}
+    @Override
+    public boolean handleMove(PointF coordinate) {
+        if (mPreviousEventCoordinate == null || mCurrentAction == null) {
+            return false;
+        }
 
-	@Override
-	public boolean handleDown(PointF coordinate)
-    {
-		mIsDown = true;
-		mMovedDistance.set(0, 0);
-		mPreviousEventCoordinate = new PointF(coordinate.x, coordinate.y);
-		mCurrentAction = getAction(coordinate.x, coordinate.y);
-		return true;
-	}
-
-	@Override
-	public boolean handleMove(PointF coordinate)
-    {
-		if (mPreviousEventCoordinate == null || mCurrentAction == null)
-        {
-			return false;
-		}
-
-		PointF delta = new PointF(coordinate.x - mPreviousEventCoordinate.x,
-                                  coordinate.y - mPreviousEventCoordinate.y);
-
-		mMovedDistance.set(mMovedDistance.x + Math.abs(delta.x),
-				           mMovedDistance.y + Math.abs(delta.y));
-
+        PointF delta = new PointF(coordinate.x - mPreviousEventCoordinate.x,
+                coordinate.y - mPreviousEventCoordinate.y);
+        mMovedDistance.set(mMovedDistance.x + Math.abs(delta.x),
+                mMovedDistance.y + Math.abs(delta.y));
         mPreviousEventCoordinate.set(coordinate.x, coordinate.y);
+        switch (mCurrentAction) {
+            case MOVE:
+                move(delta.x, delta.y);
+                break;
+            case RESIZE:
+                resize(delta.x, delta.y);
+                break;
+            case ROTATE:
+                rotate(delta.x, delta.y);
+                break;
+            default:
+                break;
+        }
+        return true;
+    }
 
-        switch (mCurrentAction)
-        {
-			case MOVE:
-				move(delta.x, delta.y);
-				break;
-			case RESIZE:
-				resize(delta.x, delta.y);
-				break;
-			case ROTATE:
-				rotate(delta.x, delta.y);
-				break;
-			default:
-				break;
-		}
-		return true;
-	}
+    @Override
+    public boolean handleUp(PointF coordinate) {
+        mIsDown = false;
+        if (mPreviousEventCoordinate == null) {
+            return false;
+        }
+        mMovedDistance.set(
+                mMovedDistance.x
+                        + Math.abs(coordinate.x - mPreviousEventCoordinate.x),
+                mMovedDistance.y
+                        + Math.abs(coordinate.y - mPreviousEventCoordinate.y));
+        if (MOVE_TOLERANCE * 2 >= mMovedDistance.x
+                && MOVE_TOLERANCE * 2 >= mMovedDistance.y
+                && isCoordinateInsideBox(coordinate)) {
+            onClickInBox();
+        }
+        return true;
+    }
 
-	@Override
-	public boolean handleUp(PointF coordinate)
-    {
-		mIsDown = false;
-		if (mPreviousEventCoordinate == null)
-        {
-			return false;
-		}
-		mMovedDistance.set(mMovedDistance.x + Math.abs(coordinate.x - mPreviousEventCoordinate.x),
-				           mMovedDistance.y + Math.abs(coordinate.y - mPreviousEventCoordinate.y));
+    private boolean isCoordinateInsideBox(PointF coordinate) {
+        if ((coordinate.x > mToolPosition.x - mBoxWidth / 2)
+                && (coordinate.x < mToolPosition.x + mBoxWidth / 2)
+                && (coordinate.y > mToolPosition.y - mBoxHeight / 2)
+                && (coordinate.y < mToolPosition.y + mBoxHeight / 2)) {
+            return true;
+        }
 
-        if (MOVE_TOLERANCE * 2 >= mMovedDistance.x	&& MOVE_TOLERANCE * 2 >= mMovedDistance.y
-                && isCoordinateInsideBox(coordinate))
-        {
-			onClickInBox();
-		}
+        return false;
+    }
 
-		return true;
-	}
+    @Override
+    public void draw(Canvas canvas) {
+        drawShape(canvas);
+    }
 
-	private boolean isCoordinateInsideBox(PointF coordinate)
-    {
-		if ((coordinate.x > mToolPosition.x - mBoxWidth / 2)
-				&& (coordinate.x < mToolPosition.x + mBoxWidth / 2)
-				&& (coordinate.y > mToolPosition.y - mBoxHeight / 2)
-				&& (coordinate.y < mToolPosition.y + mBoxHeight / 2))
-        {
-			return true;
-		}
+    @Override
+    public void drawShape(Canvas canvas) {
+        initScaleDependedValues();
 
-		return false;
-	}
+        canvas.translate(mToolPosition.x, mToolPosition.y);
+        canvas.rotate(mBoxRotation);
 
-	@Override
-	public void draw(Canvas canvas)
-    {
-		drawShape(canvas);
-	}
+        if (mBackgroundShadowEnabled) {
+            drawBackgroundShadow(canvas);
+        }
 
-	@Override
-	public void drawShape(Canvas canvas)
-    {
-		initScaleDependedValues();
+        if (mResizePointsVisible) {
+            drawResizePoints(canvas);
+        }
 
-		canvas.translate(mToolPosition.x, mToolPosition.y);
-		canvas.rotate(mBoxRotation);
+        if (mDrawingBitmap != null && mRotationEnabled) {
+            drawRotationArrows(canvas);
+        }
 
-		if (mBackgroundShadowEnabled)
-        {
-			drawBackgroundShadow(canvas);
-		}
+        if (mDrawingBitmap != null) {
+            drawBitmap(canvas);
+        }
 
-		if (mResizePointsVisible)
-        {
-			drawResizePoints(canvas);
-		}
+        drawRectangle(canvas);
+        drawToolSpecifics(canvas);
 
-		if (mDrawingBitmap != null && mRotationEnabled)
-        {
-			drawRotationArrows(canvas);
-		}
+        if (mStatusIconEnabled) {
+            drawStatus(canvas);
+        }
+    }
 
-		if (mDrawingBitmap != null)
-        {
-			drawBitmap(canvas);
-		}
+    private void drawBackgroundShadow(Canvas canvas) {
 
-		drawRectangle(canvas);
-		drawToolSpecifics(canvas);
+        Paint backgroundPaint = new Paint();
+        backgroundPaint.setColor(Color.argb(128, 0, 0, 0));
+        backgroundPaint.setStyle(Style.FILL);
 
-		if (mStatusIconEnabled)
-        {
-			drawStatus(canvas);
-		}
-	}
-
-	private void drawBackgroundShadow(Canvas canvas)
-    {
-		Paint backgroundPaint = new Paint();
-		backgroundPaint.setColor(Color.argb(128, 0, 0, 0));
-		backgroundPaint.setStyle(Style.FILL);
-
-		canvas.clipRect((-mBoxWidth + mToolStrokeWidth) / 2,
+        canvas.clipRect((-mBoxWidth + mToolStrokeWidth) / 2,
                 (mBoxHeight - mToolStrokeWidth) / 2,
                 (mBoxWidth - mToolStrokeWidth) / 2,
                 (-mBoxHeight + mToolStrokeWidth) / 2, Op.DIFFERENCE);
+        canvas.rotate(-mBoxRotation);
+        canvas.translate(-mToolPosition.x, -mToolPosition.y);
+        canvas.drawRect(0, 0,
+                PaintroidApplication.drawingSurface.getBitmapWidth(),
+                PaintroidApplication.drawingSurface.getBitmapHeight(),
+                backgroundPaint);
+        canvas.translate(mToolPosition.x, mToolPosition.y);
+        canvas.rotate(mBoxRotation);
 
-		canvas.rotate(-mBoxRotation);
-		canvas.translate(-mToolPosition.x, -mToolPosition.y);
-		canvas.drawRect(0, 0, PaintroidApplication.drawingSurface.getBitmapWidth(),
-                PaintroidApplication.drawingSurface.getBitmapHeight(), backgroundPaint);
-		canvas.translate(mToolPosition.x, mToolPosition.y);
-		canvas.rotate(mBoxRotation);
-	}
+    }
 
-	private void drawResizePoints(Canvas canvas)
-    {
-		float circleRadius = getInverselyProportionalSizeForZoom(RESIZE_CIRCLE_SIZE);
-		Paint circlePaint = new Paint();
-		circlePaint.setAntiAlias(true);
-		circlePaint.setColor(mSecondaryShapeColor);
-		circlePaint.setStyle(Style.FILL);
-		canvas.drawCircle(0, -mBoxHeight / 2, circleRadius, circlePaint);
-		canvas.drawCircle(mBoxWidth / 2, -mBoxHeight / 2, circleRadius, circlePaint);
-		canvas.drawCircle(mBoxWidth / 2, 0, circleRadius, circlePaint);
-		canvas.drawCircle(mBoxWidth / 2, mBoxHeight / 2, circleRadius, circlePaint);
-		canvas.drawCircle(0, mBoxHeight / 2, circleRadius, circlePaint);
-		canvas.drawCircle(-mBoxWidth / 2, mBoxHeight / 2, circleRadius, circlePaint);
-		canvas.drawCircle(-mBoxWidth / 2, 0, circleRadius, circlePaint);
-		canvas.drawCircle(-mBoxWidth / 2, -mBoxHeight / 2, circleRadius, circlePaint);
-	}
+    private void drawResizePoints(Canvas canvas) {
+        float circleRadius = getInverselyProportionalSizeForZoom(RESIZE_CIRCLE_SIZE);
+        Paint circlePaint = new Paint();
+        circlePaint.setAntiAlias(true);
+        circlePaint.setColor(mSecondaryShapeColor);
+        circlePaint.setStyle(Style.FILL);
+        canvas.drawCircle(0, -mBoxHeight / 2, circleRadius, circlePaint);
+        canvas.drawCircle(mBoxWidth / 2, -mBoxHeight / 2, circleRadius,
+                circlePaint);
+        canvas.drawCircle(mBoxWidth / 2, 0, circleRadius, circlePaint);
+        canvas.drawCircle(mBoxWidth / 2, mBoxHeight / 2, circleRadius,
+                circlePaint);
+        canvas.drawCircle(0, mBoxHeight / 2, circleRadius, circlePaint);
+        canvas.drawCircle(-mBoxWidth / 2, mBoxHeight / 2, circleRadius,
+                circlePaint);
+        canvas.drawCircle(-mBoxWidth / 2, 0, circleRadius, circlePaint);
+        canvas.drawCircle(-mBoxWidth / 2, -mBoxHeight / 2, circleRadius,
+                circlePaint);
+    }
 
-	private void drawRotationArrows(Canvas canvas)
-    {
-		float arcStrokeWidth = getInverselyProportionalSizeForZoom(ROTATION_ARROW_ARC_STROKE_WIDTH);
-		float arcRadius = getInverselyProportionalSizeForZoom(ROTATION_ARROW_ARC_RADIUS);
-		float arrowSize = getInverselyProportionalSizeForZoom(ROTATION_ARROW_HEAD_SIZE);
-		float offset = getInverselyProportionalSizeForZoom(ROTATION_ARROW_OFFSET);
+    private void drawRotationArrows(Canvas canvas) {
+        float arcStrokeWidth = getInverselyProportionalSizeForZoom(ROTATION_ARROW_ARC_STROKE_WIDTH);
+        float arcRadius = getInverselyProportionalSizeForZoom(ROTATION_ARROW_ARC_RADIUS);
+        float arrowSize = getInverselyProportionalSizeForZoom(ROTATION_ARROW_HEAD_SIZE);
+        float offset = getInverselyProportionalSizeForZoom(ROTATION_ARROW_OFFSET);
 
-		Paint arcPaint = new Paint();
-		arcPaint.setColor(Color.WHITE);
-		arcPaint.setStrokeWidth(arcStrokeWidth);
-		arcPaint.setStyle(Paint.Style.STROKE);
-		arcPaint.setStrokeCap(Cap.BUTT);
+        Paint arcPaint = new Paint();
+        arcPaint.setColor(Color.WHITE);
+        arcPaint.setStrokeWidth(arcStrokeWidth);
+        arcPaint.setStyle(Paint.Style.STROKE);
+        arcPaint.setStrokeCap(Cap.BUTT);
 
-		Paint arrowPaint = new Paint();
-		arrowPaint.setColor(Color.WHITE);
-		arrowPaint.setStyle(Paint.Style.FILL);
+        Paint arrowPaint = new Paint();
+        arrowPaint.setColor(Color.WHITE);
+        arrowPaint.setStyle(Paint.Style.FILL);
 
-		float tempBoxWidth = mBoxWidth;
-		float tempBoxHeight = mBoxHeight;
+        float tempBoxWidth = mBoxWidth;
+        float tempBoxHeight = mBoxHeight;
 
-		for (int i = 0; i < 4; i++)
-        {
-			float xBase = -tempBoxWidth / 2 - offset;
-			float yBase = -tempBoxHeight / 2 - offset;
+        for (int i = 0; i < 4; i++) {
 
-			Path arcPath = new Path();
+            float xBase = -tempBoxWidth / 2 - offset;
+            float yBase = -tempBoxHeight / 2 - offset;
 
-			RectF rectF = new RectF(xBase - arcRadius, yBase - arcRadius, xBase
-					                + arcRadius, yBase + arcRadius);
-			arcPath.addArc(rectF, 180, 90);
+            Path arcPath = new Path();
 
-			canvas.drawPath(arcPath, arcPaint);
+            RectF rectF = new RectF(xBase - arcRadius, yBase - arcRadius, xBase
+                    + arcRadius, yBase + arcRadius);
+            arcPath.addArc(rectF, 180, 90);
 
-			Path arrowPath = new Path();
-			arrowPath.moveTo(xBase - arcRadius - arrowSize, yBase);
-			arrowPath.lineTo(xBase - arcRadius + arrowSize, yBase);
-			arrowPath.lineTo(xBase - arcRadius, yBase + arrowSize);
-			arrowPath.close();
+            canvas.drawPath(arcPath, arcPaint);
 
-			arrowPath.moveTo(xBase, yBase - arcRadius - arrowSize);
-			arrowPath.lineTo(xBase, yBase - arcRadius + arrowSize);
-			arrowPath.lineTo(xBase + arrowSize, yBase - arcRadius);
-			arrowPath.close();
-			canvas.drawPath(arrowPath, arrowPaint);
+            Path arrowPath = new Path();
+            arrowPath.moveTo(xBase - arcRadius - arrowSize, yBase);
+            arrowPath.lineTo(xBase - arcRadius + arrowSize, yBase);
+            arrowPath.lineTo(xBase - arcRadius, yBase + arrowSize);
+            arrowPath.close();
 
-			float tempLenght = tempBoxWidth;
-			tempBoxWidth = tempBoxHeight;
-			tempBoxHeight = tempLenght;
-			canvas.rotate(90);
-		}
-	}
+            arrowPath.moveTo(xBase, yBase - arcRadius - arrowSize);
+            arrowPath.lineTo(xBase, yBase - arcRadius + arrowSize);
+            arrowPath.lineTo(xBase + arrowSize, yBase - arcRadius);
+            arrowPath.close();
+            canvas.drawPath(arrowPath, arrowPaint);
 
-	private void drawBitmap(Canvas canvas)
-    {
-		Paint bitmapPaint = new Paint(Paint.DITHER_FLAG);
-		canvas.save();
+            float tempLenght = tempBoxWidth;
+            tempBoxWidth = tempBoxHeight;
+            tempBoxHeight = tempLenght;
+            canvas.rotate(90);
+        }
+    }
 
-		canvas.clipRect(new RectF(-mBoxWidth / 2, -mBoxHeight / 2
-                , mBoxWidth / 2, mBoxHeight / 2), Op.UNION);
-		canvas.drawBitmap(mDrawingBitmap, null, new RectF(-mBoxWidth / 2, -mBoxHeight / 2
-                , mBoxWidth / 2, mBoxHeight / 2), bitmapPaint);
+    private void drawBitmap(Canvas canvas) {
 
-	}
+        Paint bitmapPaint = new Paint(Paint.DITHER_FLAG);
+        canvas.save();
 
-	private void drawRectangle(Canvas canvas)
-    {
-		mLinePaint.setStrokeWidth(mToolStrokeWidth);
-		mLinePaint.setColor(mSecondaryShapeColor);
-		canvas.drawRect(new RectF(-mBoxWidth / 2, -mBoxHeight / 2
-                                    ,mBoxWidth / 2, mBoxHeight / 2), mLinePaint);
-	}
+        canvas.clipRect(new RectF(-mBoxWidth / 2, -mBoxHeight / 2,
+                mBoxWidth / 2, mBoxHeight / 2), Op.UNION);
+        canvas.drawBitmap(mDrawingBitmap, null, new RectF(-mBoxWidth / 2, -mBoxHeight / 2,
+                mBoxWidth / 2, mBoxHeight / 2), bitmapPaint);
 
-	private void drawStatus(Canvas canvas)
-    {
-		RectF statusRect = new RectF(-48, -48, 48, 48);
-		if (mIsDown)
-        {
-			int bitmapId;
-            switch (mCurrentAction)
-            {
+    }
+
+    private void drawRectangle(Canvas canvas) {
+        mLinePaint.setStrokeWidth(mToolStrokeWidth);
+        mLinePaint.setColor(mSecondaryShapeColor);
+        canvas.drawRect(new RectF(-mBoxWidth / 2, -mBoxHeight / 2,
+                mBoxWidth / 2, mBoxHeight / 2), mLinePaint);
+    }
+
+    private void drawStatus(Canvas canvas) {
+        RectF statusRect = new RectF(-48, -48, 48, 48);
+        if (mIsDown) {
+
+            int bitmapId;
+            switch (mCurrentAction) {
                 case MOVE:
                     bitmapId = R.drawable.def_icon_move;
                     break;
@@ -462,466 +435,421 @@ public abstract class BaseToolWithRectangleShape extends BaseToolWithShape {
                     break;
             }
 
-			if (bitmapId != R.drawable.icon_menu_no_icon)
-            {
-				Paint statusPaint = new Paint();
-				statusPaint.setColor(mSecondaryShapeColor);
-				canvas.clipRect(statusRect, Op.UNION);
-				statusPaint.setAlpha(128);
-				canvas.drawOval(statusRect, statusPaint);
+            if (bitmapId != R.drawable.icon_menu_no_icon) {
+                Paint statusPaint = new Paint();
+                statusPaint.setColor(mSecondaryShapeColor);
+                canvas.clipRect(statusRect, Op.UNION);
+                statusPaint.setAlpha(128);
+                canvas.drawOval(statusRect, statusPaint);
 
-				Bitmap actionBitmap = BitmapFactory
-                                        .decodeResource(PaintroidApplication
-                                                        .applicationContext.getResources(),	bitmapId);
-				statusPaint.setAlpha(255);
-				canvas.rotate(-mBoxRotation);
-				canvas.drawBitmap(actionBitmap, -24, -24, statusPaint);
-				canvas.rotate(mBoxRotation);
-			}
-		}
+                Bitmap actionBitmap = BitmapFactory.decodeResource(
+                        PaintroidApplication.applicationContext.getResources(),
+                        bitmapId);
+                statusPaint.setAlpha(255);
+                canvas.rotate(-mBoxRotation);
+                canvas.drawBitmap(actionBitmap, -24, -24, statusPaint);
+                canvas.rotate(mBoxRotation);
+            }
+        }
 
-	}
+    }
 
-	private void move(float deltaX, float deltaY)
-    {
-		float newXPos = mToolPosition.x + deltaX;
-		float newYPos = mToolPosition.y + deltaY;
-
-        if (mRespectImageBounds)
-        {
-            if (newXPos - mBoxWidth / 2 < 0)
-            {
+    private void move(float deltaX, float deltaY) {
+        float newXPos = mToolPosition.x + deltaX;
+        float newYPos = mToolPosition.y + deltaY;
+        if (mRespectImageBounds) {
+            if (newXPos - mBoxWidth / 2 < 0) {
                 newXPos = mBoxWidth / 2;
-            }
-            else if (newXPos + mBoxWidth / 2 > PaintroidApplication.drawingSurface.getBitmapWidth())
-            {
-                newXPos = PaintroidApplication.drawingSurface.getBitmapWidth()- mBoxWidth / 2;
+            } else if (newXPos + mBoxWidth / 2 > PaintroidApplication.drawingSurface
+                    .getBitmapWidth()) {
+                newXPos = PaintroidApplication.drawingSurface.getBitmapWidth()
+                        - mBoxWidth / 2;
             }
 
-            if (newYPos - mBoxHeight / 2 < 0)
-            {
+            if (newYPos - mBoxHeight / 2 < 0) {
                 newYPos = mBoxHeight / 2;
-            }
-            else if (newYPos + mBoxHeight / 2 > PaintroidApplication.drawingSurface.getBitmapHeight())
-            {
-                newYPos = PaintroidApplication.drawingSurface.getBitmapHeight()- mBoxHeight / 2;
+            } else if (newYPos + mBoxHeight / 2 > PaintroidApplication.drawingSurface
+                    .getBitmapHeight()) {
+                newYPos = PaintroidApplication.drawingSurface.getBitmapHeight()
+                        - mBoxHeight / 2;
             }
         }
+        mToolPosition.x = newXPos;
+        mToolPosition.y = newYPos;
+    }
 
-		mToolPosition.x = newXPos;
-		mToolPosition.y = newYPos;
-	}
+    private void rotate(float deltaX, float deltaY) {
+        if (mDrawingBitmap == null) {
+            return;
+        }
 
-	private void rotate(float deltaX, float deltaY)
-    {
-		if (mDrawingBitmap == null)
-        {
-			return;
-		}
+        PointF currentPoint = new PointF(mPreviousEventCoordinate.x, mPreviousEventCoordinate.y);
 
-		PointF currentPoint = new PointF(mPreviousEventCoordinate.x, mPreviousEventCoordinate.y);
+        double previousXLength = mPreviousEventCoordinate.x - deltaX - mToolPosition.x;
+        double previousYLength = mPreviousEventCoordinate.y - deltaY - mToolPosition.y;
+        double currentXLength = currentPoint.x - mToolPosition.x;
+        double currentYLength = currentPoint.y - mToolPosition.y;
 
-		double previousXLength = mPreviousEventCoordinate.x - deltaX - mToolPosition.x;
-		double previousYLength = mPreviousEventCoordinate.y - deltaY - mToolPosition.y;
-		double currentXLength = currentPoint.x - mToolPosition.x;
-		double currentYLength = currentPoint.y - mToolPosition.y;
+        double rotationAnglePrevious = Math.atan2(previousYLength, previousXLength);
+        double rotationAngleCurrent = Math.atan2(currentYLength, currentXLength);
+        double deltaAngle = -(rotationAnglePrevious - rotationAngleCurrent);
 
-		double rotationAnglePrevious = Math.atan2(previousYLength, previousXLength);
-		double rotationAngleCurrent = Math.atan2(currentYLength, currentXLength);
-		double deltaAngle = -(rotationAnglePrevious - rotationAngleCurrent);
-
-		mBoxRotation += (float) Math.toDegrees(deltaAngle) + 360;
-		mBoxRotation = mBoxRotation % 360;
-		if (mBoxRotation > 180)
-        {
+        mBoxRotation += (float) Math.toDegrees(deltaAngle) + 360;
+        mBoxRotation = mBoxRotation % 360;
+        if (mBoxRotation > 180)
             mBoxRotation = -180 + (mBoxRotation - 180);
+    }
+
+    private FloatingBoxAction getAction(float clickCoordinatesX,
+                                        float clickCoordinatesY) {
+        mResizeAction = ResizeAction.NONE;
+        double rotationRadiant = mBoxRotation * Math.PI / 180;
+        float clickCoordinatesRotatedX = (float) (mToolPosition.x
+                + Math.cos(-rotationRadiant)
+                * (clickCoordinatesX - mToolPosition.x) - Math
+                .sin(-rotationRadiant) * (clickCoordinatesY - mToolPosition.y));
+        float clickCoordinatesRotatedY = (float) (mToolPosition.y
+                + Math.sin(-rotationRadiant)
+                * (clickCoordinatesX - mToolPosition.x) + Math
+                .cos(-rotationRadiant) * (clickCoordinatesY - mToolPosition.y));
+
+        // Move (within box)
+        if (clickCoordinatesRotatedX < mToolPosition.x + mBoxWidth / 2
+                - mBoxResizeMargin
+                && clickCoordinatesRotatedX > mToolPosition.x - mBoxWidth / 2
+                + mBoxResizeMargin
+                && clickCoordinatesRotatedY < mToolPosition.y + mBoxHeight / 2
+                - mBoxResizeMargin
+                && clickCoordinatesRotatedY > mToolPosition.y - mBoxHeight / 2
+                + mBoxResizeMargin) {
+            return FloatingBoxAction.MOVE;
         }
-	}
 
-	private FloatingBoxAction getAction(float clickCoordinatesX,float clickCoordinatesY)
-    {
-		mResizeAction = ResizeAction.NONE;
-		double rotationRadiant = mBoxRotation * Math.PI / 180;
-		float clickCoordinatesRotatedX = (float) (mToolPosition.x + Math.cos(-rotationRadiant)
-				                                    * (clickCoordinatesX - mToolPosition.x) - Math
-				                                    .sin(-rotationRadiant)*(clickCoordinatesY - mToolPosition.y));
+        // Resize (on frame)
+        if (clickCoordinatesRotatedX < mToolPosition.x + mBoxWidth / 2
+                + mBoxResizeMargin
+                && clickCoordinatesRotatedX > mToolPosition.x - mBoxWidth / 2
+                - mBoxResizeMargin
+                && clickCoordinatesRotatedY < mToolPosition.y + mBoxHeight / 2
+                + mBoxResizeMargin
+                && clickCoordinatesRotatedY > mToolPosition.y - mBoxHeight / 2
+                - mBoxResizeMargin) {
+            if (clickCoordinatesRotatedX < mToolPosition.x - mBoxWidth / 2
+                    + mBoxResizeMargin) {
+                mResizeAction = ResizeAction.LEFT;
+            } else if (clickCoordinatesRotatedX > mToolPosition.x + mBoxWidth
+                    / 2 - mBoxResizeMargin) {
+                mResizeAction = ResizeAction.RIGHT;
+            }
+            if (clickCoordinatesRotatedY < mToolPosition.y - mBoxHeight / 2
+                    + mBoxResizeMargin) {
+                if (mResizeAction == ResizeAction.LEFT) {
+                    mResizeAction = ResizeAction.TOPLEFT;
+                } else if (mResizeAction == ResizeAction.RIGHT) {
+                    mResizeAction = ResizeAction.TOPRIGHT;
+                } else {
+                    mResizeAction = ResizeAction.TOP;
+                }
+            } else if (clickCoordinatesRotatedY > mToolPosition.y + mBoxHeight
+                    / 2 - mBoxResizeMargin) {
+                if (mResizeAction == ResizeAction.LEFT) {
+                    mResizeAction = ResizeAction.BOTTOMLEFT;
+                } else if (mResizeAction == ResizeAction.RIGHT) {
+                    mResizeAction = ResizeAction.BOTTOMRIGHT;
+                } else {
+                    mResizeAction = ResizeAction.BOTTOM;
+                }
+            }
+            return FloatingBoxAction.RESIZE;
+        }
 
-		float clickCoordinatesRotatedY = (float) (mToolPosition.y + Math.sin(-rotationRadiant)
-                                                  * (clickCoordinatesX - mToolPosition.x) + Math
-				                                    .cos(-rotationRadiant) * (clickCoordinatesY - mToolPosition.y));
+        // Only allow rotation if an image is present
+        if ((mDrawingBitmap != null) && mRotationEnabled) {
+            PointF topLeftRotationPoint = new PointF(mToolPosition.x - mBoxWidth / 2 - mRotationSymbolDistance / 2,
+                    mToolPosition.y - mBoxHeight / 2 - mRotationSymbolDistance / 2);
+            PointF topRightRotationPoint = new PointF(mToolPosition.x + mBoxWidth / 2 + mRotationSymbolDistance / 2,
+                    mToolPosition.y - mBoxHeight / 2 - mRotationSymbolDistance / 2);
+            PointF bottomLeftRotationPoint = new PointF(mToolPosition.x - mBoxWidth / 2 - mRotationSymbolDistance / 2,
+                    mToolPosition.y + mBoxHeight / 2 + mRotationSymbolDistance / 2);
+            PointF bottomRightRotationPoint = new PointF(mToolPosition.x + mBoxWidth / 2 + mRotationSymbolDistance / 2,
+                    mToolPosition.y + mBoxHeight / 2 + mRotationSymbolDistance / 2);
 
-		// Move (within box)
-		if (clickCoordinatesRotatedX < mToolPosition.x + mBoxWidth / 2 - mBoxResizeMargin
-				&& clickCoordinatesRotatedX > mToolPosition.x - mBoxWidth / 2 + mBoxResizeMargin
-				&& clickCoordinatesRotatedY < mToolPosition.y + mBoxHeight / 2 - mBoxResizeMargin
-				&& clickCoordinatesRotatedY > mToolPosition.y - mBoxHeight / 2 + mBoxResizeMargin)
-        {
-			return FloatingBoxAction.MOVE;
-		}
+            if (checkRotationPoints(clickCoordinatesRotatedX, clickCoordinatesRotatedY, topLeftRotationPoint) ||
+                    checkRotationPoints(clickCoordinatesRotatedX, clickCoordinatesRotatedY, topRightRotationPoint) ||
+                    checkRotationPoints(clickCoordinatesRotatedX, clickCoordinatesRotatedY, bottomLeftRotationPoint) ||
+                    checkRotationPoints(clickCoordinatesRotatedX, clickCoordinatesRotatedY, bottomRightRotationPoint)) {
 
-		// Resize (on frame)
-		if (clickCoordinatesRotatedX < mToolPosition.x + mBoxWidth / 2 + mBoxResizeMargin
-				&& clickCoordinatesRotatedX > mToolPosition.x - mBoxWidth / 2 - mBoxResizeMargin
-				&& clickCoordinatesRotatedY < mToolPosition.y + mBoxHeight / 2 + mBoxResizeMargin
-				&& clickCoordinatesRotatedY > mToolPosition.y - mBoxHeight / 2 - mBoxResizeMargin) {
-			if (clickCoordinatesRotatedX < mToolPosition.x - mBoxWidth / 2 + mBoxResizeMargin)
-            {
-				mResizeAction = ResizeAction.LEFT;
-			}
-            else if (clickCoordinatesRotatedX > mToolPosition.x + mBoxWidth	/ 2 - mBoxResizeMargin)
-            {
-				mResizeAction = ResizeAction.RIGHT;
-			}
-			if (clickCoordinatesRotatedY < mToolPosition.y - mBoxHeight / 2	+ mBoxResizeMargin)
-            {
-				if (mResizeAction == ResizeAction.LEFT)
-                {
-					mResizeAction = ResizeAction.TOPLEFT;
-				}
-                else if (mResizeAction == ResizeAction.RIGHT)
-                {
-					mResizeAction = ResizeAction.TOPRIGHT;
-				}
-                else
-                {
-					mResizeAction = ResizeAction.TOP;
-				}
-			}
-            else if (clickCoordinatesRotatedY > mToolPosition.y + mBoxHeight/ 2 - mBoxResizeMargin)
-            {
-				if (mResizeAction == ResizeAction.LEFT)
-                {
-					mResizeAction = ResizeAction.BOTTOMLEFT;
-				}
-                else if (mResizeAction == ResizeAction.RIGHT)
-                {
-					mResizeAction = ResizeAction.BOTTOMRIGHT;
-				}
-                else
-                {
-					mResizeAction = ResizeAction.BOTTOM;
-				}
-			}
-			return FloatingBoxAction.RESIZE;
-		}
+                return FloatingBoxAction.ROTATE;
+            }
+        }
+        return FloatingBoxAction.MOVE;
+    }
 
-		// Only allow rotation if an image is present
-		if ((mDrawingBitmap != null) && mRotationEnabled)
-        {
-			PointF topLeftRotationPoint = new PointF(mToolPosition.x - mBoxWidth / 2
-                                                            - mRotationSymbolDistance / 2,
-					                                 mToolPosition.y - mBoxHeight / 2
-                                                            - mRotationSymbolDistance / 2);
+    private boolean checkRotationPoints(float clickCoordinatesRotatedX, float clickCoordinatesRotatedY, PointF rotationPoint) {
+        if ((clickCoordinatesRotatedX > rotationPoint.x - mRotationSymbolDistance / 2)
+                && (clickCoordinatesRotatedX < rotationPoint.x + mRotationSymbolDistance / 2)
+                && (clickCoordinatesRotatedY > rotationPoint.y - mRotationSymbolDistance / 2)
+                && (clickCoordinatesRotatedY < rotationPoint.y + mRotationSymbolDistance / 2)) {
+            return true;
+        }
+        return false;
+    }
 
-            PointF topRightRotationPoint = new PointF(mToolPosition.x + mBoxWidth / 2
-                                                            + mRotationSymbolDistance / 2,
-                                                      mToolPosition.y - mBoxHeight / 2
-                                                              - mRotationSymbolDistance / 2);
+    private void resize(float deltaX, float deltaY) {
+        double rotationRadian = mBoxRotation * Math.PI / 180;
+        double deltaXCorrected = Math.cos(-rotationRadian) * (deltaX)
+                - Math.sin(-rotationRadian) * (deltaY);
+        double deltaYCorrected = Math.sin(-rotationRadian) * (deltaX)
+                + Math.cos(-rotationRadian) * (deltaY);
 
-			PointF bottomLeftRotationPoint = new PointF(mToolPosition.x - mBoxWidth / 2
-                                                            - mRotationSymbolDistance / 2,
-					                                    mToolPosition.y + mBoxHeight / 2
-                                                                + mRotationSymbolDistance / 2);
+        switch (mResizeAction) {
+            case TOPLEFT:
+            case BOTTOMRIGHT:
+                if (Math.abs(deltaXCorrected) > Math.abs(deltaYCorrected)) {
+                    deltaYCorrected = (((mBoxWidth + deltaXCorrected) * mBoxHeight) / mBoxWidth) - mBoxHeight;
+                } else {
+                    deltaXCorrected = ((mBoxWidth * (mBoxHeight + deltaYCorrected)) / mBoxHeight) - mBoxWidth;
+                }
+                break;
+            case TOPRIGHT:
+            case BOTTOMLEFT:
+                if (Math.abs(deltaXCorrected) > Math.abs(deltaYCorrected)) {
+                    deltaYCorrected = (((mBoxWidth - deltaXCorrected) * mBoxHeight) / mBoxWidth) - mBoxHeight;
+                } else {
+                    deltaXCorrected = ((mBoxWidth * (mBoxHeight - deltaYCorrected)) / mBoxHeight) - mBoxWidth;
+                }
+                break;
+        }
 
-			PointF bottomRightRotationPoint = new PointF(mToolPosition.x + mBoxWidth / 2
-                                                            + mRotationSymbolDistance / 2,
-					                                     mToolPosition.y + mBoxHeight / 2
-                                                                 + mRotationSymbolDistance / 2);
+        float resizeXMoveCenterX = (float) ((deltaXCorrected / 2) * Math
+                .cos(rotationRadian));
+        float resizeXMoveCenterY = (float) ((deltaXCorrected / 2) * Math
+                .sin(rotationRadian));
+        float resizeYMoveCenterX = (float) ((deltaYCorrected / 2) * Math
+                .sin(rotationRadian));
+        float resizeYMoveCenterY = (float) ((deltaYCorrected / 2) * Math
+                .cos(rotationRadian));
 
-			if (checkRotationPoints(clickCoordinatesRotatedX, clickCoordinatesRotatedY, topLeftRotationPoint)
-                    || checkRotationPoints(clickCoordinatesRotatedX, clickCoordinatesRotatedY, topRightRotationPoint)
-                    || checkRotationPoints(clickCoordinatesRotatedX, clickCoordinatesRotatedY, bottomLeftRotationPoint)
-                    || checkRotationPoints(clickCoordinatesRotatedX, clickCoordinatesRotatedY, bottomRightRotationPoint))
-            {
-				return FloatingBoxAction.ROTATE;
-			}
-		}
-		return FloatingBoxAction.MOVE;
-	}
+        float newHeight;
+        float newWidth;
+        float oldHeight = mBoxHeight;
+        float oldWidth = mBoxWidth;
 
-	private boolean checkRotationPoints(float clickCoordinatesRotatedX, float clickCoordinatesRotatedY, PointF rotationPoint)
-    {
-		if ((clickCoordinatesRotatedX > rotationPoint.x - mRotationSymbolDistance / 2)
-				&& (clickCoordinatesRotatedX < rotationPoint.x + mRotationSymbolDistance / 2)
-				&& (clickCoordinatesRotatedY > rotationPoint.y - mRotationSymbolDistance / 2)
-				&& (clickCoordinatesRotatedY < rotationPoint.y + mRotationSymbolDistance / 2))
-        {
-			return true;
-		}
-		return false;
-	}
+        float newPosX = mToolPosition.x;
+        float newPosY = mToolPosition.y;
+        float oldPosX = mToolPosition.x;
+        float oldPosY = mToolPosition.y;
 
-	private void resize(float deltaX, float deltaY)
-    {
-		double rotationRadian = mBoxRotation * Math.PI / 180;
-		double deltaXCorrected = Math.cos(-rotationRadian) * (deltaX)- Math.sin(-rotationRadian) * (deltaY);
-		double deltaYCorrected = Math.sin(-rotationRadian) * (deltaX)+ Math.cos(-rotationRadian) * (deltaY);
+        // Height
+        switch (mResizeAction) {
+            case TOP:
+            case TOPRIGHT:
+            case TOPLEFT:
+                newHeight = (float) (mBoxHeight - deltaYCorrected);
+                newPosX = mToolPosition.x - resizeYMoveCenterX;
+                newPosY = mToolPosition.y + resizeYMoveCenterY;
+                if (mRespectImageBounds && (newPosY - newHeight / 2 < 0)) {
+                    newPosX = mToolPosition.x;
+                    newPosY = mToolPosition.y;
+                    break;
+                }
 
-		switch (mResizeAction)
-        {
-			case TOPLEFT:
-			case BOTTOMRIGHT:
-				if (Math.abs(deltaXCorrected) > Math.abs(deltaYCorrected))
-                {
-					deltaYCorrected = (((mBoxWidth + deltaXCorrected) * mBoxHeight) / mBoxWidth) - mBoxHeight;
-				}
-                else
-                {
-					deltaXCorrected = ((mBoxWidth * (mBoxHeight + deltaYCorrected)) / mBoxHeight) - mBoxWidth;
-				}
-				break;
+                if (mRespectMaximumBorderRatio &&
+                        newHeight > (PaintroidApplication.drawingSurface
+                                .getBitmapHeight() * MAXIMUM_BORDER_RATIO)) {
+                    mBoxHeight = (PaintroidApplication.drawingSurface
+                            .getBitmapHeight() * MAXIMUM_BORDER_RATIO);
+                    break;
+                }
 
-			case TOPRIGHT:
-			case BOTTOMLEFT:
-				if (Math.abs(deltaXCorrected) > Math.abs(deltaYCorrected))
-                {
-					deltaYCorrected = (((mBoxWidth - deltaXCorrected) * mBoxHeight) / mBoxWidth) - mBoxHeight;
-				}
-                else
-                {
-					deltaXCorrected = ((mBoxWidth * (mBoxHeight - deltaYCorrected)) / mBoxHeight) - mBoxWidth;
-				}
-				break;
-		}
+                mBoxHeight = newHeight;
+                mToolPosition.x = newPosX;
+                mToolPosition.y = newPosY;
 
-		float resizeXMoveCenterX = (float) ((deltaXCorrected / 2) * Math.cos(rotationRadian));
-		float resizeXMoveCenterY = (float) ((deltaXCorrected / 2) * Math.sin(rotationRadian));
-		float resizeYMoveCenterX = (float) ((deltaYCorrected / 2) * Math.sin(rotationRadian));
-		float resizeYMoveCenterY = (float) ((deltaYCorrected / 2) * Math.cos(rotationRadian));
+                break;
+            case BOTTOM:
+            case BOTTOMLEFT:
+            case BOTTOMRIGHT:
+                newHeight = (float) (mBoxHeight + deltaYCorrected);
+                newPosX = mToolPosition.x - resizeYMoveCenterX;
+                newPosY = mToolPosition.y + resizeYMoveCenterY;
+                if (mRespectImageBounds
+                        && (newPosY + newHeight / 2 > PaintroidApplication.drawingSurface
+                        .getBitmapHeight())) {
+                    newPosX = mToolPosition.x;
+                    newPosY = mToolPosition.y;
+                    break;
+                }
 
-		float newHeight;
-		float newWidth;
-		float oldHeight = mBoxHeight;
-		float oldWidth = mBoxWidth;
+                if (mRespectMaximumBorderRatio &&
+                        newHeight > (PaintroidApplication.drawingSurface
+                                .getBitmapHeight() * MAXIMUM_BORDER_RATIO)) {
+                    mBoxHeight = (PaintroidApplication.drawingSurface
+                            .getBitmapHeight() * MAXIMUM_BORDER_RATIO);
+                    break;
+                }
 
-		float newPosX = mToolPosition.x;
-		float newPosY = mToolPosition.y;
-		float oldPosX = mToolPosition.x;
-		float oldPosY = mToolPosition.y;
+                mBoxHeight = newHeight;
+                mToolPosition.x = newPosX;
+                mToolPosition.y = newPosY;
 
-		// Height
-		switch (mResizeAction)
-        {
-			case TOP:
-			case TOPRIGHT:
-			case TOPLEFT:
-				newHeight = (float) (mBoxHeight - deltaYCorrected);
-				newPosX = mToolPosition.x - resizeYMoveCenterX;
-				newPosY = mToolPosition.y + resizeYMoveCenterY;
-				if (mRespectImageBounds && (newPosY - newHeight / 2 < 0))
-                {
-					newPosX = mToolPosition.x;
-					newPosY = mToolPosition.y;
-					break;
-				}
+                break;
+            default:
+                break;
+        }
 
-				if (mRespectMaximumBorderRatio && newHeight > (PaintroidApplication.drawingSurface
-						                                        .getBitmapHeight() * MAXIMUM_BORDER_RATIO))
-                {
-					mBoxHeight = (PaintroidApplication.drawingSurface.getBitmapHeight() * MAXIMUM_BORDER_RATIO);
-					break;
-				}
+        // Width
+        switch (mResizeAction) {
+            case LEFT:
+            case TOPLEFT:
+            case BOTTOMLEFT:
+                newWidth = (float) (mBoxWidth - deltaXCorrected);
+                newPosX = mToolPosition.x + resizeXMoveCenterX;
+                newPosY = mToolPosition.y + resizeXMoveCenterY;
+                if (mRespectImageBounds && (newPosX - newWidth / 2 < 0)) {
+                    newPosX = mToolPosition.x;
+                    newPosY = mToolPosition.y;
+                    break;
+                }
 
-				mBoxHeight = newHeight;
-				mToolPosition.x = newPosX;
-				mToolPosition.y = newPosY;
+                if (mRespectMaximumBorderRatio &&
+                        newWidth > (PaintroidApplication.drawingSurface
+                                .getBitmapWidth() * MAXIMUM_BORDER_RATIO)) {
+                    mBoxWidth = (PaintroidApplication.drawingSurface
+                            .getBitmapWidth() * MAXIMUM_BORDER_RATIO);
+                    break;
+                }
 
-				break;
-			case BOTTOM:
-			case BOTTOMLEFT:
-			case BOTTOMRIGHT:
-				newHeight = (float) (mBoxHeight + deltaYCorrected);
-				newPosX = mToolPosition.x - resizeYMoveCenterX;
-				newPosY = mToolPosition.y + resizeYMoveCenterY;
-				if (mRespectImageBounds && (newPosY + newHeight / 2 > PaintroidApplication.drawingSurface
-                                                                      .getBitmapHeight()))
-                {
-					newPosX = mToolPosition.x;
-					newPosY = mToolPosition.y;
-					break;
-				}
+                mBoxWidth = newWidth;
+                mToolPosition.x = newPosX;
+                mToolPosition.y = newPosY;
 
-				if (mRespectMaximumBorderRatio && newHeight > (PaintroidApplication.drawingSurface
-						                                        .getBitmapHeight() * MAXIMUM_BORDER_RATIO))
-                {
-					mBoxHeight = (PaintroidApplication.drawingSurface.getBitmapHeight() * MAXIMUM_BORDER_RATIO);
-					break;
-				}
+                break;
+            case RIGHT:
+            case TOPRIGHT:
+            case BOTTOMRIGHT:
+                newWidth = (float) (mBoxWidth + deltaXCorrected);
+                newPosX = mToolPosition.x + resizeXMoveCenterX;
+                newPosY = mToolPosition.y + resizeXMoveCenterY;
+                if (mRespectImageBounds
+                        && (newPosX + newWidth / 2 > PaintroidApplication.drawingSurface
+                        .getBitmapWidth())) {
+                    newPosX = mToolPosition.x;
+                    newPosY = mToolPosition.y;
+                    break;
+                }
 
-				mBoxHeight = newHeight;
-				mToolPosition.x = newPosX;
-				mToolPosition.y = newPosY;
+                if (mRespectMaximumBorderRatio &&
+                        newWidth > (PaintroidApplication.drawingSurface
+                                .getBitmapWidth() * MAXIMUM_BORDER_RATIO)) {
+                    mBoxWidth = (PaintroidApplication.drawingSurface
+                            .getBitmapWidth() * MAXIMUM_BORDER_RATIO);
+                    break;
+                }
 
-				break;
-			default:
-				break;
-		}
+                mBoxWidth = newWidth;
+                mToolPosition.x = newPosX;
+                mToolPosition.y = newPosY;
 
-		// Width
-		switch (mResizeAction)
-        {
-			case LEFT:
-			case TOPLEFT:
-			case BOTTOMLEFT:
-				newWidth = (float) (mBoxWidth - deltaXCorrected);
-				newPosX = mToolPosition.x + resizeXMoveCenterX;
-				newPosY = mToolPosition.y + resizeXMoveCenterY;
-				if (mRespectImageBounds && (newPosX - newWidth / 2 < 0))
-                {
-					newPosX = mToolPosition.x;
-					newPosY = mToolPosition.y;
-					break;
-				}
+                break;
+            default:
+                break;
+        }
 
-				if (mRespectMaximumBorderRatio && newWidth > (PaintroidApplication.drawingSurface
-				                                        		.getBitmapWidth() * MAXIMUM_BORDER_RATIO))
-                {
-					mBoxWidth = (PaintroidApplication.drawingSurface.getBitmapWidth() * MAXIMUM_BORDER_RATIO);
-					break;
-				}
+        // prevent that box gets too small
+        if (mBoxWidth < DEFAULT_BOX_RESIZE_MARGIN) {
+            mBoxWidth = DEFAULT_BOX_RESIZE_MARGIN;
+            mToolPosition.x = oldPosX;
+        }
+        if (mBoxHeight < DEFAULT_BOX_RESIZE_MARGIN) {
+            mBoxHeight = DEFAULT_BOX_RESIZE_MARGIN;
+            mToolPosition.y = oldPosY;
+        }
 
-				mBoxWidth = newWidth;
-				mToolPosition.x = newPosX;
-				mToolPosition.y = newPosY;
+        if (mRespectMaximumBoxResolution && mMaximumBoxResolution > 0
+                && mBoxWidth * mBoxHeight > mMaximumBoxResolution) {
+            preventThatBoxGetsTooLarge(oldWidth, oldHeight, oldPosX, oldPosY);
+        }
+    }
 
-				break;
-			case RIGHT:
-			case TOPRIGHT:
-			case BOTTOMRIGHT:
-				newWidth = (float) (mBoxWidth + deltaXCorrected);
-				newPosX = mToolPosition.x + resizeXMoveCenterX;
-				newPosY = mToolPosition.y + resizeXMoveCenterY;
-				if (mRespectImageBounds	&& (newPosX + newWidth / 2 > PaintroidApplication.drawingSurface
-						                                             .getBitmapWidth()))
-                {
-					newPosX = mToolPosition.x;
-					newPosY = mToolPosition.y;
-					break;
-				}
+    protected void setRespectImageBounds(boolean respectImageBounds) {
+        mRespectImageBounds = respectImageBounds;
+    }
 
-				if (mRespectMaximumBorderRatio && newWidth > (PaintroidApplication.drawingSurface
-						                                        .getBitmapWidth() * MAXIMUM_BORDER_RATIO))
-                {
-					mBoxWidth = (PaintroidApplication.drawingSurface.getBitmapWidth() * MAXIMUM_BORDER_RATIO);
-					break;
-				}
+    protected boolean getRespectImageBounds() {
+        return mRespectImageBounds;
+    }
 
-				mBoxWidth = newWidth;
-				mToolPosition.x = newPosX;
-				mToolPosition.y = newPosY;
+    protected void setRotationEnabled(boolean rotationEnabled) {
+        mRotationEnabled = rotationEnabled;
+    }
 
-				break;
-			default:
-				break;
-		}
+    protected boolean isRotationEnabled() {
+        return mRotationEnabled;
+    }
 
-		// prevent that box gets too small
-		if (mBoxWidth < DEFAULT_BOX_RESIZE_MARGIN)
-        {
-			mBoxWidth = DEFAULT_BOX_RESIZE_MARGIN;
-			mToolPosition.x = oldPosX;
-		}
+    protected void setBackgroundShadowEnabled(boolean backgroundShadowEnabled) {
+        mBackgroundShadowEnabled = backgroundShadowEnabled;
+    }
 
-        if (mBoxHeight < DEFAULT_BOX_RESIZE_MARGIN)
-        {
-			mBoxHeight = DEFAULT_BOX_RESIZE_MARGIN;
-			mToolPosition.y = oldPosY;
-		}
+    protected boolean isBackgroundShadowEnabled() {
+        return mBackgroundShadowEnabled;
+    }
 
-		if (mRespectMaximumBoxResolution && mMaximumBoxResolution > 0 && mBoxWidth * mBoxHeight > mMaximumBoxResolution)
-        {
-			preventThatBoxGetsTooLarge(oldWidth, oldHeight, oldPosX, oldPosY);
-		}
-	}
+    protected void setResizePointsVisible(boolean resizePointsVisible) {
+        mResizePointsVisible = resizePointsVisible;
+    }
 
-	protected void setRespectImageBounds(boolean respectImageBounds)
-    {
-		mRespectImageBounds = respectImageBounds;
-	}
+    protected boolean getResizePointsVisible() {
+        return mResizePointsVisible;
+    }
 
-	protected boolean getRespectImageBounds() {
-		return mRespectImageBounds;
-	}
+    protected void setRespectMaximumBorderRatio(boolean respectMaximumBorderRatio) {
+        mRespectMaximumBorderRatio = respectMaximumBorderRatio;
+    }
 
-	protected void setRotationEnabled(boolean rotationEnabled)
-    {
-		mRotationEnabled = rotationEnabled;
-	}
+    protected boolean getRespectMaximumBorderRatio() {
+        return mRespectMaximumBorderRatio;
+    }
 
-	protected boolean isRotationEnabled()
-    {
-		return mRotationEnabled;
-	}
+    protected void setRespectMaximumBoxResolution(boolean respectMaximumBoxResolution) {
+        mRespectMaximumBoxResolution = respectMaximumBoxResolution;
+    }
 
-	protected void setBackgroundShadowEnabled(boolean backgroundShadowEnabled)
-    {
-		mBackgroundShadowEnabled = backgroundShadowEnabled;
-	}
+    protected boolean getRespectMaximumBoxResolution() {
+        return mRespectMaximumBoxResolution;
+    }
 
-	protected boolean isBackgroundShadowEnabled()
-    {
-		return mBackgroundShadowEnabled;
-	}
+    protected void setMaximumBoxResolution(float maximumBoxResolution) {
+        mMaximumBoxResolution = maximumBoxResolution;
+    }
 
-	protected void setResizePointsVisible(boolean resizePointsVisible) {
-		mResizePointsVisible = resizePointsVisible;
-	}
+    protected float getMaximumBoxResolution() {
+        return mMaximumBoxResolution;
+    }
 
-	protected boolean getResizePointsVisible()
-    {
-		return mResizePointsVisible;
-	}
+    protected abstract void onClickInBox();
 
-	protected void setRespectMaximumBorderRatio(boolean respectMaximumBorderRatio)
-    {
-		mRespectMaximumBorderRatio = respectMaximumBorderRatio;
-	}
+    protected abstract void drawToolSpecifics(Canvas canvas);
 
-	protected boolean getRespectMaximumBorderRatio()
-    {
-		return mRespectMaximumBorderRatio;
-	}
+    protected void preventThatBoxGetsTooLarge(float oldWidth, float oldHeight,
+                                              float oldPosX, float oldPosY) {
+        mBoxWidth = oldWidth;
+        mBoxHeight = oldHeight;
+        mToolPosition.x = oldPosX;
+        mToolPosition.y = oldPosY;
+    }
 
-	protected void setRespectMaximumBoxResolution(boolean respectMaximumBoxResolution)
-    {
-		mRespectMaximumBoxResolution = respectMaximumBoxResolution;
-	}
+    @Override
+    public Point getAutoScrollDirection(float pointX, float pointY,
+                                        int viewWidth, int viewHeight) {
 
-	protected boolean getRespectMaximumBoxResolution()
-    {
-		return mRespectMaximumBoxResolution;
-	}
+        if (mCurrentAction == FloatingBoxAction.MOVE
+                || mCurrentAction == FloatingBoxAction.RESIZE) {
 
-	protected void setMaximumBoxResolution(float maximumBoxResolution)
-    {
-		mMaximumBoxResolution = maximumBoxResolution;
-	}
-
-	protected float getMaximumBoxResolution()
-    {
-		return mMaximumBoxResolution;
-	}
-
-	protected abstract void onClickInBox();
-
-	protected abstract void drawToolSpecifics(Canvas canvas);
-
-	protected void preventThatBoxGetsTooLarge(float oldWidth, float oldHeight, float oldPosX, float oldPosY)
-    {
-		mBoxWidth = oldWidth;
-		mBoxHeight = oldHeight;
-		mToolPosition.x = oldPosX;
-		mToolPosition.y = oldPosY;
-	}
-
-	@Override
-	public Point getAutoScrollDirection(float pointX, float pointY, int viewWidth, int viewHeight)
-    {
-
-		if (mCurrentAction == FloatingBoxAction.MOVE || mCurrentAction == FloatingBoxAction.RESIZE)
-        {
-			return super.getAutoScrollDirection(pointX, pointY, viewWidth, viewHeight);
-		}
-		return new Point(0, 0);
-	}
+            return super.getAutoScrollDirection(pointX, pointY, viewWidth,
+                    viewHeight);
+        }
+        return new Point(0, 0);
+    }
 }

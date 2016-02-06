@@ -1,6 +1,6 @@
 /**
  *  Paintroid: An image manipulation application for Android.
- *  Copyright (C) 2010-2015 The Catrobat Team
+ *  Copyright (C) 2010-2013 The Catrobat Team
  *  (<http://developer.catrobat.org/credits>)
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -19,11 +19,12 @@
 
 package org.catrobat.paintroid.command;
 
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
-
-import org.catrobat.paintroid.tools.Layer;
 
 public interface Command {
 
-	void run(Canvas canvas);
+    public void run(Canvas canvas, Bitmap bitmap);
+
+    public void freeResources();
 }

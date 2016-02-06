@@ -209,7 +209,7 @@ public class DrawingSurface extends SurfaceView implements 	SurfaceHolder.Callba
 
         if (mCurrentLayer != null)
         {
-            mWorkingBitmapCanvas.setBitmap(mCurrentLayer.getBitmap());
+            //mWorkingBitmapCanvas.setBitmap(mCurrentLayer.getBitmap());
             mWorkingBitmapRect.set(0, 0, mCurrentLayer.getBitmap().getWidth(), mCurrentLayer.getBitmap().getHeight());
             mDrawingSurfaceListener.setCurrentLayer(layer);
         }

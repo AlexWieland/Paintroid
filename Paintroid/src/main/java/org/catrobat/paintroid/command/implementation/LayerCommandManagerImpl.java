@@ -2,8 +2,9 @@ package org.catrobat.paintroid.command.implementation;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.PorterDuff;
+import android.os.AsyncTask;
+import android.os.Debug;
+import android.util.Log;
 
 import org.catrobat.paintroid.PaintroidApplication;
 import org.catrobat.paintroid.command.Command;
@@ -12,6 +13,7 @@ import org.catrobat.paintroid.tools.Layer;
 import org.catrobat.paintroid.tools.Tool;
 import org.catrobat.paintroid.ui.DrawSurfaceTrigger;
 
+import java.io.Console;
 import java.util.LinkedList;
 
 /**
@@ -20,8 +22,7 @@ import java.util.LinkedList;
  * permanently deleted. This flag is used once redo action is not possible, to mark all the objects
  * that should be permanently removed.
  */
-public class LayerCommandManagerImpl implements LayerCommandManager
-{
+public class LayerCommandManagerImpl implements LayerCommandManager {
     private Layer mLayer;
 
     private LinkedList<Command> mCommandList;
@@ -29,8 +30,7 @@ public class LayerCommandManagerImpl implements LayerCommandManager
     private DrawSurfaceTrigger mDrawSurfaceTrigger;
     private boolean mDeleteFlag;
 
-    public LayerCommandManagerImpl(LayerCommand layerCommand, DrawSurfaceTrigger drawSurfaceTrigger)
-    {
+    public LayerCommandManagerImpl(LayerCommand layerCommand, DrawSurfaceTrigger drawSurfaceTrigger) {
         mLayer = layerCommand.getCurrentLayer();
         mDrawSurfaceTrigger = drawSurfaceTrigger;
         mCommandList = new LinkedList<Command>();
@@ -45,8 +45,7 @@ public class LayerCommandManagerImpl implements LayerCommandManager
     }
 
     @Override
-    public void commitCommandToLayer(Command command)
-    {
+    public void commitCommandToLayer(Command command) {
         mUndoCommandList.clear();
         mCommandList.addLast(command);
     }
@@ -62,35 +61,32 @@ public class LayerCommandManagerImpl implements LayerCommandManager
     }
 
     @Override
-    public synchronized void undo()
-    {
+    public synchronized void undo() {
         Command command = mCommandList.removeLast();
         mUndoCommandList.addFirst(command);
         executeAllCommandsOnLayerCanvas();
     }
 
-    private void executeAllCommandsOnLayerCanvas()
-    {
+    private void executeAllCommandsOnLayerCanvas() {
         clearLayersBitmap();
         for (Command command : mCommandList)
         {
-            command.run(mLayer.getLayerCanvas());
+            command.run(mLayer.getLayerCanvas(), mLayer.getBitmap());
             PaintroidApplication.currentTool.resetInternalState(Tool.StateChange.RESET_INTERNAL_STATE);
         }
 
         mDrawSurfaceTrigger.redraw();
     }
 
-    private void clearLayersBitmap()
-    {
+    private void clearLayersBitmap() {
         Canvas canvas = mLayer.getLayerCanvas();
 
-        synchronized (canvas)
-        {
+        synchronized (canvas) {
             //canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
             mLayer.getBitmap().eraseColor(Color.TRANSPARENT);
         }
     }
+
     @Override
     public synchronized void redo()
     {
@@ -98,7 +94,7 @@ public class LayerCommandManagerImpl implements LayerCommandManager
         {
             Command command = mUndoCommandList.removeFirst();
             mCommandList.addLast(command);
-            command.run(mLayer.getLayerCanvas());
+            command.run(mLayer.getLayerCanvas(), mLayer.getBitmap());
             PaintroidApplication.currentTool.resetInternalState(Tool.StateChange.RESET_INTERNAL_STATE);
         }
 

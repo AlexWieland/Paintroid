@@ -31,7 +31,6 @@ import org.catrobat.paintroid.dialog.BrushPickerDialog.OnBrushChangedListener;
 import org.catrobat.paintroid.dialog.IndeterminateProgressDialog;
 import org.catrobat.paintroid.dialog.colorpicker.ColorPickerDialog;
 import org.catrobat.paintroid.dialog.colorpicker.ColorPickerDialog.OnColorPickedListener;
-import org.catrobat.paintroid.tools.Layer;
 import org.catrobat.paintroid.tools.Tool;
 import org.catrobat.paintroid.tools.ToolType;
 import org.catrobat.paintroid.ui.TopBar.ToolButtonIDs;
@@ -49,189 +48,172 @@ import android.graphics.PointF;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Shader;
-import android.view.Display;
 import android.view.WindowManager;
 
 public abstract class BaseTool extends Observable implements Tool, Observer {
-	// TODO maybe move to PaintroidApplication.
-	public static final Paint CHECKERED_PATTERN = new Paint();
-	protected static final int NO_BUTTON_RESOURCE = R.drawable.icon_menu_no_icon;
-	public static final float MOVE_TOLERANCE = 5;
-	public static final int SCROLL_TOLERANCE_PERCENTAGE = 10;
+    // TODO maybe move to PaintroidApplication.
+    public static final Paint CHECKERED_PATTERN = new Paint();
+    protected static final int NO_BUTTON_RESOURCE = R.drawable.icon_menu_no_icon;
+    public static final float MOVE_TOLERANCE = 5;
+    public static final int SCROLL_TOLERANCE_PERCENTAGE = 10;
 
-	protected static Paint mBitmapPaint;
-	protected static Paint mCanvasPaint;
-	protected ToolType mToolType;
-	protected Context mContext;
-	protected PointF mMovedDistance;
-	protected PointF mPreviousEventCoordinate;
-	protected static int mScrollTolerance;
+    protected static Paint mBitmapPaint;
+    protected static Paint mCanvasPaint;
+    protected ToolType mToolType;
+    protected Context mContext;
+    protected PointF mMovedDistance;
+    protected PointF mPreviousEventCoordinate;
+    protected static int mScrollTolerance;
 
-	private OnBrushChangedListener mStroke;
-	protected OnColorPickedListener mColor;
+    private OnBrushChangedListener mStroke;
+    protected OnColorPickedListener mColor;
 
-	protected static final PorterDuffXfermode eraseXfermode = new PorterDuffXfermode(PorterDuff.Mode.CLEAR);
+    protected static final PorterDuffXfermode eraseXfermode = new PorterDuffXfermode(
+            PorterDuff.Mode.CLEAR);
 
-	static
-    {
-		mBitmapPaint = new Paint();
-		mBitmapPaint.setColor(Color.BLACK);
-		mBitmapPaint.setAntiAlias(true);
-		mBitmapPaint.setDither(true);
-		mBitmapPaint.setStyle(Paint.Style.STROKE);
-		mBitmapPaint.setStrokeJoin(Paint.Join.ROUND);
-		mBitmapPaint.setStrokeCap(Paint.Cap.ROUND);
-		mBitmapPaint.setStrokeWidth(Tool.stroke25);
-		mCanvasPaint = new Paint(mBitmapPaint);
-		Bitmap checkerboard = BitmapFactory.decodeResource(PaintroidApplication.applicationContext.getResources()
-                                                            , R.drawable.checkeredbg);
-		BitmapShader shader = new BitmapShader(checkerboard,Shader.TileMode.REPEAT, Shader.TileMode.REPEAT);
-		CHECKERED_PATTERN.setShader(shader);
-		WindowManager windowManager = (WindowManager) PaintroidApplication.applicationContext
-                                                        .getSystemService(Context.WINDOW_SERVICE);
+    static {
+        mBitmapPaint = new Paint();
+        mBitmapPaint.setColor(Color.BLACK);
+        mBitmapPaint.setAntiAlias(true);
+        mBitmapPaint.setDither(true);
+        mBitmapPaint.setStyle(Paint.Style.STROKE);
+        mBitmapPaint.setStrokeJoin(Paint.Join.ROUND);
+        mBitmapPaint.setStrokeCap(Paint.Cap.ROUND);
+        mBitmapPaint.setStrokeWidth(Tool.stroke25);
+        mCanvasPaint = new Paint(mBitmapPaint);
+        Bitmap checkerboard = BitmapFactory.decodeResource(
+                PaintroidApplication.applicationContext.getResources(),
+                R.drawable.checkeredbg);
+        BitmapShader shader = new BitmapShader(checkerboard,
+                Shader.TileMode.REPEAT, Shader.TileMode.REPEAT);
+        CHECKERED_PATTERN.setShader(shader);
+        WindowManager windowManager = (WindowManager) PaintroidApplication.applicationContext
+                .getSystemService(Context.WINDOW_SERVICE);
+        mScrollTolerance = windowManager.getDefaultDisplay().getWidth()
+                * SCROLL_TOLERANCE_PERCENTAGE / 100;
+    }
 
-        Display display = windowManager.getDefaultDisplay();
-        Point size = new Point();
-        display.getSize(size);
-		mScrollTolerance = size.x * SCROLL_TOLERANCE_PERCENTAGE / 100;
-	}
+    public BaseTool(Context context, ToolType toolType) {
+        super();
+        mToolType = toolType;
+        mContext = context;
 
-	public BaseTool(Context context, ToolType toolType)
-    {
-		super();
-		mToolType = toolType;
-		mContext = context;
+        mColor = new OnColorPickedListener() {
+            @Override
+            public void colorChanged(int color) {
+                changePaintColor(color);
+            }
+        };
 
-		mColor =  new OnColorPickedListener()
-        {
-			@Override
-			public void colorChanged(int color)
-            {
-				changePaintColor(color);
-			}
-		};
+        mStroke = new OnBrushChangedListener() {
+            @Override
+            public void setCap(Cap cap) {
+                changePaintStrokeCap(cap);
+            }
 
-		mStroke = new OnBrushChangedListener()
-        {
-			@Override
-			public void setCap(Cap cap) {
-				changePaintStrokeCap(cap);
-			}
+            @Override
+            public void setStroke(int strokeWidth) {
+                changePaintStrokeWidth(strokeWidth);
+            }
+        };
 
-			@Override
-			public void setStroke(int strokeWidth) {
-				changePaintStrokeWidth(strokeWidth);
-			}
-		};
+        BrushPickerDialog.getInstance().addBrushChangedListener(mStroke);
+        ColorPickerDialog.getInstance().addOnColorPickedListener(mColor);
 
-		BrushPickerDialog.getInstance().addBrushChangedListener(mStroke);
-		ColorPickerDialog.getInstance().addOnColorPickedListener(mColor);
+        mMovedDistance = new PointF(0f, 0f);
+        mPreviousEventCoordinate = new PointF(0f, 0f);
 
-		mMovedDistance = new PointF(0f, 0f);
-		mPreviousEventCoordinate = new PointF(0f, 0f);
-	}
+    }
 
-	@Override
-	public void changePaintColor(int color)
-    {
-		mBitmapPaint.setColor(color);
-		if (Color.alpha(color) == 0x00)
-        {
-			mBitmapPaint.setXfermode(eraseXfermode);
-			mCanvasPaint.reset();
-			mCanvasPaint.setStyle(mBitmapPaint.getStyle());
-			mCanvasPaint.setStrokeJoin(mBitmapPaint.getStrokeJoin());
-			mCanvasPaint.setStrokeCap(mBitmapPaint.getStrokeCap());
-			mCanvasPaint.setStrokeWidth(mBitmapPaint.getStrokeWidth());
-			mCanvasPaint.setShader(CHECKERED_PATTERN.getShader());
-			mCanvasPaint.setColor(Color.BLACK);
-			mBitmapPaint.setAlpha(0x00);
-			mCanvasPaint.setAlpha(0x00);
-		}
-        else
-        {
-			mBitmapPaint.setXfermode(null);
-			mCanvasPaint.set(mBitmapPaint);
-		}
-		super.setChanged();
-		super.notifyObservers();
-	}
+    @Override
+    public void changePaintColor(int color) {
+        mBitmapPaint.setColor(color);
+        if (Color.alpha(color) == 0x00) {
+            mBitmapPaint.setXfermode(eraseXfermode);
+            mCanvasPaint.reset();
+            mCanvasPaint.setStyle(mBitmapPaint.getStyle());
+            mCanvasPaint.setStrokeJoin(mBitmapPaint.getStrokeJoin());
+            mCanvasPaint.setStrokeCap(mBitmapPaint.getStrokeCap());
+            mCanvasPaint.setStrokeWidth(mBitmapPaint.getStrokeWidth());
+            mCanvasPaint.setShader(CHECKERED_PATTERN.getShader());
+            mCanvasPaint.setColor(Color.BLACK);
+            mBitmapPaint.setAlpha(0x00);
+            mCanvasPaint.setAlpha(0x00);
+        } else {
+            mBitmapPaint.setXfermode(null);
+            mCanvasPaint.set(mBitmapPaint);
+        }
+        super.setChanged();
+        super.notifyObservers();
+    }
 
-	@Override
-	public void changePaintStrokeWidth(int strokeWidth)
-    {
-		mBitmapPaint.setStrokeWidth(strokeWidth);
-		mCanvasPaint.setStrokeWidth(strokeWidth);
-		boolean antiAliasing = (strokeWidth > 1);
-		mBitmapPaint.setAntiAlias(antiAliasing);
-		mCanvasPaint.setAntiAlias(antiAliasing);
+    @Override
+    public void changePaintStrokeWidth(int strokeWidth) {
+        mBitmapPaint.setStrokeWidth(strokeWidth);
+        mCanvasPaint.setStrokeWidth(strokeWidth);
+        boolean antiAliasing = (strokeWidth > 1);
+        mBitmapPaint.setAntiAlias(antiAliasing);
+        mCanvasPaint.setAntiAlias(antiAliasing);
 
-		super.setChanged();
-		super.notifyObservers();
-	}
+        super.setChanged();
+        super.notifyObservers();
+    }
 
-	@Override
-	public void changePaintStrokeCap(Cap cap)
-    {
-		mBitmapPaint.setStrokeCap(cap);
-		mCanvasPaint.setStrokeCap(cap);
-		super.setChanged();
-		super.notifyObservers();
-	}
+    @Override
+    public void changePaintStrokeCap(Cap cap) {
+        mBitmapPaint.setStrokeCap(cap);
+        mCanvasPaint.setStrokeCap(cap);
+        super.setChanged();
+        super.notifyObservers();
+    }
 
-	@Override
-	public void setDrawPaint(Paint paint)
-    {
-		mBitmapPaint.set(paint);
-		mCanvasPaint.set(paint);
-		super.setChanged();
-		super.notifyObservers();
-	}
+    @Override
+    public void setDrawPaint(Paint paint) {
+        mBitmapPaint.set(paint);
+        mCanvasPaint.set(paint);
+        super.setChanged();
+        super.notifyObservers();
+    }
 
-	@Override
-	public Paint getDrawPaint()
-    {
-		return new Paint(mBitmapPaint);
-	}
+    @Override
+    public Paint getDrawPaint() {
+        return new Paint(mBitmapPaint);
+    }
 
-	@Override
-	public abstract void draw(Canvas canvas);
+    @Override
+    public abstract void draw(Canvas canvas);
 
-	@Override
-	public ToolType getToolType()
-    {
-		return this.mToolType;
-	}
+    @Override
+    public ToolType getToolType() {
+        return this.mToolType;
+    }
 
-	protected void showColorPicker()
-    {
-		ColorPickerDialog.getInstance().addOnColorPickedListener(mColor);
-		ColorPickerDialog.getInstance().show();
-		ColorPickerDialog.getInstance().setInitialColor(getDrawPaint().getColor());
-	}
+    protected void showColorPicker() {
+        ColorPickerDialog.getInstance().addOnColorPickedListener(mColor);
+        ColorPickerDialog.getInstance().show();
+        ColorPickerDialog.getInstance().setInitialColor(
+                getDrawPaint().getColor());
 
-	protected void showBrushPicker()
-    {
-		BrushPickerDialog.getInstance().addBrushChangedListener(mStroke);
-		BrushPickerDialog.getInstance().setCurrentPaint(mBitmapPaint);
-		BrushPickerDialog.getInstance().show(((MainActivity) mContext).getSupportFragmentManager()
-                                             ,"brushpicker");
-	}
+    }
 
-	@Override
-	public void attributeButtonClick(ToolButtonIDs buttonNumber, Layer layer)
-    {
-		// no default action
-	}
+    protected void showBrushPicker() {
+        BrushPickerDialog.getInstance().addBrushChangedListener(mStroke);
+        BrushPickerDialog.getInstance().setCurrentPaint(mBitmapPaint);
+        BrushPickerDialog.getInstance().show(
+                ((MainActivity) mContext).getSupportFragmentManager(),
+                "brushpicker");
+    }
 
-	@Override
-	public int getAttributeButtonResource(ToolButtonIDs buttonNumber)
-    {
-        switch (buttonNumber)
-        {
+    @Override
+    public void attributeButtonClick(ToolButtonIDs buttonNumber) {
+        // no default action
+    }
+
+    @Override
+    public int getAttributeButtonResource(ToolButtonIDs buttonNumber) {
+        switch (buttonNumber) {
             case BUTTON_ID_TOOL:
-                switch (mToolType)
-                {
+                switch (mToolType) {
                     case BRUSH:
                         return R.drawable.icon_menu_brush;
                     case RESIZE:
@@ -266,83 +248,68 @@ public abstract class BaseTool extends Observable implements Tool, Observer {
             default:
                 return NO_BUTTON_RESOURCE;
         }
-	}
+    }
 
-	@Override
-	public int getAttributeButtonColor(ToolButtonIDs buttonNumber)
-    {
-        switch (buttonNumber)
-        {
+    @Override
+    public int getAttributeButtonColor(ToolButtonIDs buttonNumber) {
+        switch (buttonNumber) {
             case BUTTON_ID_PARAMETER_TOP:
                 return mBitmapPaint.getColor();
-
             default:
                 return Color.BLACK;
+
         }
-	}
+    }
 
-	protected int getStrokeColorResource()
-    {
-		if (mBitmapPaint.getColor() == Color.TRANSPARENT)
-        {
-			return R.drawable.checkeredbg_repeat;
-		}
-        else
-        {
-			return NO_BUTTON_RESOURCE;
-		}
-	}
+    protected int getStrokeColorResource() {
+        if (mBitmapPaint.getColor() == Color.TRANSPARENT) {
+            return R.drawable.checkeredbg_repeat;
+        } else {
+            return NO_BUTTON_RESOURCE;
+        }
+    }
 
-	@Override
-	public void update(Observable observable, Object data)
-    {
-		if (data instanceof BaseCommand.NOTIFY_STATES)
-        {
-			if (BaseCommand.NOTIFY_STATES.COMMAND_DONE == data
-					|| BaseCommand.NOTIFY_STATES.COMMAND_FAILED == data)
-            {
-				IndeterminateProgressDialog.getInstance().dismiss();
-				observable.deleteObserver(this);
-			}
-		}
-	}
+    @Override
+    public void update(Observable observable, Object data) {
+        if (data instanceof BaseCommand.NOTIFY_STATES) {
+            if (BaseCommand.NOTIFY_STATES.COMMAND_DONE == data
+                    || BaseCommand.NOTIFY_STATES.COMMAND_FAILED == data) {
+                IndeterminateProgressDialog.getInstance().dismiss();
+                observable.deleteObserver(this);
+            }
+        }
+    }
 
-	protected abstract void resetInternalState();
+    protected abstract void resetInternalState();
 
-	@Override
-	public void resetInternalState(StateChange stateChange)
-    {
-		if (getToolType().shouldReactToStateChange(stateChange))
-        {
-			resetInternalState();
-		}
-	}
+    @Override
+    public void resetInternalState(StateChange stateChange) {
+        if (getToolType().shouldReactToStateChange(stateChange)) {
+            resetInternalState();
+        }
+    }
 
-	@Override
-	public Point getAutoScrollDirection(float pointX, float pointY,	int viewWidth, int viewHeight)
-    {
-		int deltaX = 0;
-		int deltaY = 0;
+    @Override
+    public Point getAutoScrollDirection(float pointX, float pointY,
+                                        int viewWidth, int viewHeight) {
+        int deltaX = 0;
+        int deltaY = 0;
 
-		if (pointX < mScrollTolerance)
-        {
-			deltaX = 1;
-		}
-		if (pointX > viewWidth - mScrollTolerance)
-        {
-			deltaX = -1;
-		}
+        if (pointX < mScrollTolerance) {
+            deltaX = 1;
+        }
+        if (pointX > viewWidth - mScrollTolerance) {
+            deltaX = -1;
+        }
 
-		if (pointY < mScrollTolerance)
-        {
-			deltaY = 1;
-		}
+        if (pointY < mScrollTolerance) {
+            deltaY = 1;
+        }
 
-		if (pointY > viewHeight - mScrollTolerance)
-        {
-			deltaY = -1;
-		}
+        if (pointY > viewHeight - mScrollTolerance) {
+            deltaY = -1;
+        }
 
-		return new Point(deltaX, deltaY);
-	}
+        return new Point(deltaX, deltaY);
+    }
 }

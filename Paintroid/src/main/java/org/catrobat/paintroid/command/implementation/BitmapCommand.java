@@ -19,8 +19,8 @@
 
 package org.catrobat.paintroid.command.implementation;
 
+import org.catrobat.paintroid.FileIO;
 import org.catrobat.paintroid.PaintroidApplication;
-import org.catrobat.paintroid.tools.Layer;
 
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
@@ -31,34 +31,37 @@ public class BitmapCommand extends BaseCommand {
 
     private boolean mResetScaleAndTranslation = true;
 
-    public BitmapCommand(Layer layer) {
-
-//		if (bitmap != null) {
-//			mBitmap = Bitmap.createBitmap(bitmap);
-//		}
+    public BitmapCommand(Bitmap bitmap) {
+        if (bitmap != null) {
+            mBitmap = Bitmap.createBitmap(bitmap);
+        }
     }
 
     public BitmapCommand(Bitmap bitmap, boolean resetScaleAndTranslation) {
-//		this(bitmap);
+        this(bitmap);
         mResetScaleAndTranslation = resetScaleAndTranslation;
     }
 
     @Override
-    public void run(Canvas canvas) {
-//		if (layer == null && mFileToStoredBitmap != null) {
-//			layer.setBitmap(FileIO.getBitmapFromFile(mFileToStoredBitmap));
-//		}
-/*		if (layer != null) {
-			if (layer.getBitmap() != null) {
-				layer.getBitmap().eraseColor(Color.TRANSPARENT);
-			}*/
-//			PaintroidApplication.drawingSurface.setBitmap(layer.getBitmap().copy(
-//					Config.ARGB_8888, true));
-
-        if (mResetScaleAndTranslation
-                && PaintroidApplication.perspective != null) {
-            PaintroidApplication.perspective.resetScaleAndTranslation();
+    public void run(Canvas canvas, Bitmap bitmap) {
+        if (mBitmap == null && mFileToStoredBitmap != null) {
+            mBitmap = FileIO.getBitmapFromFile(mFileToStoredBitmap);
         }
+        if (mBitmap != null) {
+            if (bitmap != null) {
+                bitmap.eraseColor(Color.TRANSPARENT);
+            }
+/*            PaintroidApplication.drawingSurface.setBitmap(mBitmap.copy(
+                    Config.ARGB_8888, true));*/
 
+            if (mResetScaleAndTranslation
+                    && PaintroidApplication.perspective != null) {
+                PaintroidApplication.perspective.resetScaleAndTranslation();
+            }
+
+            if (mFileToStoredBitmap == null) {
+                storeBitmap();
+            }
+        }
     }
 }

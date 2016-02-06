@@ -21,7 +21,6 @@ package org.catrobat.paintroid.tools.implementation;
 
 import org.catrobat.paintroid.PaintroidApplication;
 import org.catrobat.paintroid.R;
-import org.catrobat.paintroid.tools.Layer;
 import org.catrobat.paintroid.tools.ToolType;
 import org.catrobat.paintroid.ui.TopBar.ToolButtonIDs;
 
@@ -30,82 +29,82 @@ import android.graphics.Canvas;
 import android.graphics.PointF;
 
 public class MoveZoomTool extends BaseTool {
-	private final static float ZOOM_IN_SCALE = 1.75f;
+    private final static float ZOOM_IN_SCALE = 1.75f;
 
-	public MoveZoomTool(Context context, ToolType toolType) {
-		super(context, toolType);
-	}
+    public MoveZoomTool(Context context, ToolType toolType) {
+        super(context, toolType);
+    }
 
-	@Override
-	public void attributeButtonClick(ToolButtonIDs buttonNumber, Layer layer) {
-		switch (buttonNumber) {
-		case BUTTON_ID_PARAMETER_BOTTOM_1:
-			zoomOut();
-			break;
-		case BUTTON_ID_PARAMETER_BOTTOM_2:
-			zoomIn();
-			break;
-		default:
-			super.attributeButtonClick(buttonNumber, layer);
-		}
-	}
+    @Override
+    public void attributeButtonClick(ToolButtonIDs buttonNumber) {
+        switch (buttonNumber) {
+            case BUTTON_ID_PARAMETER_BOTTOM_1:
+                zoomOut();
+                break;
+            case BUTTON_ID_PARAMETER_BOTTOM_2:
+                zoomIn();
+                break;
+            default:
+                super.attributeButtonClick(buttonNumber);
+        }
+    }
 
-	private void zoomOut() {
-		float scale = 1 / ZOOM_IN_SCALE;
-		PaintroidApplication.perspective.multiplyScale(scale);
-	}
+    private void zoomOut() {
+        float scale = 1 / ZOOM_IN_SCALE;
+        PaintroidApplication.perspective.multiplyScale(scale);
+    }
 
-	private void zoomIn() {
-		float scale = ZOOM_IN_SCALE;
-		PaintroidApplication.perspective.multiplyScale(scale);
-		PaintroidApplication.perspective.translate(0, 0);
-	}
+    private void zoomIn() {
+        float scale = ZOOM_IN_SCALE;
+        PaintroidApplication.perspective.multiplyScale(scale);
+        PaintroidApplication.perspective.translate(0, 0);
+    }
 
-	@Override
-	public int getAttributeButtonResource(ToolButtonIDs buttonNumber) {
-		switch (buttonNumber) {
-		case BUTTON_ID_PARAMETER_TOP:
-			return NO_BUTTON_RESOURCE;
-		case BUTTON_ID_PARAMETER_BOTTOM_1:
-			return R.drawable.icon_zoom_out;
-		case BUTTON_ID_PARAMETER_BOTTOM_2:
-			return R.drawable.icon_zoom_in;
-		default:
-			return super.getAttributeButtonResource(buttonNumber);
-		}
-	}
+    @Override
+    public int getAttributeButtonResource(ToolButtonIDs buttonNumber) {
+        switch (buttonNumber) {
+            case BUTTON_ID_PARAMETER_TOP:
+                return NO_BUTTON_RESOURCE;
+            case BUTTON_ID_PARAMETER_BOTTOM_1:
+                return R.drawable.icon_zoom_out;
+            case BUTTON_ID_PARAMETER_BOTTOM_2:
+                return R.drawable.icon_zoom_in;
+            default:
+                return super.getAttributeButtonResource(buttonNumber);
+        }
+    }
 
-	@Override
-	public boolean handleDown(PointF coordinate) {
-		PaintroidApplication.perspective.convertFromCanvasToScreen(coordinate);
-		mPreviousEventCoordinate = coordinate;
-		return true;
-	}
+    @Override
+    public boolean handleDown(PointF coordinate) {
+        PaintroidApplication.perspective.convertFromCanvasToScreen(coordinate);
+        mPreviousEventCoordinate = coordinate;
+        return true;
+    }
 
-	@Override
-	public boolean handleMove(PointF coordinate) {
+    @Override
+    public boolean handleMove(PointF coordinate) {
 
-		PaintroidApplication.perspective.convertFromCanvasToScreen(coordinate);
+        PaintroidApplication.perspective.convertFromCanvasToScreen(coordinate);
 
-		PaintroidApplication.perspective.translate(coordinate.x
-				- mPreviousEventCoordinate.x, coordinate.y
-				- mPreviousEventCoordinate.y);
-		mPreviousEventCoordinate.set(coordinate);
+        PaintroidApplication.perspective.translate(coordinate.x
+                - mPreviousEventCoordinate.x, coordinate.y
+                - mPreviousEventCoordinate.y);
+        mPreviousEventCoordinate.set(coordinate);
 
-		return true;
-	}
+        return true;
+    }
 
-	@Override
-	public boolean handleUp(PointF coordinate) {
-		return false;
-	}
+    @Override
+    public boolean handleUp(PointF coordinate) {
+        return false;
+    }
 
-	@Override
-	public void resetInternalState() {
-	}
+    @Override
+    public void resetInternalState() {
+    }
 
-	@Override
-	public void draw(Canvas canvas) {
-	}
+    @Override
+    public void draw(Canvas canvas) {
+    }
 
 }

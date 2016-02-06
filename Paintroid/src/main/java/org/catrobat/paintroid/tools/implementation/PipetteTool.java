@@ -21,7 +21,6 @@ package org.catrobat.paintroid.tools.implementation;
 
 import org.catrobat.paintroid.PaintroidApplication;
 import org.catrobat.paintroid.dialog.colorpicker.ColorPickerDialog;
-import org.catrobat.paintroid.tools.Layer;
 import org.catrobat.paintroid.tools.ToolType;
 import org.catrobat.paintroid.ui.TopBar.ToolButtonIDs;
 
@@ -31,64 +30,64 @@ import android.graphics.PointF;
 
 public class PipetteTool extends BaseTool {
 
-	public PipetteTool(Context context, ToolType toolType) {
-		super(context, toolType);
-	}
+    public PipetteTool(Context context, ToolType toolType) {
+        super(context, toolType);
+    }
 
-	@Override
-	public void draw(Canvas canvas) {
-	}
+    @Override
+    public void draw(Canvas canvas) {
+    }
 
-	@Override
-	public boolean handleDown(PointF coordinate) {
-		return setColor(coordinate);
-	}
+    @Override
+    public boolean handleDown(PointF coordinate) {
+        return setColor(coordinate);
+    }
 
-	@Override
-	public boolean handleMove(PointF coordinate) {
-		return setColor(coordinate);
-	}
+    @Override
+    public boolean handleMove(PointF coordinate) {
+        return setColor(coordinate);
+    }
 
-	@Override
-	public boolean handleUp(PointF coordinate) {
-		return setColor(coordinate);
-	}
+    @Override
+    public boolean handleUp(PointF coordinate) {
+        return setColor(coordinate);
+    }
 
-	protected boolean setColor(PointF coordinate) {
-		if (coordinate == null) {
-			return false;
-		}
-		int color = PaintroidApplication.drawingSurface.getPixel(coordinate);
-		ColorPickerDialog.getInstance().setInitialColor(color);
-		changePaintColor(color);
-		return true;
-	}
+    protected boolean setColor(PointF coordinate) {
+        if (coordinate == null) {
+            return false;
+        }
+        int color = PaintroidApplication.drawingSurface.getPixel(coordinate);
+        ColorPickerDialog.getInstance().setInitialColor(color);
+        changePaintColor(color);
+        return true;
+    }
 
-	@Override
-	public int getAttributeButtonResource(ToolButtonIDs buttonNumber) {
+    @Override
+    public int getAttributeButtonResource(ToolButtonIDs buttonNumber) {
 
-		switch (buttonNumber) {
-		case BUTTON_ID_PARAMETER_TOP:
-			return getStrokeColorResource();
-		default:
-			return super.getAttributeButtonResource(buttonNumber);
-		}
-	}
+        switch (buttonNumber) {
+            case BUTTON_ID_PARAMETER_TOP:
+                return getStrokeColorResource();
+            default:
+                return super.getAttributeButtonResource(buttonNumber);
+        }
+    }
 
-	@Override
-	public int getAttributeButtonColor(ToolButtonIDs buttonNumber) {
+    @Override
+    public int getAttributeButtonColor(ToolButtonIDs buttonNumber) {
 
-		return super.getAttributeButtonColor(buttonNumber);
+        return super.getAttributeButtonColor(buttonNumber);
 
-	}
+    }
 
-	@Override
-	public void resetInternalState() {
-	}
+    @Override
+    public void resetInternalState() {
+    }
 
-	@Override
-	public void attributeButtonClick(ToolButtonIDs buttonNumber, Layer layer) {
-		// no clicks allowed
-	}
+    @Override
+    public void attributeButtonClick(ToolButtonIDs buttonNumber) {
+        // no clicks allowed
+    }
 
 }

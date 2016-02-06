@@ -19,8 +19,7 @@
 
 package org.catrobat.paintroid.command.implementation;
 
-import org.catrobat.paintroid.PaintroidApplication;
-import org.catrobat.paintroid.tools.Layer;
+import org.catrobat.paintroid.FileIO;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -29,70 +28,59 @@ import android.graphics.Point;
 import android.graphics.RectF;
 
 public class StampCommand extends BaseCommand {
-	protected final Point mCoordinates;
-	protected final float mBoxWidth;
-	protected final float mBoxHeight;
-	protected final float mBoxRotation;
-	protected final RectF mBoxRect;
+    protected final Point mCoordinates;
+    protected final float mBoxWidth;
+    protected final float mBoxHeight;
+    protected final float mBoxRotation;
+    protected final RectF mBoxRect;
 
-	public StampCommand(Point position, float width, float height, float rotation, Bitmap bitmap, int layerId)
-    {
-		super(new Paint(Paint.DITHER_FLAG), layerId);
+    public StampCommand(Bitmap bitmap, Point position, float width,
+                        float height, float rotation) {
+        super(new Paint(Paint.DITHER_FLAG));
 
-		if (position != null)
-        {
-			mCoordinates = new Point(position.x, position.y);
-		}
-        else
-        {
-			mCoordinates = null;
-		}
+        if (position != null) {
+            mCoordinates = new Point(position.x, position.y);
+        } else {
+            mCoordinates = null;
+        }
+        if (bitmap != null) {
+            mBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, false);
+        }
+        mBoxWidth = width;
+        mBoxHeight = height;
+        mBoxRotation = rotation;
+        mBoxRect = new RectF(-mBoxWidth / 2f, -mBoxHeight / 2f, mBoxWidth / 2f,
+                mBoxHeight / 2f);
+    }
 
-        Layer layer = PaintroidApplication.drawingSurface.getCurrentLayer();
-		if(layer != null)
-        {
-			if (layer.getBitmap() != null)
-            {
-				layer.setBitmap(bitmap.copy(Bitmap.Config.ARGB_8888, false));
-			}
-		}
+    @Override
+    public void run(Canvas canvas, Bitmap bitmap) {
 
-		mBoxWidth = width;
-		mBoxHeight = height;
-		mBoxRotation = rotation;
-		mBoxRect = new RectF(-mBoxWidth / 2f, -mBoxHeight / 2f, mBoxWidth / 2f,	mBoxHeight / 2f);
-	}
+        notifyStatus(NOTIFY_STATES.COMMAND_STARTED);
+        if (mFileToStoredBitmap != null) {
+            mBitmap = FileIO.getBitmapFromFile(mFileToStoredBitmap);
+        }
 
-	@Override
-	public void run(Canvas canvas) {
+        if (mBitmap == null) {
+            setChanged();
+            notifyStatus(NOTIFY_STATES.COMMAND_FAILED);
+            return;
+        }
 
-		notifyStatus(NOTIFY_STATES.COMMAND_STARTED);
-//		if (mFileToStoredBitmap != null) {
-//			mBitmap = FileIO.getBitmapFromFile(mFileToStoredBitmap);
-//		}
+        canvas.save();
+        canvas.translate(mCoordinates.x, mCoordinates.y);
+        canvas.rotate(mBoxRotation);
+        canvas.drawBitmap(mBitmap, null, mBoxRect, mPaint);
 
-/*		Bitmap bitmap = layer.getBitmap();
+        canvas.restore();
 
-		if (bitmap == null) {
-			setChanged();
-			notifyStatus(NOTIFY_STATES.COMMAND_FAILED);
-			return;
-		}
+        if (mFileToStoredBitmap == null) {
+            storeBitmap();
+        } else {
+            mBitmap.recycle();
+            mBitmap = null;
+        }
 
-		canvas.save();
-		canvas.translate(mCoordinates.x, mCoordinates.y);
-		canvas.rotate(mBoxRotation);
-		canvas.drawBitmap(bitmap, null, mBoxRect, mPaint);
-
-		canvas.restore();*/
-
-//		if (mFileToStoredBitmap == null) {
-//			storeBitmap();
-//		} else {
-//			bitmap.recycle();
-//			bitmap = null;
-//		}
-
-		notifyStatus(NOTIFY_STATES.COMMAND_DONE);
-	}
+        notifyStatus(NOTIFY_STATES.COMMAND_DONE);
+    }
 }
