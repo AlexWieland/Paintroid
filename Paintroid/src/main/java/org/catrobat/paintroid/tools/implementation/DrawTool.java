@@ -55,7 +55,7 @@ public class DrawTool extends BaseTool {
     }
 
     @Override
-    public void draw(Canvas canvas) {
+    public void trackFingerMotion(Canvas canvas) {
         changePaintColor(mCanvasPaint.getColor());
         if (mCanvasPaint.getColor() == Color.TRANSPARENT) {
             mCanvasPaint.setColor(Color.BLACK);

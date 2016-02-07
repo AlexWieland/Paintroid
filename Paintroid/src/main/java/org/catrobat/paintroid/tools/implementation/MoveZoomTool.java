@@ -104,7 +104,7 @@ public class MoveZoomTool extends BaseTool {
     }
 
     @Override
-    public void draw(Canvas canvas) {
+    public void trackFingerMotion(Canvas canvas) {
     }
 
 }

@@ -44,7 +44,7 @@ public class LineTool extends BaseTool {
     }
 
     @Override
-    public void draw(Canvas canvas) {
+    public void trackFingerMotion(Canvas canvas) {
         if (mInitialEventCoordinate == null || mCurrentCoordinate == null) {
             return;
         }

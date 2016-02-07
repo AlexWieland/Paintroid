@@ -160,7 +160,7 @@ public class DrawingSurface extends SurfaceView implements 	SurfaceHolder.Callba
             if (mCurrentLayer != null)
             {
                 redrawAllTheLayers(surfaceViewCanvas);
-                PaintroidApplication.currentTool.draw(surfaceViewCanvas);
+                PaintroidApplication.currentTool.trackFingerMotion(surfaceViewCanvas);
             }
         }
         catch (Exception catchAllException)

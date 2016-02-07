@@ -47,8 +47,8 @@ public class EraserTool extends DrawTool {
     }
 
     @Override
-    public void draw(Canvas canvas) {
-        super.draw(canvas);
+    public void trackFingerMotion(Canvas canvas) {
+        super.trackFingerMotion(canvas);
     }
 
     @Override

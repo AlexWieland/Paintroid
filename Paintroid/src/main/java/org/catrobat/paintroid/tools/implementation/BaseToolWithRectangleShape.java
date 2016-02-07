@@ -269,7 +269,7 @@ public abstract class BaseToolWithRectangleShape extends BaseToolWithShape {
     }
 
     @Override
-    public void draw(Canvas canvas) {
+    public void trackFingerMotion(Canvas canvas) {
         drawShape(canvas);
     }
 

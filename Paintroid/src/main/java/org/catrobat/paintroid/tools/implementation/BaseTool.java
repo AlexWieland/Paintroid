@@ -181,7 +181,7 @@ public abstract class BaseTool extends Observable implements Tool, Observer {
     }
 
     @Override
-    public abstract void draw(Canvas canvas);
+    public abstract void trackFingerMotion(Canvas canvas);
 
     @Override
     public ToolType getToolType() {
