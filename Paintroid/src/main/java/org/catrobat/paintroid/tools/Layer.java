@@ -29,7 +29,7 @@ public class Layer {
     public Layer(int layer_id, Bitmap bitmap, Canvas canvas) {
         mLayerID = layer_id;
         mBitmap = bitmap;
-        mLayerCanvas = canvas;
+        mLayerCanvas = new Canvas(mBitmap);
         setSelected(false);
         mLayerName = LAYER_PREFIX + layer_id;
         mIsLocked = false;

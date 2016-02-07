@@ -33,14 +33,15 @@ public class PathCommand extends BaseCommand {
     protected Path mPath;
 
     public PathCommand(Paint paint, Path path) {
-        super(paint);
+        super(new Paint(paint));
         if (path != null) {
             mPath = new Path(path);
         }
     }
 
     @Override
-    public void run(Canvas canvas, Bitmap bitmap) {
+    public void run(Canvas canvas, Bitmap bitmap)
+    {
         if ((canvas == null) || mPath == null) {
             Log.w(PaintroidApplication.TAG,
                     "Object must not be null in PathCommand.");

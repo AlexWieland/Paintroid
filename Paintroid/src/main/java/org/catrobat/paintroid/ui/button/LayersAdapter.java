@@ -39,6 +39,7 @@ import org.catrobat.paintroid.ui.DrawingSurface;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Observable;
 
 public class LayersAdapter extends BaseAdapter {
 
@@ -138,14 +139,7 @@ public class LayersAdapter extends BaseAdapter {
 
 	public void tryAddLayer(Layer existingLayer)
     {
-
-		DrawingSurface drawingSurface = PaintroidApplication.drawingSurface;
-		Bitmap image = Bitmap.createBitmap(drawingSurface.getBitmapWidth()
-				                            ,drawingSurface.getBitmapHeight()
-				                            ,Bitmap.Config.ARGB_8888);
-		Layer bufferLayer = new Layer(existingLayer.getLayerID(), image, PaintroidApplication.drawingSurface.getWorkingCanvas());
-		bufferLayer.setName(existingLayer.getName());
-		mLayerList.add(0,bufferLayer);
+        mLayerList.add(0,existingLayer);
 		notifyDataSetChanged();
 	}
 

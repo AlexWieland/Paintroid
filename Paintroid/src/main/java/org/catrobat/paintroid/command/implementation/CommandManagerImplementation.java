@@ -23,7 +23,7 @@ import android.util.Pair;
 
 import org.catrobat.paintroid.command.Command;
 import org.catrobat.paintroid.command.CommandManager;
-import org.catrobat.paintroid.command.LayerCommandManager;
+import org.catrobat.paintroid.command.LayerDrawingCommands;
 import org.catrobat.paintroid.command.UndoRedoManager;
 import org.catrobat.paintroid.command.UndoRedoManager.StatusMode;
 import org.catrobat.paintroid.ui.DrawSurfaceTrigger;
@@ -45,7 +45,7 @@ public class CommandManagerImplementation implements CommandManager, Observer
 
     private LinkedList<Pair<LayerOperation, LayerCommand>> mLayerCommandList;
     private LinkedList<Pair<LayerOperation, LayerCommand>> mLayerUndoCommandList;
-    private ArrayList<LayerCommandManager> mLayerCommandManagerList;
+    private ArrayList<LayerDrawingCommands> mLayerDrawingCommandsList;
     private DrawSurfaceTrigger mDrawSurfaceTrigger;
     private LayersAdapter mLayersAdapter;
 
@@ -53,84 +53,83 @@ public class CommandManagerImplementation implements CommandManager, Observer
     {
         mLayerCommandList = new LinkedList<Pair<LayerOperation, LayerCommand>>();
         mLayerUndoCommandList = new LinkedList<Pair<LayerOperation, LayerCommand>>();
-        mLayerCommandManagerList = new ArrayList<LayerCommandManager>();
+        mLayerDrawingCommandsList = new ArrayList<LayerDrawingCommands>();
         mDrawSurfaceTrigger = drawSurfaceTrigger;
         mLayersAdapter = layersAdapter;
     }
 
     @Override
-    public synchronized void commitCommandToLayer(LayerCommand layerCommand, Command command)
+    public void commitCommandToLayer(LayerCommand layerCommand, Command command)
     {
-        if (mLayerCommandList.size() == MAX_COMMANDS)
+        synchronized (mLayerCommandList)
         {
-            return;
+            clearUndoCommandList();
+            LayerDrawingCommands layerDrawingCommands = getLayerCommandManagerForLayer(layerCommand);
+            layerDrawingCommands.commitCommandToLayer(command);
+            mLayerCommandList.addLast(createLayerCommand(LayerOperation.COMMIT_COMMAND, layerCommand));
         }
 
-        clearUndoCommandList();
-        LayerCommandManager layerCommandManager = getLayerCommandManagerForLayer(layerCommand);
-        layerCommandManager.commitCommandToLayer(command);
-        mLayerCommandList.addLast(createLayerCommand(LayerOperation.COMMIT_COMMAND, layerCommand));
+        mDrawSurfaceTrigger.redraw();
     }
 
     @Override
-    public synchronized void commitAddLayerCommand(LayerCommand layerCommand)
+    public void commitAddLayerCommand(LayerCommand layerCommand)
     {
-        if (mLayerCommandList.size() == MAX_COMMANDS)
+        synchronized (mLayerCommandList)
         {
-            return;
+            clearUndoCommandList();
+            mLayerDrawingCommandsList.add(new LayerDrawingCommandsImpl(layerCommand, mDrawSurfaceTrigger));
+            mLayerCommandList.addLast(createLayerCommand(LayerOperation.ADD, layerCommand));
         }
 
-        clearUndoCommandList();
-        mLayerCommandManagerList.add(new LayerCommandManagerImpl(layerCommand, mDrawSurfaceTrigger));
-        mLayerCommandList.addLast(createLayerCommand(LayerOperation.ADD, layerCommand));
-
+        mDrawSurfaceTrigger.redraw();
     }
 
     @Override
-    public synchronized void commitRemoveLayerCommand(LayerCommand layerCommand)
+    public void commitRemoveLayerCommand(LayerCommand layerCommand)
     {
-        if (mLayerCommandList.size() == MAX_COMMANDS)
+        synchronized (mLayerCommandList)
         {
-            return;
+            clearUndoCommandList();
+            getLayerCommandManagerForLayer(layerCommand).optForDelete(true);
+            mLayerCommandList.addLast(createLayerCommand(LayerOperation.REMOVE, layerCommand));
         }
 
-        clearUndoCommandList();
-        getLayerCommandManagerForLayer(layerCommand).optForDelete(true);
-        mLayerCommandList.addLast(createLayerCommand(LayerOperation.REMOVE, layerCommand));
+        mDrawSurfaceTrigger.redraw();
+    }
+
+    @Override
+    public void commitMergeLayerCommand(LayerCommand layerCommand) {
 
     }
 
     @Override
-    public synchronized void commitMergeLayerCommand(LayerCommand layerCommand) {
+    public void commitLayerVisibilityCommand(LayerCommand layerCommand) {
 
     }
 
     @Override
-    public synchronized void commitLayerVisibilityCommand(LayerCommand layerCommand) {
+    public void commitLayerLockCommand(LayerCommand layerCommand) {
 
     }
 
     @Override
-    public synchronized void commitLayerLockCommand(LayerCommand layerCommand) {
+    public void commitRenameLayerCommand(LayerCommand layerCommand) {
 
     }
 
-    @Override
-    public synchronized void commitRenameLayerCommand(LayerCommand layerCommand) {
-
-    }
-
-    private LayerCommandManager getLayerCommandManagerForLayer(LayerCommand layerCommand)
+    private LayerDrawingCommands getLayerCommandManagerForLayer(LayerCommand layerCommand)
     {
-        for (LayerCommandManager layerCommandManager : mLayerCommandManagerList)
+        synchronized (mLayerDrawingCommandsList)
         {
-            if(layerCommandManager.getLayer().getLayerID() == layerCommand.getCurrentLayer().getLayerID())
-            {
-                return layerCommandManager;
+            for (LayerDrawingCommands layerDrawingCommands : mLayerDrawingCommandsList) {
+                if (layerDrawingCommands.getLayer().getLayerID() == layerCommand.getCurrentLayer().getLayerID()) {
+                    return layerDrawingCommands;
+                }
             }
-        }
 
-        return null;
+            return null;
+        }
     }
 
     private Pair<LayerOperation, LayerCommand> createLayerCommand(LayerOperation operation, LayerCommand layerCommand)
@@ -143,31 +142,37 @@ public class CommandManagerImplementation implements CommandManager, Observer
     {
         mLayerCommandList.clear();
         mLayerUndoCommandList.clear();
-        mLayerCommandManagerList.clear();
+        mLayerDrawingCommandsList.clear();
         UndoRedoManager.getInstance().update(StatusMode.DISABLE_REDO);
         UndoRedoManager.getInstance().update(StatusMode.DISABLE_UNDO);
     }
 
 
     @Override
-    public synchronized void undo()
+    public void undo()
     {
-        if(mLayerCommandList.size() > INIT_APP_lAYER_COUNT)
+        synchronized (mLayerCommandList)
         {
-            Pair<LayerOperation, LayerCommand> command = mLayerCommandList.removeLast();
-            mLayerUndoCommandList.addFirst(command);
-            processCommand(command, OperationMode.UNDO);
+            if (mLayerCommandList.size() > INIT_APP_lAYER_COUNT)
+            {
+                Pair<LayerOperation, LayerCommand> command = mLayerCommandList.removeLast();
+                mLayerUndoCommandList.addFirst(command);
+                processCommand(command, OperationMode.UNDO);
+            }
         }
     }
 
     @Override
-    public synchronized void redo()
+    public void redo()
     {
-        if(mLayerUndoCommandList.size() != 0)
+        synchronized (mLayerUndoCommandList)
         {
-            Pair<LayerOperation, LayerCommand> command = mLayerUndoCommandList.removeFirst();
-            mLayerCommandList.addLast(command);
-            processCommand(command, OperationMode.REDO);
+            if (mLayerUndoCommandList.size() != 0)
+            {
+                Pair<LayerOperation, LayerCommand> command = mLayerUndoCommandList.removeFirst();
+                mLayerCommandList.addLast(command);
+                processCommand(command, OperationMode.REDO);
+            }
         }
     }
 
@@ -194,10 +199,12 @@ public class CommandManagerImplementation implements CommandManager, Observer
             case ADD:
                 getLayerCommandManagerForLayer(command.second).optForDelete(true);
                 mLayersAdapter.removeLayer(command.second.getCurrentLayer().getLayerID());
+                mDrawSurfaceTrigger.redraw();
                 break;
             case REMOVE:
                 getLayerCommandManagerForLayer(command.second).optForDelete(false);
                 mLayersAdapter.tryAddLayer(command.second.getCurrentLayer());
+                mDrawSurfaceTrigger.redraw();
                 break;
             case MERGE:
                 break;
@@ -217,10 +224,12 @@ public class CommandManagerImplementation implements CommandManager, Observer
             case ADD:
                 getLayerCommandManagerForLayer(command.second).optForDelete(false);
                 mLayersAdapter.tryAddLayer(command.second.getCurrentLayer());
+                mDrawSurfaceTrigger.redraw();
                 break;
             case REMOVE:
                 getLayerCommandManagerForLayer(command.second).optForDelete(true);
                 mLayersAdapter.removeLayer(command.second.getCurrentLayer().getLayerID());
+                mDrawSurfaceTrigger.redraw();
                 break;
             case MERGE:
                 break;
@@ -229,21 +238,25 @@ public class CommandManagerImplementation implements CommandManager, Observer
             case LOCK:
                 break;
         }
-
     }
 
     private void clearUndoCommandList()
     {
-        mLayerUndoCommandList.clear();
-        Iterator<LayerCommandManager> commandManagerIterator = mLayerCommandManagerList.iterator();
-        while (commandManagerIterator.hasNext())
+        synchronized (mLayerCommandList)
         {
-            if(commandManagerIterator.next().getDeleteFlagValue())
+            mLayerUndoCommandList.clear();
+
+            synchronized (mLayerDrawingCommandsList)
             {
-                commandManagerIterator.remove();
+                Iterator<LayerDrawingCommands> commandManagerIterator = mLayerDrawingCommandsList.iterator();
+                while (commandManagerIterator.hasNext()) {
+                    if (commandManagerIterator.next().getDeleteFlagValue())
+                    {
+                        commandManagerIterator.remove();
+                    }
+                }
             }
         }
-
     }
 
     private synchronized void deleteFailedCommand(Command command)

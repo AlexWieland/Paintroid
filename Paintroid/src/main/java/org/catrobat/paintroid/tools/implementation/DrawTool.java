@@ -122,12 +122,20 @@ public class DrawTool extends BaseTool {
         pathToDraw.lineTo(coordinate.x, coordinate.y);
         Command command = new PathCommand(mBitmapPaint, pathToDraw);
         PaintroidApplication.commandManager.commitCommandToLayer(new LayerCommand(layer), command);
+        synchronized (layer.getLayerCanvas())
+        {
+            command.run(layer.getLayerCanvas(), layer.getBitmap());
+        }
         return true;
     }
 
     protected boolean addPointCommand(PointF coordinate, Layer layer) {
         Command command = new PointCommand(mBitmapPaint, coordinate);
         PaintroidApplication.commandManager.commitCommandToLayer(new LayerCommand(layer), command);
+        synchronized (layer.getLayerCanvas())
+        {
+            command.run(layer.getLayerCanvas(), layer.getBitmap());
+        }
         return true;
     }
 
