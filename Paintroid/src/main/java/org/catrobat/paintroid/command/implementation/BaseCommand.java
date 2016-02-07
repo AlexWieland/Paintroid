@@ -35,24 +35,25 @@ import android.graphics.Paint;
 import android.graphics.Paint.Cap;
 import android.util.Log;
 
-public abstract class BaseCommand extends Observable implements Command {
+public abstract class BaseCommand extends Observable implements Command
+{
     protected Paint mPaint;
     protected Bitmap mBitmap;
     protected File mFileToStoredBitmap;
 
-    public static enum NOTIFY_STATES {
-        COMMAND_STARTED, COMMAND_DONE, COMMAND_FAILED
-    };
+    public static enum NOTIFY_STATES { COMMAND_STARTED, COMMAND_DONE, COMMAND_FAILED };
 
-    public BaseCommand() {
-    }
+    public BaseCommand() { }
 
-    public BaseCommand(Paint paint) {
-        if (paint != null) {
+    public BaseCommand(Paint paint)
+    {
+        if (paint != null)
+        {
             mPaint = new Paint(paint);
-        } else {
-            Log.w(PaintroidApplication.TAG,
-                    "Object is null falling back to default object in "
+        }
+        else
+        {
+            Log.w(PaintroidApplication.TAG, "Object is null falling back to default object in "
                             + this.toString());
             mPaint = new Paint();
             mPaint.setColor(Color.BLACK);
@@ -65,18 +66,24 @@ public abstract class BaseCommand extends Observable implements Command {
     public abstract void run(Canvas canvas, Bitmap bitmap);
 
     @Override
-    public void freeResources() {
-        if (mBitmap != null && !mBitmap.isRecycled()) {
+    public void freeResources()
+    {
+        //TODO: check when and if needed.
+/*        if (mBitmap != null && !mBitmap.isRecycled())
+        {
             mBitmap.recycle();
             mBitmap = null;
         }
+
         if (mFileToStoredBitmap != null && mFileToStoredBitmap.exists()) {
             mFileToStoredBitmap.delete();
-        }
+        }*/
     }
 
-    public final void storeBitmap() {
-        File cacheDir = PaintroidApplication.applicationContext.getCacheDir();
+    public final void storeBitmap()
+    {
+        //TODO: check and if needed
+/*        File cacheDir = PaintroidApplication.applicationContext.getCacheDir();
         Random random = new Random();
         random.setSeed(System.currentTimeMillis());
         mFileToStoredBitmap = new File(cacheDir.getAbsolutePath(),
@@ -90,10 +97,11 @@ public abstract class BaseCommand extends Observable implements Command {
             Log.e(PaintroidApplication.TAG, "Cannot store bitmap. ", e);
         }
         mBitmap.recycle();
-        mBitmap = null;
+        mBitmap = null;*/
     }
 
-    protected void notifyStatus(NOTIFY_STATES state) {
+    protected void notifyStatus(NOTIFY_STATES state)
+    {
         setChanged();
         notifyObservers(state);
     }
