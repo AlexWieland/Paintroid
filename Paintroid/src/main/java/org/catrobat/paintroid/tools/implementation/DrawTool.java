@@ -84,14 +84,10 @@ public class DrawTool extends BaseTool {
                 || coordinate == null) {
             return false;
         }
-        pathToDraw.quadTo(mPreviousEventCoordinate.x,
-                mPreviousEventCoordinate.y, coordinate.x, coordinate.y);
+        pathToDraw.quadTo(mPreviousEventCoordinate.x, mPreviousEventCoordinate.y, coordinate.x, coordinate.y);
         pathToDraw.incReserve(1);
-        movedDistance.set(
-                movedDistance.x
-                        + Math.abs(coordinate.x - mPreviousEventCoordinate.x),
-                movedDistance.y
-                        + Math.abs(coordinate.y - mPreviousEventCoordinate.y));
+        movedDistance.set(movedDistance.x + Math.abs(coordinate.x - mPreviousEventCoordinate.x),
+                movedDistance.y + Math.abs(coordinate.y - mPreviousEventCoordinate.y));
         mPreviousEventCoordinate.set(coordinate.x, coordinate.y);
 
         return true;
@@ -122,20 +118,12 @@ public class DrawTool extends BaseTool {
         pathToDraw.lineTo(coordinate.x, coordinate.y);
         Command command = new PathCommand(mBitmapPaint, pathToDraw);
         PaintroidApplication.commandManager.commitCommandToLayer(new LayerCommand(layer), command);
-        synchronized (layer.getLayerCanvas())
-        {
-            command.run(layer.getLayerCanvas(), layer.getBitmap());
-        }
         return true;
     }
 
     protected boolean addPointCommand(PointF coordinate, Layer layer) {
         Command command = new PointCommand(mBitmapPaint, coordinate);
         PaintroidApplication.commandManager.commitCommandToLayer(new LayerCommand(layer), command);
-        synchronized (layer.getLayerCanvas())
-        {
-            command.run(layer.getLayerCanvas(), layer.getBitmap());
-        }
         return true;
     }
 

@@ -104,7 +104,6 @@ public class DrawingSurfaceListener implements OnTouchListener {
 
 			case MotionEvent.ACTION_MOVE:
 
-                mDrawSurfaceTrigger.redraw();
                 if (event.getPointerCount() == 1)
                 {
 					if (System.nanoTime() < (mZoomTimeStamp + BLOCKING_TIME))
@@ -155,6 +154,7 @@ public class DrawingSurfaceListener implements OnTouchListener {
 					}
 					mZoomTimeStamp = System.nanoTime();
 				}
+				mDrawSurfaceTrigger.redraw();
 				break;
 			case MotionEvent.ACTION_UP:
 			case MotionEvent.ACTION_CANCEL:
@@ -237,7 +237,8 @@ public class DrawingSurfaceListener implements OnTouchListener {
 		@Override
 		public void run() {
 			while (running) {
-				Point autoScrollDirection = PaintroidApplication.currentTool
+
+			 Point autoScrollDirection = PaintroidApplication.currentTool
                                             .getAutoScrollDirection(pointX, pointY, width, height);
 
 				if (autoScrollDirection.x != 0 || autoScrollDirection.y != 0) {

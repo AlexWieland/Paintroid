@@ -23,6 +23,7 @@ import org.catrobat.paintroid.PaintroidApplication;
 import org.catrobat.paintroid.dialog.LayersDialog;
 import org.catrobat.paintroid.listener.DrawingSurfaceListener;
 import org.catrobat.paintroid.tools.Layer;
+import org.catrobat.paintroid.tools.Tool;
 import org.catrobat.paintroid.tools.implementation.BaseTool;
 import org.catrobat.paintroid.ui.button.LayersAdapter;
 
@@ -161,6 +162,7 @@ public class DrawingSurface extends SurfaceView implements 	SurfaceHolder.Callba
             {
                 redrawAllTheLayers(surfaceViewCanvas);
                 PaintroidApplication.currentTool.trackFingerMotion(surfaceViewCanvas);
+
             }
         }
         catch (Exception catchAllException)

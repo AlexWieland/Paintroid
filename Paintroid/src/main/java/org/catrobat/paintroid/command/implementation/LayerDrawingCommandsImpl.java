@@ -50,6 +50,7 @@ public class LayerDrawingCommandsImpl implements LayerDrawingCommands {
             synchronized (mLayer.getLayerCanvas())
             {
                 command.run(mLayer.getLayerCanvas(), mLayer.getBitmap());
+                PaintroidApplication.currentTool.resetInternalState(Tool.StateChange.RESET_INTERNAL_STATE);
             }
         }
     }
