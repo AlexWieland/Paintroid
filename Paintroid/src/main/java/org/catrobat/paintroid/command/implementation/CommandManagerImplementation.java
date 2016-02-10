@@ -23,7 +23,7 @@ import android.util.Pair;
 
 import org.catrobat.paintroid.command.Command;
 import org.catrobat.paintroid.command.CommandManager;
-import org.catrobat.paintroid.command.LayerDrawingCommands;
+import org.catrobat.paintroid.command.LayerBitmapCommandManager;
 import org.catrobat.paintroid.command.UndoRedoManager;
 import org.catrobat.paintroid.command.UndoRedoManager.StatusMode;
 import org.catrobat.paintroid.ui.DrawSurfaceTrigger;
@@ -37,15 +37,15 @@ import java.util.Observer;
 
 public class CommandManagerImplementation implements CommandManager, Observer
 {
-    enum LayerOperation {COMMIT_COMMAND, ADD, REMOVE, MERGE, VISIBILITY, LOCK}
+    enum LayerOperation {COMMIT_LAYER_BITMAP_COMMAND, ADD, REMOVE, MERGE, VISIBILITY, LOCK, RENAME_LAYER}
 
     private static final int MAX_COMMANDS = 512;
     private static final int INIT_APP_lAYER_COUNT = 1;
-    enum OperationMode{UNDO, REDO};
+    enum OperationMode{UNDO, REDO}
 
     private LinkedList<Pair<LayerOperation, LayerCommand>> mLayerCommandList;
     private LinkedList<Pair<LayerOperation, LayerCommand>> mLayerUndoCommandList;
-    private ArrayList<LayerDrawingCommands> mLayerDrawingCommandsList;
+    private ArrayList<LayerBitmapCommandManager> mLayerBitmapCommandManagerList;
     private DrawSurfaceTrigger mDrawSurfaceTrigger;
     private LayersAdapter mLayersAdapter;
 
@@ -53,7 +53,7 @@ public class CommandManagerImplementation implements CommandManager, Observer
     {
         mLayerCommandList = new LinkedList<Pair<LayerOperation, LayerCommand>>();
         mLayerUndoCommandList = new LinkedList<Pair<LayerOperation, LayerCommand>>();
-        mLayerDrawingCommandsList = new ArrayList<LayerDrawingCommands>();
+        mLayerBitmapCommandManagerList = new ArrayList<LayerBitmapCommandManager>();
         mDrawSurfaceTrigger = drawSurfaceTrigger;
         mLayersAdapter = layersAdapter;
     }
@@ -64,9 +64,9 @@ public class CommandManagerImplementation implements CommandManager, Observer
         synchronized (mLayerCommandList)
         {
             clearUndoCommandList();
-            LayerDrawingCommands layerDrawingCommands = getLayerCommandManagerForLayer(layerCommand);
-            layerDrawingCommands.commitCommandToLayer(command);
-            mLayerCommandList.addLast(createLayerCommand(LayerOperation.COMMIT_COMMAND, layerCommand));
+            LayerBitmapCommandManager layerBitmapCommandManager = getLayerBitmapCommandManager(layerCommand);
+            layerBitmapCommandManager.commitCommandToLayer(command);
+            mLayerCommandList.addLast(createLayerCommand(LayerOperation.COMMIT_LAYER_BITMAP_COMMAND, layerCommand));
         }
 
         mDrawSurfaceTrigger.redraw();
@@ -78,7 +78,7 @@ public class CommandManagerImplementation implements CommandManager, Observer
         synchronized (mLayerCommandList)
         {
             clearUndoCommandList();
-            mLayerDrawingCommandsList.add(new LayerDrawingCommandsImpl(layerCommand, mDrawSurfaceTrigger));
+            mLayerBitmapCommandManagerList.add(new LayerBitmapCommandManagerImpl(layerCommand, mDrawSurfaceTrigger));
             mLayerCommandList.addLast(createLayerCommand(LayerOperation.ADD, layerCommand));
         }
 
@@ -91,7 +91,7 @@ public class CommandManagerImplementation implements CommandManager, Observer
         synchronized (mLayerCommandList)
         {
             clearUndoCommandList();
-            getLayerCommandManagerForLayer(layerCommand).optForDelete(true);
+            getLayerBitmapCommandManager(layerCommand).optForDelete(true);
             mLayerCommandList.addLast(createLayerCommand(LayerOperation.REMOVE, layerCommand));
         }
 
@@ -118,13 +118,13 @@ public class CommandManagerImplementation implements CommandManager, Observer
 
     }
 
-    private LayerDrawingCommands getLayerCommandManagerForLayer(LayerCommand layerCommand)
+    private LayerBitmapCommandManager getLayerBitmapCommandManager(LayerCommand layerCommand)
     {
-        synchronized (mLayerDrawingCommandsList)
+        synchronized (mLayerBitmapCommandManagerList)
         {
-            for (LayerDrawingCommands layerDrawingCommands : mLayerDrawingCommandsList) {
-                if (layerDrawingCommands.getLayer().getLayerID() == layerCommand.getCurrentLayer().getLayerID()) {
-                    return layerDrawingCommands;
+            for (LayerBitmapCommandManager layerBitmapCommandManager : mLayerBitmapCommandManagerList) {
+                if (layerBitmapCommandManager.getLayer().getLayerID() == layerCommand.getCurrentLayer().getLayerID()) {
+                    return layerBitmapCommandManager;
                 }
             }
 
@@ -142,7 +142,7 @@ public class CommandManagerImplementation implements CommandManager, Observer
     {
         mLayerCommandList.clear();
         mLayerUndoCommandList.clear();
-        mLayerDrawingCommandsList.clear();
+        mLayerBitmapCommandManagerList.clear();
         UndoRedoManager.getInstance().update(StatusMode.DISABLE_REDO);
         UndoRedoManager.getInstance().update(StatusMode.DISABLE_UNDO);
     }
@@ -193,16 +193,16 @@ public class CommandManagerImplementation implements CommandManager, Observer
     {
         switch (command.first)
         {
-            case COMMIT_COMMAND:
-                getLayerCommandManagerForLayer(command.second).undo();
+            case COMMIT_LAYER_BITMAP_COMMAND:
+                getLayerBitmapCommandManager(command.second).undo();
                 break;
             case ADD:
-                getLayerCommandManagerForLayer(command.second).optForDelete(true);
+                getLayerBitmapCommandManager(command.second).optForDelete(true);
                 mLayersAdapter.removeLayer(command.second.getCurrentLayer().getLayerID());
                 mDrawSurfaceTrigger.redraw();
                 break;
             case REMOVE:
-                getLayerCommandManagerForLayer(command.second).optForDelete(false);
+                getLayerBitmapCommandManager(command.second).optForDelete(false);
                 mLayersAdapter.tryAddLayer(command.second.getCurrentLayer());
                 mDrawSurfaceTrigger.redraw();
                 break;
@@ -218,16 +218,16 @@ public class CommandManagerImplementation implements CommandManager, Observer
     private void processRedoCommand(Pair<LayerOperation, LayerCommand> command)
     {
         switch (command.first) {
-            case COMMIT_COMMAND:
-                getLayerCommandManagerForLayer(command.second).redo();
+            case COMMIT_LAYER_BITMAP_COMMAND:
+                getLayerBitmapCommandManager(command.second).redo();
                 break;
             case ADD:
-                getLayerCommandManagerForLayer(command.second).optForDelete(false);
+                getLayerBitmapCommandManager(command.second).optForDelete(false);
                 mLayersAdapter.tryAddLayer(command.second.getCurrentLayer());
                 mDrawSurfaceTrigger.redraw();
                 break;
             case REMOVE:
-                getLayerCommandManagerForLayer(command.second).optForDelete(true);
+                getLayerBitmapCommandManager(command.second).optForDelete(true);
                 mLayersAdapter.removeLayer(command.second.getCurrentLayer().getLayerID());
                 mDrawSurfaceTrigger.redraw();
                 break;
@@ -246,9 +246,9 @@ public class CommandManagerImplementation implements CommandManager, Observer
         {
             mLayerUndoCommandList.clear();
 
-            synchronized (mLayerDrawingCommandsList)
+            synchronized (mLayerBitmapCommandManagerList)
             {
-                Iterator<LayerDrawingCommands> commandManagerIterator = mLayerDrawingCommandsList.iterator();
+                Iterator<LayerBitmapCommandManager> commandManagerIterator = mLayerBitmapCommandManagerList.iterator();
                 while (commandManagerIterator.hasNext()) {
                     if (commandManagerIterator.next().getDeleteFlagValue())
                     {

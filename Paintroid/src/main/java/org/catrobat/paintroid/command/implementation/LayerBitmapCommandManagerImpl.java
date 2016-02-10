@@ -1,11 +1,10 @@
 package org.catrobat.paintroid.command.implementation;
 
 import android.graphics.Color;
-import android.graphics.PorterDuff;
 
 import org.catrobat.paintroid.PaintroidApplication;
 import org.catrobat.paintroid.command.Command;
-import org.catrobat.paintroid.command.LayerDrawingCommands;
+import org.catrobat.paintroid.command.LayerBitmapCommandManager;
 import org.catrobat.paintroid.tools.Layer;
 import org.catrobat.paintroid.tools.Tool;
 import org.catrobat.paintroid.ui.DrawSurfaceTrigger;
@@ -14,10 +13,10 @@ import java.util.LinkedList;
 
 /**
  * Contains all the commands that can be executed on the layer in question.
- * It also contains the delete flag, which is used signal whether the LayerDrawingCommands object should be
+ * It also contains the delete flag, which is used signal whether the LayerBitmapCommandManager object should be
  * permanently deleted. Use case: once the redo operation is unavailable.
  */
-public class LayerDrawingCommandsImpl implements LayerDrawingCommands {
+public class LayerBitmapCommandManagerImpl implements LayerBitmapCommandManager {
     private Layer mLayer;
 
     private LinkedList<Command> mCommandList;
@@ -25,7 +24,7 @@ public class LayerDrawingCommandsImpl implements LayerDrawingCommands {
     private DrawSurfaceTrigger mDrawSurfaceTrigger;
     private boolean mDeleteFlag;
 
-    public LayerDrawingCommandsImpl(LayerCommand layerCommand, DrawSurfaceTrigger drawSurfaceTrigger)
+    public LayerBitmapCommandManagerImpl(LayerCommand layerCommand, DrawSurfaceTrigger drawSurfaceTrigger)
     {
         mLayer = layerCommand.getCurrentLayer();
         mDrawSurfaceTrigger = drawSurfaceTrigger;
@@ -97,7 +96,7 @@ public class LayerDrawingCommandsImpl implements LayerDrawingCommands {
     {
         synchronized (mLayer.getLayerCanvas())
         {
-            clearLayersBitmap();
+            clearLayerBitmap();
             for (Command command : mCommandList)
             {
                 command.run(mLayer.getLayerCanvas(), mLayer.getBitmap());
@@ -108,7 +107,7 @@ public class LayerDrawingCommandsImpl implements LayerDrawingCommands {
         }
     }
 
-    private void clearLayersBitmap()
+    private void clearLayerBitmap()
     {
         synchronized (mLayer.getLayerCanvas())
         {

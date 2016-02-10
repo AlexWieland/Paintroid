@@ -3,10 +3,10 @@ package org.catrobat.paintroid.command;
 import org.catrobat.paintroid.tools.Layer;
 
 /**
- * Describes command manager responsible for maintaining draw commands which have been performed on
- * specific layer.
+ * Describes command manager responsible for maintaining drawing commands which have been performed on
+ * specific layer's bitmap.
  */
-public interface LayerDrawingCommands
+public interface LayerBitmapCommandManager
 {
     /**
      * Retrieves layer assigned to command manager.
