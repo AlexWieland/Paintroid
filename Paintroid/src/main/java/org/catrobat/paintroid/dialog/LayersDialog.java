@@ -432,7 +432,7 @@ public final class LayersDialog extends BaseDialog implements OnItemClickListene
                 ArrayList<Integer> layerToMergeIds = new ArrayList<Integer>();
                 layerToMergeIds.add(mCurrentLayer.getLayerID());
                 layerToMergeIds.add(firstLayertoMerge.getLayerID());
-				PaintroidApplication.commandManager.commitMergeLayerCommand(new LayerCommand(layerToMergeIds));
+				//PaintroidApplication.commandManager.commitMergeLayerCommand(new LayerCommand(layerToMergeIds));
 
 				mergeButtonDisabled();
 				refreshView();
