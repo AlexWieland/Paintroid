@@ -27,6 +27,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.util.Log;
+import android.util.TimingLogger;
 
 public class FillCommand extends BaseCommand {
 
@@ -49,12 +50,11 @@ public class FillCommand extends BaseCommand {
             return;
         }
 
-        if (PaintroidApplication.savedPictureUri == null)
+        Bitmap emptyImage = Bitmap.createBitmap(bitmap.getWidth(),bitmap.getHeight(), bitmap.getConfig());
+        if (bitmap.sameAs(emptyImage))
         {
-                /*&& PaintroidApplication.commandManager.getNumberOfCommands() == EMPTY_COMMAND_LIST_LENGTH + 1*/
             canvas.drawColor(mPaint.getColor());
-            Log.w(PaintroidApplication.TAG,
-                    "Fill Command color: " + mPaint.getColor());
+            Log.w(PaintroidApplication.TAG, "Fill Command color: " + mPaint.getColor());
         } else {
             int colorToReplace = bitmap.getPixel(mClickedPixel.x,
                     mClickedPixel.y);
