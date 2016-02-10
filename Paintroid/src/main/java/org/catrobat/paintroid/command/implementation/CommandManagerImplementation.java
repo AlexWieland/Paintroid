@@ -119,6 +119,13 @@ public class CommandManagerImplementation implements CommandManager, Observer
 
     @Override
     public void commitLayerLockCommand(LayerCommand layerCommand) {
+        synchronized (mLayerCommandList)
+        {
+            clearUndoCommandList();
+            mLayerCommandList.addLast(createLayerCommand(LayerOperation.LOCK, layerCommand));
+        }
+
+        mDrawSurfaceTrigger.redraw();
     }
 
     @Override
@@ -217,11 +224,14 @@ public class CommandManagerImplementation implements CommandManager, Observer
             case MERGE:
                 break;
             case VISIBILITY:
-                Layer layer = command.second.getCurrentLayer();
-                layer.setVisible(!layer.getVisible());
+                command.second.getCurrentLayer().setVisible(!command.second.getCurrentLayer().getVisible());
                 LayersDialog.getInstance().refreshView();
+                mDrawSurfaceTrigger.redraw();
                 break;
             case LOCK:
+                command.second.getCurrentLayer().setLocked(!command.second.getCurrentLayer().getLocked());
+                LayersDialog.getInstance().refreshView();
+                mDrawSurfaceTrigger.redraw();
                 break;
             case RENAME_LAYER:
                 break;
@@ -249,8 +259,12 @@ public class CommandManagerImplementation implements CommandManager, Observer
             case VISIBILITY:
                 command.second.getCurrentLayer().setVisible(!command.second.getCurrentLayer().getVisible());
                 LayersDialog.getInstance().refreshView();
+                mDrawSurfaceTrigger.redraw();
                 break;
             case LOCK:
+                command.second.getCurrentLayer().setLocked(!command.second.getCurrentLayer().getLocked());
+                LayersDialog.getInstance().refreshView();
+                mDrawSurfaceTrigger.redraw();
                 break;
             case RENAME_LAYER:
                 break;
