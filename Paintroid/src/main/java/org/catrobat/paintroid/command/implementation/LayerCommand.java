@@ -14,6 +14,7 @@ public class LayerCommand
 {
     private Layer mCurrentLayer;
     private ArrayList<LayerBitmapCommandManager> mLayersToMerge;
+    private String previousLayerName;
 
     public LayerCommand(Layer currentLayer)
     {
@@ -23,6 +24,11 @@ public class LayerCommand
     public LayerCommand(ArrayList<LayerBitmapCommandManager> layersToMerge)
     {
         mLayersToMerge = layersToMerge;
+    }
+
+    public LayerCommand(Layer mCurrentLayer, String previousLayerName) {
+        this.mCurrentLayer = mCurrentLayer;
+        this.previousLayerName = previousLayerName;
     }
 
     public Layer getCurrentLayer() {

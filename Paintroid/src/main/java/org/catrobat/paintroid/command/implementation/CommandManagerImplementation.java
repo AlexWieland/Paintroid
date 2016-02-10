@@ -21,11 +21,14 @@ package org.catrobat.paintroid.command.implementation;
 
 import android.util.Pair;
 
+import org.catrobat.paintroid.PaintroidApplication;
 import org.catrobat.paintroid.command.Command;
 import org.catrobat.paintroid.command.CommandManager;
 import org.catrobat.paintroid.command.LayerBitmapCommandManager;
 import org.catrobat.paintroid.command.UndoRedoManager;
 import org.catrobat.paintroid.command.UndoRedoManager.StatusMode;
+import org.catrobat.paintroid.dialog.LayersDialog;
+import org.catrobat.paintroid.tools.Layer;
 import org.catrobat.paintroid.ui.DrawSurfaceTrigger;
 import org.catrobat.paintroid.ui.button.LayersAdapter;
 
@@ -105,12 +108,17 @@ public class CommandManagerImplementation implements CommandManager, Observer
 
     @Override
     public void commitLayerVisibilityCommand(LayerCommand layerCommand) {
+        synchronized (mLayerCommandList)
+        {
+            clearUndoCommandList();
+            mLayerCommandList.addLast(createLayerCommand(LayerOperation.VISIBILITY, layerCommand));
+        }
 
+        mDrawSurfaceTrigger.redraw();
     }
 
     @Override
     public void commitLayerLockCommand(LayerCommand layerCommand) {
-
     }
 
     @Override
@@ -209,8 +217,13 @@ public class CommandManagerImplementation implements CommandManager, Observer
             case MERGE:
                 break;
             case VISIBILITY:
+                Layer layer = command.second.getCurrentLayer();
+                layer.setVisible(!layer.getVisible());
+                LayersDialog.getInstance().refreshView();
                 break;
             case LOCK:
+                break;
+            case RENAME_LAYER:
                 break;
         }
     }
@@ -234,8 +247,12 @@ public class CommandManagerImplementation implements CommandManager, Observer
             case MERGE:
                 break;
             case VISIBILITY:
+                command.second.getCurrentLayer().setVisible(!command.second.getCurrentLayer().getVisible());
+                LayersDialog.getInstance().refreshView();
                 break;
             case LOCK:
+                break;
+            case RENAME_LAYER:
                 break;
         }
     }
