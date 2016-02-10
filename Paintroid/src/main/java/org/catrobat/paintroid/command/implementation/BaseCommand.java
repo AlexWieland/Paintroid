@@ -65,7 +65,6 @@ public abstract class BaseCommand extends Observable implements Command
     @Override
     public abstract void run(Canvas canvas, Bitmap bitmap);
 
-    @Override
     public void freeResources()
     {
         //TODO: check when and if needed.
