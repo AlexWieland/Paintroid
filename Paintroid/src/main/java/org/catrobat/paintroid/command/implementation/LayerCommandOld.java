@@ -105,15 +105,15 @@ public class LayerCommandOld extends BaseCommand
         {
             case CLEAR:
                 processClearLayerCommand(canvas, mLayerActualActivity);
-            case ADD:
+            case ADD_LAYER:
                 processAddLayerCommand(canvas, mLayerActualActivity, flag);
                 break;
-            case REMOVE:
+            case REMOVE_LAYER:
                 LayersDialog.getInstance().getAdapter().removeLayer(mLayerActualActivity.getLayerID());
                 LayersDialog.getInstance().refreshView();
                 LayersDialog.getInstance().selectLayer(LayersDialog.getInstance().getAdapter().getLayer(0));
                 break;
-            case MERGE:
+            case MERGE_LAYERS:
                 LayersDialog.getInstance().selectLayer(LayersDialog.getInstance().getAdapter()
                         .getLayer(LayersDialog.getInstance().getAdapter().getPosition(mLayerActualActivity.getLayerID())));
                 LayersDialog.getInstance().mergeLayerCalledFromCommand(mLayerToMerge.getLayerID());

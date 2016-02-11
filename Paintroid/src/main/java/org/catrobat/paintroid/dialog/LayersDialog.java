@@ -422,17 +422,20 @@ public final class LayersDialog extends BaseDialog implements OnItemClickListene
 				{
 					mergedBitmap =  overlay(mCurrentLayer, firstLayertoMerge);
 				}
+                Layer layer = mLayerButtonAdapter.createLayerForBitmap(mergedBitmap);
 
-				mCurrentLayer.setOpacity(100);
-				mCurrentLayer.setBitmap(mergedBitmap);
-				mCurrentLayer.setName(mCurrentLayer.getName());
-
-				mLayerButtonAdapter.removeLayer(firstLayertoMerge.getLayerID());
+                layer.setOpacity(100);
+                layer.setName(mCurrentLayer.getName());
 
                 ArrayList<Integer> layerToMergeIds = new ArrayList<Integer>();
                 layerToMergeIds.add(mCurrentLayer.getLayerID());
                 layerToMergeIds.add(firstLayertoMerge.getLayerID());
-				//PaintroidApplication.commandManager.commitMergeLayerCommand(new LayerCommand(layerToMergeIds));
+
+                mLayerButtonAdapter.removeLayer(firstLayertoMerge.getLayerID());
+                mLayerButtonAdapter.removeLayer(mCurrentLayer.getLayerID());
+                mCurrentLayer = layer;
+
+				PaintroidApplication.commandManager.commitMergeLayerCommand(new LayerCommand(mCurrentLayer, layerToMergeIds));
 
 				mergeButtonDisabled();
 				refreshView();

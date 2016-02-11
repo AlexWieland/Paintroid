@@ -66,6 +66,15 @@ public class LayersAdapter extends BaseAdapter {
 		return mLayerList;
 	}
 
+    public Layer createLayerForBitmap(Bitmap bitmap)
+    {
+        Layer layer = new Layer(mLayerCounter, bitmap, PaintroidApplication.drawingSurface.getWorkingCanvas());
+        mLayerList.add(0, layer);
+        mLayerCounter++;
+        notifyDataSetChanged();
+        return layer;
+    }
+
 	@Override
 	public int getCount()
 	{

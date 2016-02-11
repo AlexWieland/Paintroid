@@ -29,10 +29,10 @@ public interface CommandManager
 
     /**
      * Adds the new command (draw path, erase, draw shape) to corresponding layer.
-     * @param command command to commit to layer.
+     * @param bitmapCommand command to commit to layer bitmap.
      * @param layerCommand contains layer to which command should be commited.
      */
-	void commitCommandToLayer(LayerCommand layerCommand, Command command);
+	void commitCommandToLayer(LayerCommand layerCommand, Command bitmapCommand);
 
     /**
      * Adds new layer to application.

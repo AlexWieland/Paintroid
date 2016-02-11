@@ -3,10 +3,9 @@ package org.catrobat.paintroid.command;
 import org.catrobat.paintroid.tools.Layer;
 
 /**
- * Describes command manager responsible for maintaining drawing commands which have been performed on
- * specific layer's bitmap.
+ * Describes layer commands responsible for drawing. These commands are performed on layer's bitmap.
  */
-public interface LayerBitmapCommandManager
+public interface LayerBitmapCommand
 {
     /**
      * Retrieves layer assigned to command manager.
@@ -19,20 +18,6 @@ public interface LayerBitmapCommandManager
      * @param command which has been performed on layer.
      */
     void commitCommandToLayer(Command command);
-
-
-    /**
-     * Sets whether object has been chosen for deletion.
-     * @param deleteFlag value of objects delete flag.
-     */
-    void optForDelete(boolean deleteFlag);
-
-    /**
-     * Retrieves value of delete flag.
-     * @return delete flag value.
-     */
-    boolean getDeleteFlagValue();
-
 
     /**
      * Undo drawing command for assigned layer.

@@ -4,33 +4,27 @@ import android.graphics.Color;
 
 import org.catrobat.paintroid.PaintroidApplication;
 import org.catrobat.paintroid.command.Command;
-import org.catrobat.paintroid.command.LayerBitmapCommandManager;
+import org.catrobat.paintroid.command.LayerBitmapCommand;
 import org.catrobat.paintroid.tools.Layer;
 import org.catrobat.paintroid.tools.Tool;
-import org.catrobat.paintroid.ui.DrawSurfaceTrigger;
 
 import java.util.LinkedList;
 
 /**
- * Contains all the commands that can be executed on the layer in question.
- * It also contains the delete flag, which is used signal whether the LayerBitmapCommandManager object should be
- * permanently deleted. Use case: once the redo operation is unavailable.
+ * Contains all the commands that are to be executed on the layer's bitmap.
  */
-public class LayerBitmapCommandManagerImpl implements LayerBitmapCommandManager {
+public class LayerBitmapCommandImpl implements LayerBitmapCommand {
     private Layer mLayer;
 
     private LinkedList<Command> mCommandList;
     private LinkedList<Command> mUndoCommandList;
-    private DrawSurfaceTrigger mDrawSurfaceTrigger;
-    private boolean mDeleteFlag;
 
-    public LayerBitmapCommandManagerImpl(LayerCommand layerCommand, DrawSurfaceTrigger drawSurfaceTrigger)
+
+    public LayerBitmapCommandImpl(LayerCommand layerCommand)
     {
-        mLayer = layerCommand.getCurrentLayer();
-        mDrawSurfaceTrigger = drawSurfaceTrigger;
+        mLayer = layerCommand.getLayer();
         mCommandList = new LinkedList<Command>();
         mUndoCommandList = new LinkedList<Command>();
-        mDeleteFlag = false;
     }
 
 
@@ -52,16 +46,6 @@ public class LayerBitmapCommandManagerImpl implements LayerBitmapCommandManager 
                 PaintroidApplication.currentTool.resetInternalState(Tool.StateChange.RESET_INTERNAL_STATE);
             }
         }
-    }
-
-    @Override
-    public void optForDelete(boolean deleteFlag) {
-        mDeleteFlag = deleteFlag;
-    }
-
-    @Override
-    public boolean getDeleteFlagValue() {
-        return mDeleteFlag;
     }
 
     @Override
@@ -87,7 +71,6 @@ public class LayerBitmapCommandManagerImpl implements LayerBitmapCommandManager 
                 {
                     command.run(mLayer.getLayerCanvas(), mLayer.getBitmap());
                     PaintroidApplication.currentTool.resetInternalState(Tool.StateChange.RESET_INTERNAL_STATE);
-                    mDrawSurfaceTrigger.redraw();
                 }
             }
         }
@@ -102,8 +85,6 @@ public class LayerBitmapCommandManagerImpl implements LayerBitmapCommandManager 
                 command.run(mLayer.getLayerCanvas(), mLayer.getBitmap());
                 PaintroidApplication.currentTool.resetInternalState(Tool.StateChange.RESET_INTERNAL_STATE);
             }
-
-            mDrawSurfaceTrigger.redraw();
         }
     }
 
@@ -111,7 +92,6 @@ public class LayerBitmapCommandManagerImpl implements LayerBitmapCommandManager 
     {
         synchronized (mLayer.getLayerCanvas())
         {
-            //mLayer.getLayerCanvas().drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
             mLayer.getBitmap().eraseColor(Color.TRANSPARENT);
         }
     }

@@ -1,41 +1,56 @@
 package org.catrobat.paintroid.command.implementation;
 
-import org.catrobat.paintroid.command.LayerBitmapCommandManager;
+import org.catrobat.paintroid.command.LayerBitmapCommand;
 import org.catrobat.paintroid.tools.Layer;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 
 /**
  * Describes Layer command. It can contain either simple layer on which some operation is being
- * performed, or list of command managers for merged layers.
+ * performed, or list of merged layers ids, along with the new layer created by merge and
+ * merged layers bitmap command managers.
  */
 public class LayerCommand
 {
-    private Layer mCurrentLayer;
-    private ArrayList<LayerBitmapCommandManager> mLayersToMerge;
+    private Layer mLayer;
+    private ArrayList<Integer> mListOfMergedLayerIds;
+    private ArrayList<LayerBitmapCommand> mLayersBitmapCommands;
+
     private String previousLayerName;
 
-    public LayerCommand(Layer currentLayer)
+    public LayerCommand(Layer layer)
     {
-        mCurrentLayer = currentLayer;
+        mLayer = layer;
     }
 
-    public LayerCommand(ArrayList<LayerBitmapCommandManager> layersToMerge)
+    public LayerCommand(Layer newLayer, ArrayList<Integer> listOfMergedLayerIds)
     {
-        mLayersToMerge = layersToMerge;
+        mLayer = newLayer;
+        mListOfMergedLayerIds = listOfMergedLayerIds;
+        mLayersBitmapCommands = new ArrayList<LayerBitmapCommand>(mListOfMergedLayerIds.size());
     }
 
-    public LayerCommand(Layer mCurrentLayer, String previousLayerName) {
-        this.mCurrentLayer = mCurrentLayer;
+    public LayerCommand(Layer layer, String previousLayerName)
+    {
+        this.mLayer = layer;
         this.previousLayerName = previousLayerName;
     }
 
-    public Layer getCurrentLayer() {
-        return mCurrentLayer;
+    public Layer getLayer() {
+        return mLayer;
     }
 
-    public ArrayList<LayerBitmapCommandManager> getLayersToMerge() {
-        return mLayersToMerge;
+    public ArrayList<Integer> getLayersToMerge()
+    {
+        return mListOfMergedLayerIds;
+    }
+
+    public void setLayersBitmapCommands(ArrayList<LayerBitmapCommand> layersBitmapCommandManagerList)
+    {
+        this.mLayersBitmapCommands = layersBitmapCommandManagerList;
+    }
+
+    public ArrayList<LayerBitmapCommand> getLayersBitmapCommands() {
+        return mLayersBitmapCommands;
     }
 }
