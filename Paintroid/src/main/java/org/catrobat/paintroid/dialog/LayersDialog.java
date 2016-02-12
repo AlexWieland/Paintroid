@@ -45,18 +45,19 @@ import android.widget.TextView;
 import org.catrobat.paintroid.MainActivity;
 import org.catrobat.paintroid.PaintroidApplication;
 import org.catrobat.paintroid.R;
-import org.catrobat.paintroid.command.Command;
 import org.catrobat.paintroid.command.implementation.LayerCommand;
-import org.catrobat.paintroid.command.implementation.LayerCommandOld;
+import org.catrobat.paintroid.eventlistener.RefreshLayerDialogEventListener;
 import org.catrobat.paintroid.tools.Layer;
 import org.catrobat.paintroid.ui.button.LayersAdapter;
 
 import java.util.ArrayList;
 
 public final class LayersDialog extends BaseDialog implements OnItemClickListener
-		,OnItemLongClickListener
-		,DialogInterface.OnDismissListener,
-		SeekBar.OnSeekBarChangeListener {
+                                                                ,OnItemLongClickListener
+                                                                ,DialogInterface.OnDismissListener
+                                                                ,SeekBar.OnSeekBarChangeListener
+                                                                ,RefreshLayerDialogEventListener
+{
 
 	private static final String NOT_INITIALIZED_ERROR_MESSAGE = "LayerDialog has not been " +
 			"initialized. Call init() first!";
@@ -77,7 +78,6 @@ public final class LayersDialog extends BaseDialog implements OnItemClickListene
 	private Boolean mergeClicked;
 	private SeekBar mOpacitySeekbar;
 	private TextView mOpacitySeekbarLabel;
-
 	public LayersAdapter getAdapter()
 	{
 		return mLayerButtonAdapter;
@@ -563,4 +563,10 @@ public final class LayersDialog extends BaseDialog implements OnItemClickListene
 		mLayerButtonAdapter = new LayersAdapter(context, PaintroidApplication.openedFromCatroid
 												,first_Layer);
 	}
+
+    @Override
+    public void onLayerDialogRefreshView() {
+        refreshView();
+    }
+
 }

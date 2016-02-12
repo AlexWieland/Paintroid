@@ -26,7 +26,8 @@ import org.catrobat.paintroid.command.CommandManager;
 import org.catrobat.paintroid.command.LayerBitmapCommand;
 import org.catrobat.paintroid.command.UndoRedoManager;
 import org.catrobat.paintroid.command.UndoRedoManager.StatusMode;
-import org.catrobat.paintroid.dialog.LayersDialog;
+import org.catrobat.paintroid.eventlistener.RedrawSurfaceViewEventListener;
+import org.catrobat.paintroid.eventlistener.RefreshLayerDialogEventListener;
 import org.catrobat.paintroid.ui.DrawSurfaceTrigger;
 import org.catrobat.paintroid.ui.button.LayersAdapter;
 
@@ -42,11 +43,11 @@ public class CommandManagerImplementation implements CommandManager, Observer
     private static final int INIT_APP_lAYER_COUNT = 1;
 
     enum CommandType {COMMIT_LAYER_BITMAP_COMMAND
-                      ,ADD_LAYER, REMOVE_LAYER
-                      ,MERGE_LAYERS
-                      ,CHANGE_LAYER_VISIBILITY
-                      ,LOCK_LAYER
-                      ,RENAME_LAYER}
+        ,ADD_LAYER, REMOVE_LAYER
+        ,MERGE_LAYERS
+        ,CHANGE_LAYER_VISIBILITY
+        ,LOCK_LAYER
+        ,RENAME_LAYER}
 
 
     enum Action {UNDO, REDO}
@@ -54,16 +55,27 @@ public class CommandManagerImplementation implements CommandManager, Observer
     private LinkedList<Pair<CommandType, LayerCommand>> mLayerCommandList;
     private LinkedList<Pair<CommandType, LayerCommand>> mLayerUndoCommandList;
     private ArrayList<LayerBitmapCommand> mLayerBitmapCommands;
-    private DrawSurfaceTrigger mDrawSurfaceTrigger;
     private LayersAdapter mLayersAdapter;
+
+    private RefreshLayerDialogEventListener mRefreshLayerDialogListener;
+    private RedrawSurfaceViewEventListener mRedrawSurfaceViewListener;
 
     public CommandManagerImplementation(DrawSurfaceTrigger drawSurfaceTrigger, LayersAdapter layersAdapter)
     {
         mLayerCommandList = new LinkedList<Pair<CommandType, LayerCommand>>();
         mLayerUndoCommandList = new LinkedList<Pair<CommandType, LayerCommand>>();
         mLayerBitmapCommands = new ArrayList<LayerBitmapCommand>();
-        mDrawSurfaceTrigger = drawSurfaceTrigger;
         mLayersAdapter = layersAdapter;
+    }
+
+    public void setRefreshLayerDialogListener(RefreshLayerDialogEventListener listener)
+    {
+        this.mRefreshLayerDialogListener = listener;
+    }
+
+    public void setRedrawSurfaceViewListener(RedrawSurfaceViewEventListener listener)
+    {
+        this.mRedrawSurfaceViewListener = listener;
     }
 
     @Override
@@ -80,7 +92,7 @@ public class CommandManagerImplementation implements CommandManager, Observer
             mLayerCommandList.addLast(createLayerCommand(CommandType.COMMIT_LAYER_BITMAP_COMMAND, layerCommand));
         }
 
-        mDrawSurfaceTrigger.redraw();
+        drawingSurfaceRedraw();
     }
 
     @Override
@@ -97,7 +109,7 @@ public class CommandManagerImplementation implements CommandManager, Observer
             mLayerCommandList.addLast(createLayerCommand(CommandType.ADD_LAYER, layerCommand));
         }
 
-        mDrawSurfaceTrigger.redraw();
+        drawingSurfaceRedraw();
     }
 
     @Override
@@ -111,7 +123,7 @@ public class CommandManagerImplementation implements CommandManager, Observer
             mLayerCommandList.addLast(createLayerCommand(CommandType.REMOVE_LAYER, layerCommand));
         }
 
-        mDrawSurfaceTrigger.redraw();
+        drawingSurfaceRedraw();
     }
 
     @Override
@@ -133,7 +145,7 @@ public class CommandManagerImplementation implements CommandManager, Observer
             mLayerCommandList.addLast(createLayerCommand(CommandType.MERGE_LAYERS, layerCommand));
         }
 
-        mDrawSurfaceTrigger.redraw();
+        drawingSurfaceRedraw();
 
     }
 
@@ -146,7 +158,7 @@ public class CommandManagerImplementation implements CommandManager, Observer
             mLayerCommandList.addLast(createLayerCommand(CommandType.CHANGE_LAYER_VISIBILITY, layerCommand));
         }
 
-        mDrawSurfaceTrigger.redraw();
+        drawingSurfaceRedraw();
     }
 
     @Override
@@ -158,7 +170,7 @@ public class CommandManagerImplementation implements CommandManager, Observer
             mLayerCommandList.addLast(createLayerCommand(CommandType.LOCK_LAYER, layerCommand));
         }
 
-        mDrawSurfaceTrigger.redraw();
+        drawingSurfaceRedraw();
     }
 
     @Override
@@ -271,30 +283,22 @@ public class CommandManagerImplementation implements CommandManager, Observer
         {
             case COMMIT_LAYER_BITMAP_COMMAND:
                 command.second.getLayersBitmapCommands().get(0).undo();
+                drawingSurfaceRedraw();
                 break;
             case ADD_LAYER:
-                mLayerBitmapCommands.remove(command.second.getLayersBitmapCommands().get(0));
-                mLayersAdapter.removeLayer(command.second.getLayer().getLayerID());
-                mDrawSurfaceTrigger.redraw();
+                handleRemoveLayer(command.second);
                 break;
             case REMOVE_LAYER:
-                mLayerBitmapCommands.add(command.second.getLayersBitmapCommands().get(0));
-                mLayersAdapter.tryAddLayer(command.second.getLayer());
-                mDrawSurfaceTrigger.redraw();
+                handleAddLayer(command.second);
                 break;
             case MERGE_LAYERS:
                 handleUnmerge(command.second);
-                LayersDialog.getInstance().refreshView();
                 break;
             case CHANGE_LAYER_VISIBILITY:
-                command.second.getLayer().setVisible(!command.second.getLayer().getVisible());
-                LayersDialog.getInstance().refreshView();
-                mDrawSurfaceTrigger.redraw();
+                handleLayerVisibilityChanged(command.second);
                 break;
             case LOCK_LAYER:
-                command.second.getLayer().setLocked(!command.second.getLayer().getLocked());
-                LayersDialog.getInstance().refreshView();
-                mDrawSurfaceTrigger.redraw();
+                handleLayerLockedChanged(command.second);
                 break;
             case RENAME_LAYER:
                 break;
@@ -306,38 +310,50 @@ public class CommandManagerImplementation implements CommandManager, Observer
         switch (command.first) {
             case COMMIT_LAYER_BITMAP_COMMAND:
                 command.second.getLayersBitmapCommands().get(0).redo();
+                drawingSurfaceRedraw();
                 break;
             case ADD_LAYER:
-                mLayerBitmapCommands.add(command.second.getLayersBitmapCommands().get(0));
-                mLayersAdapter.tryAddLayer(command.second.getLayer());
-
+                handleAddLayer(command.second);
                 break;
             case REMOVE_LAYER:
-                mLayerBitmapCommands.remove(command.second.getLayersBitmapCommands().get(0));
-                mLayersAdapter.removeLayer(command.second.getLayer().getLayerID());
-                mDrawSurfaceTrigger.redraw();
+                handleRemoveLayer(command.second);
                 break;
             case MERGE_LAYERS:
                 handleMerge(command.second);
-                LayersDialog.getInstance().refreshView();
                 break;
             case CHANGE_LAYER_VISIBILITY:
-                command.second.getLayer().setVisible(!command.second.getLayer().getVisible());
-                LayersDialog.getInstance().refreshView();
-                mDrawSurfaceTrigger.redraw();
+                handleLayerVisibilityChanged(command.second);
                 break;
             case LOCK_LAYER:
-                command.second.getLayer().setLocked(!command.second.getLayer().getLocked());
-                LayersDialog.getInstance().refreshView();
-
+                handleLayerLockedChanged(command.second);
                 break;
             case RENAME_LAYER:
                 break;
         }
-
-
     }
 
+    private void handleAddLayer(LayerCommand command)
+    {
+        mLayerBitmapCommands.add(command.getLayersBitmapCommands().get(0));
+        mLayersAdapter.tryAddLayer(command.getLayer());
+        layerDialogRefreshView();
+        drawingSurfaceRedraw();
+    }
+
+    private void handleRemoveLayer(LayerCommand command)
+    {
+        mLayerBitmapCommands.remove(command.getLayersBitmapCommands().get(0));
+        mLayersAdapter.removeLayer(command.getLayer().getLayerID());
+        layerDialogRefreshView();
+        drawingSurfaceRedraw();
+    }
+
+    /**
+     * Undo - Redo operations are reflections of one another. By merge the previously  merged layer
+     * needs to be re-added along with its LayerBitmapCommand, while origin layers need to be
+     * removed along with their LayerBitmapCommands.
+     * @param command Layer command containing merged layer and its LayerBitmapCommand.
+     */
     private void handleMerge(LayerCommand command)
     {
         mLayersAdapter.tryAddLayer(command.getLayer());
@@ -353,9 +369,16 @@ public class CommandManagerImplementation implements CommandManager, Observer
 
         command.setLayersBitmapCommands(result);
 
-        mDrawSurfaceTrigger.redraw();
+        layerDialogRefreshView();
+        drawingSurfaceRedraw();
     }
 
+    /**
+     * Undo - Redo operations are reflections of one another. By un-merge the previously merged layer
+     * needs to be removed along with its LayerBitmapCommand, while origin layers need to be
+     * re-added along with their LayerBitmapCommands.
+     * @param command Layer command containing origin layers and their LayerBitmapCommands.
+     */
     private void handleUnmerge(LayerCommand command)
     {
         ListIterator<LayerBitmapCommand> iterator = command.getLayersBitmapCommands().listIterator();
@@ -374,12 +397,42 @@ public class CommandManagerImplementation implements CommandManager, Observer
         mLayerBitmapCommands.remove(result.get(0));
         mLayersAdapter.removeLayer(command.getLayer().getLayerID());
 
-        mDrawSurfaceTrigger.redraw();
+        layerDialogRefreshView();
+        drawingSurfaceRedraw();
+    }
+
+    private void handleLayerVisibilityChanged(LayerCommand command)
+    {
+        command.getLayer().setVisible(!command.getLayer().getVisible());
+        layerDialogRefreshView();
+        drawingSurfaceRedraw();
+    }
+
+    private void handleLayerLockedChanged(LayerCommand command)
+    {
+        command.getLayer().setLocked(!command.getLayer().getLocked());
+        layerDialogRefreshView();
     }
 
     private synchronized void deleteFailedCommand(Command command)
     {
 
+    }
+
+    private void drawingSurfaceRedraw()
+    {
+        if(mRedrawSurfaceViewListener != null)
+        {
+            mRedrawSurfaceViewListener.onSurfaceViewRedraw();
+        }
+    }
+
+    private void layerDialogRefreshView()
+    {
+        if(mRefreshLayerDialogListener != null)
+        {
+            mRefreshLayerDialogListener.onLayerDialogRefreshView();
+        }
     }
 
     @Override

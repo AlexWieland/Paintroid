@@ -21,11 +21,10 @@ package org.catrobat.paintroid.ui;
 
 import org.catrobat.paintroid.PaintroidApplication;
 import org.catrobat.paintroid.dialog.LayersDialog;
+import org.catrobat.paintroid.eventlistener.RedrawSurfaceViewEventListener;
 import org.catrobat.paintroid.listener.DrawingSurfaceListener;
 import org.catrobat.paintroid.tools.Layer;
-import org.catrobat.paintroid.tools.Tool;
 import org.catrobat.paintroid.tools.implementation.BaseTool;
-import org.catrobat.paintroid.ui.button.LayersAdapter;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -47,7 +46,9 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class DrawingSurface extends SurfaceView implements 	SurfaceHolder.Callback {
+public class DrawingSurface extends SurfaceView implements SurfaceHolder.Callback
+                                                            ,RedrawSurfaceViewEventListener
+{
 
     protected static final int BACKGROUND_COLOR = Color.LTGRAY;
     private static final int DRAW_THREAD_TIMEOUT = 20;
@@ -331,6 +332,11 @@ public class DrawingSurface extends SurfaceView implements 	SurfaceHolder.Callba
         }
 
         return 0;
+    }
+
+    @Override
+    public void onSurfaceViewRedraw() {
+        mSurfaceViewDrawTrigger.redraw();
     }
 
     private static class DrawingThread extends Thread {

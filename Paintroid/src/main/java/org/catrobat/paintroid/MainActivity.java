@@ -41,7 +41,6 @@ import org.catrobat.paintroid.tools.ToolType;
 import org.catrobat.paintroid.tools.implementation.ImportTool;
 import org.catrobat.paintroid.ui.BottomBar;
 import org.catrobat.paintroid.ui.DrawingSurface;
-import org.catrobat.paintroid.ui.Perspective;
 import org.catrobat.paintroid.ui.TopBar;
 
 import android.annotation.SuppressLint;
@@ -59,7 +58,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
@@ -145,13 +143,10 @@ public class MainActivity extends OptionsMenuActivity {
         mBottomBar = new BottomBar(this);
 
         LayersDialog.init(this, new Layer(0, Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)
-                                            , PaintroidApplication.drawingSurface.getWorkingCanvas()));
+                , PaintroidApplication.drawingSurface.getWorkingCanvas()));
 
-        PaintroidApplication.commandManager = new CommandManagerImplementation
-                (PaintroidApplication.drawingSurface.getSurfaceViewDrawTrigger()
-                        , LayersDialog.getInstance().getAdapter());
+        initCommandManager();
 
-        PaintroidApplication.commandManager.commitAddLayerCommand(new LayerCommand(LayersDialog.getInstance().getAdapter().getLayer(0)));
 
 		if (PaintroidApplication.openedFromCatroid && catroidPicturePath != null
 				&& catroidPicturePath.length() > 0)
@@ -202,6 +197,24 @@ public class MainActivity extends OptionsMenuActivity {
 			initialiseNewBitmap();
 		}
 	}
+
+    private void initCommandManager()
+    {
+        PaintroidApplication.commandManager = new CommandManagerImplementation
+                (PaintroidApplication.drawingSurface.getSurfaceViewDrawTrigger()
+                        , LayersDialog.getInstance().getAdapter());
+
+        ((CommandManagerImplementation)PaintroidApplication.commandManager)
+                                        .setRefreshLayerDialogListener(LayersDialog.getInstance());
+
+        ((CommandManagerImplementation)PaintroidApplication.commandManager)
+                                        .setRedrawSurfaceViewListener(PaintroidApplication.drawingSurface);
+
+        PaintroidApplication.commandManager.commitAddLayerCommand(new LayerCommand(LayersDialog
+                .getInstance().getAdapter()
+                .getLayer(0)));
+
+    }
 
 	@Override
 	protected void onResume()
