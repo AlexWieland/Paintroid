@@ -210,9 +210,14 @@ public class MainActivity extends OptionsMenuActivity {
         ((CommandManagerImplementation)PaintroidApplication.commandManager)
                                         .setRedrawSurfaceViewListener(PaintroidApplication.drawingSurface);
 
+
+        ((CommandManagerImplementation)PaintroidApplication.commandManager)
+                .setUpdateTopBarListener(mTopBar);
+
         PaintroidApplication.commandManager.commitAddLayerCommand(new LayerCommand(LayersDialog
                 .getInstance().getAdapter()
                 .getLayer(0)));
+
 
     }
 

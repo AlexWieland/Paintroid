@@ -24,11 +24,9 @@ import android.util.Pair;
 import org.catrobat.paintroid.command.Command;
 import org.catrobat.paintroid.command.CommandManager;
 import org.catrobat.paintroid.command.LayerBitmapCommand;
-import org.catrobat.paintroid.command.UndoRedoManager;
-import org.catrobat.paintroid.command.UndoRedoManager.StatusMode;
 import org.catrobat.paintroid.eventlistener.RedrawSurfaceViewEventListener;
 import org.catrobat.paintroid.eventlistener.RefreshLayerDialogEventListener;
-import org.catrobat.paintroid.ui.DrawSurfaceTrigger;
+import org.catrobat.paintroid.eventlistener.UpdateTopBarEventListener;
 import org.catrobat.paintroid.ui.button.LayersAdapter;
 
 import java.util.ArrayList;
@@ -59,6 +57,7 @@ public class CommandManagerImplementation implements CommandManager, Observer
 
     private RefreshLayerDialogEventListener mRefreshLayerDialogListener;
     private RedrawSurfaceViewEventListener mRedrawSurfaceViewListener;
+    private UpdateTopBarEventListener mUpdateTopBarListener;
 
     public CommandManagerImplementation(LayersAdapter layersAdapter)
     {
@@ -70,12 +69,17 @@ public class CommandManagerImplementation implements CommandManager, Observer
 
     public void setRefreshLayerDialogListener(RefreshLayerDialogEventListener listener)
     {
-        this.mRefreshLayerDialogListener = listener;
+        mRefreshLayerDialogListener = listener;
     }
 
     public void setRedrawSurfaceViewListener(RedrawSurfaceViewEventListener listener)
     {
-        this.mRedrawSurfaceViewListener = listener;
+        mRedrawSurfaceViewListener = listener;
+    }
+
+    public void setUpdateTopBarListener(UpdateTopBarEventListener listener)
+    {
+        mUpdateTopBarListener = listener;
     }
 
     @Override
@@ -84,6 +88,7 @@ public class CommandManagerImplementation implements CommandManager, Observer
         synchronized (mLayerCommandList)
         {
             clearUndoCommandList();
+            enableUndo(true);
 
             ArrayList<LayerBitmapCommand> result = layerIdToOneElementBitmapCommandList(layerCommand.getLayer().getLayerID());
             result.get(0).commitCommandToLayer(bitmapCommand);
@@ -101,6 +106,10 @@ public class CommandManagerImplementation implements CommandManager, Observer
         synchronized (mLayerCommandList)
         {
             clearUndoCommandList();
+            if(mLayerCommandList.size() > INIT_APP_lAYER_COUNT)
+            {
+                enableUndo(true);
+            }
 
             LayerBitmapCommand bitmapCommand = new LayerBitmapCommandImpl(layerCommand);
             layerCommand.setLayersBitmapCommands(layerBitmapCommandToOneElementList(bitmapCommand));
@@ -118,6 +127,7 @@ public class CommandManagerImplementation implements CommandManager, Observer
         synchronized (mLayerCommandList)
         {
             clearUndoCommandList();
+            enableUndo(true);
 
             layerCommand.setLayersBitmapCommands(layerIdToOneElementBitmapCommandList(layerCommand.getLayer().getLayerID()));
             mLayerCommandList.addLast(createLayerCommand(CommandType.REMOVE_LAYER, layerCommand));
@@ -132,6 +142,7 @@ public class CommandManagerImplementation implements CommandManager, Observer
         synchronized (mLayerCommandList)
         {
             clearUndoCommandList();
+            enableUndo(true);
 
             ArrayList<LayerBitmapCommand> result = getLayerBitmapCommands(layerCommand.getLayersToMerge());
             layerCommand.setLayersBitmapCommands(result);
@@ -155,6 +166,8 @@ public class CommandManagerImplementation implements CommandManager, Observer
         synchronized (mLayerCommandList)
         {
             clearUndoCommandList();
+            enableUndo(true);
+
             mLayerCommandList.addLast(createLayerCommand(CommandType.CHANGE_LAYER_VISIBILITY, layerCommand));
         }
 
@@ -167,6 +180,8 @@ public class CommandManagerImplementation implements CommandManager, Observer
         synchronized (mLayerCommandList)
         {
             clearUndoCommandList();
+            enableUndo(true);
+
             mLayerCommandList.addLast(createLayerCommand(CommandType.LOCK_LAYER, layerCommand));
         }
 
@@ -223,8 +238,8 @@ public class CommandManagerImplementation implements CommandManager, Observer
         mLayerCommandList.clear();
         mLayerUndoCommandList.clear();
         mLayerBitmapCommands.clear();
-        UndoRedoManager.getInstance().update(StatusMode.DISABLE_REDO);
-        UndoRedoManager.getInstance().update(StatusMode.DISABLE_UNDO);
+        enableRedo(false);
+        enableUndo(false);
     }
 
 
@@ -238,8 +253,20 @@ public class CommandManagerImplementation implements CommandManager, Observer
                 Pair<CommandType, LayerCommand> command = mLayerCommandList.removeLast();
                 mLayerUndoCommandList.addFirst(command);
                 processCommand(command, Action.UNDO);
+                enableRedo(true);
+
+                if(mLayerCommandList.size() == INIT_APP_lAYER_COUNT)
+                {
+                    onFirstCommandReached();
+                }
             }
         }
+    }
+
+    private void onFirstCommandReached()
+    {
+        //select first layer
+        enableUndo(false);
     }
 
     @Override
@@ -249,9 +276,14 @@ public class CommandManagerImplementation implements CommandManager, Observer
         {
             if (mLayerUndoCommandList.size() != 0)
             {
+                enableUndo(true);
                 Pair<CommandType, LayerCommand> command = mLayerUndoCommandList.removeFirst();
                 mLayerCommandList.addLast(command);
                 processCommand(command, Action.REDO);
+                if(mLayerUndoCommandList.size() == 0)
+                {
+                    enableRedo(false);
+                }
             }
         }
     }
@@ -260,6 +292,7 @@ public class CommandManagerImplementation implements CommandManager, Observer
     {
         synchronized (mLayerCommandList)
         {
+            enableRedo(false);
             mLayerUndoCommandList.clear();
         }
     }
@@ -432,6 +465,22 @@ public class CommandManagerImplementation implements CommandManager, Observer
         if(mRefreshLayerDialogListener != null)
         {
             mRefreshLayerDialogListener.onLayerDialogRefreshView();
+        }
+    }
+
+    private void enableUndo(boolean enable)
+    {
+        if(mUpdateTopBarListener != null)
+        {
+            mUpdateTopBarListener.onUndoEnabled(enable);
+        }
+    }
+
+    private void enableRedo(boolean enable)
+    {
+        if(mUpdateTopBarListener != null)
+        {
+            mUpdateTopBarListener.onRedoEnabled(enable);
         }
     }
 
