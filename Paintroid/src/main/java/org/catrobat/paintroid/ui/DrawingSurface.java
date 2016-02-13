@@ -21,6 +21,7 @@ package org.catrobat.paintroid.ui;
 
 import org.catrobat.paintroid.PaintroidApplication;
 import org.catrobat.paintroid.dialog.LayersDialog;
+import org.catrobat.paintroid.eventlistener.ChangeActiveLayerEventListener;
 import org.catrobat.paintroid.eventlistener.RedrawSurfaceViewEventListener;
 import org.catrobat.paintroid.listener.DrawingSurfaceListener;
 import org.catrobat.paintroid.tools.Layer;
@@ -48,6 +49,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class DrawingSurface extends SurfaceView implements SurfaceHolder.Callback
                                                             ,RedrawSurfaceViewEventListener
+                                                            ,ChangeActiveLayerEventListener
 {
 
     protected static final int BACKGROUND_COLOR = Color.LTGRAY;
@@ -337,6 +339,15 @@ public class DrawingSurface extends SurfaceView implements SurfaceHolder.Callbac
     @Override
     public void onSurfaceViewRedraw() {
         mSurfaceViewDrawTrigger.redraw();
+    }
+
+    @Override
+    public void onActiveLayerChanged(Layer layer)
+    {
+        if(mCurrentLayer.getLayerID() != layer.getLayerID())
+        {
+            mCurrentLayer = layer;
+        }
     }
 
     private static class DrawingThread extends Thread {

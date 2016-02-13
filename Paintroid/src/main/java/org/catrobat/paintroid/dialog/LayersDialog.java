@@ -46,6 +46,7 @@ import org.catrobat.paintroid.MainActivity;
 import org.catrobat.paintroid.PaintroidApplication;
 import org.catrobat.paintroid.R;
 import org.catrobat.paintroid.command.implementation.LayerCommand;
+import org.catrobat.paintroid.eventlistener.ChangeActiveLayerEventListener;
 import org.catrobat.paintroid.eventlistener.RefreshLayerDialogEventListener;
 import org.catrobat.paintroid.tools.Layer;
 import org.catrobat.paintroid.ui.button.LayersAdapter;
@@ -57,6 +58,7 @@ public final class LayersDialog extends BaseDialog implements OnItemClickListene
                                                                 ,DialogInterface.OnDismissListener
                                                                 ,SeekBar.OnSeekBarChangeListener
                                                                 ,RefreshLayerDialogEventListener
+                                                                ,ChangeActiveLayerEventListener
 {
 
 	private static final String NOT_INITIALIZED_ERROR_MESSAGE = "LayerDialog has not been " +
@@ -277,6 +279,7 @@ public final class LayersDialog extends BaseDialog implements OnItemClickListene
 		{
 			refreshView();
             Layer layer = mLayerButtonAdapter.getLayer(0);
+            selectLayer(layer);
 		}
 		else
 		{
@@ -433,7 +436,7 @@ public final class LayersDialog extends BaseDialog implements OnItemClickListene
 
                 mLayerButtonAdapter.removeLayer(firstLayertoMerge.getLayerID());
                 mLayerButtonAdapter.removeLayer(mCurrentLayer.getLayerID());
-                mCurrentLayer = layer;
+                selectLayer(layer);
 
 				PaintroidApplication.commandManager.commitMergeLayerCommand(new LayerCommand(mCurrentLayer, layerToMergeIds));
 
@@ -569,4 +572,11 @@ public final class LayersDialog extends BaseDialog implements OnItemClickListene
         refreshView();
     }
 
+    @Override
+    public void onActiveLayerChanged(Layer layer) {
+        if(mCurrentLayer.getLayerID() != layer.getLayerID())
+        {
+            selectLayer(layer);
+        }
+    }
 }

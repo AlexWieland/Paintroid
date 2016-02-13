@@ -24,9 +24,11 @@ import android.util.Pair;
 import org.catrobat.paintroid.command.Command;
 import org.catrobat.paintroid.command.CommandManager;
 import org.catrobat.paintroid.command.LayerBitmapCommand;
+import org.catrobat.paintroid.eventlistener.ChangeActiveLayerEventListener;
 import org.catrobat.paintroid.eventlistener.RedrawSurfaceViewEventListener;
 import org.catrobat.paintroid.eventlistener.RefreshLayerDialogEventListener;
 import org.catrobat.paintroid.eventlistener.UpdateTopBarEventListener;
+import org.catrobat.paintroid.tools.Layer;
 import org.catrobat.paintroid.ui.button.LayersAdapter;
 
 import java.util.ArrayList;
@@ -58,6 +60,7 @@ public class CommandManagerImplementation implements CommandManager, Observer
     private RefreshLayerDialogEventListener mRefreshLayerDialogListener;
     private RedrawSurfaceViewEventListener mRedrawSurfaceViewListener;
     private UpdateTopBarEventListener mUpdateTopBarListener;
+    private ArrayList<ChangeActiveLayerEventListener> mChangeActiveLayerListener;
 
     public CommandManagerImplementation(LayersAdapter layersAdapter)
     {
@@ -80,6 +83,16 @@ public class CommandManagerImplementation implements CommandManager, Observer
     public void setUpdateTopBarListener(UpdateTopBarEventListener listener)
     {
         mUpdateTopBarListener = listener;
+    }
+
+    public void addChangeActiveLayerListener(ChangeActiveLayerEventListener listener)
+    {
+        if(mChangeActiveLayerListener == null)
+        {
+            mChangeActiveLayerListener = new ArrayList<ChangeActiveLayerEventListener>();
+        }
+
+        mChangeActiveLayerListener.add(listener);
     }
 
     @Override
@@ -106,16 +119,18 @@ public class CommandManagerImplementation implements CommandManager, Observer
         synchronized (mLayerCommandList)
         {
             clearUndoCommandList();
-            if(mLayerCommandList.size() > INIT_APP_lAYER_COUNT)
-            {
-                enableUndo(true);
-            }
 
             LayerBitmapCommand bitmapCommand = new LayerBitmapCommandImpl(layerCommand);
             layerCommand.setLayersBitmapCommands(layerBitmapCommandToOneElementList(bitmapCommand));
 
             mLayerBitmapCommands.add(bitmapCommand);
             mLayerCommandList.addLast(createLayerCommand(CommandType.ADD_LAYER, layerCommand));
+
+            if(mLayerCommandList.size() > INIT_APP_lAYER_COUNT)
+            {
+                enableUndo(true);
+            }
+
         }
 
         drawingSurfaceRedraw();
@@ -265,7 +280,7 @@ public class CommandManagerImplementation implements CommandManager, Observer
 
     private void onFirstCommandReached()
     {
-        //select first layer
+        changeActiveLayer(mLayerCommandList.get(0).second.getLayer());
         enableUndo(false);
     }
 
@@ -316,6 +331,7 @@ public class CommandManagerImplementation implements CommandManager, Observer
         {
             case COMMIT_LAYER_BITMAP_COMMAND:
                 command.second.getLayersBitmapCommands().get(0).undo();
+                changeActiveLayer(command.second.getLayer());
                 drawingSurfaceRedraw();
                 break;
             case ADD_LAYER:
@@ -343,6 +359,7 @@ public class CommandManagerImplementation implements CommandManager, Observer
         switch (command.first) {
             case COMMIT_LAYER_BITMAP_COMMAND:
                 command.second.getLayersBitmapCommands().get(0).redo();
+                changeActiveLayer(command.second.getLayer());
                 drawingSurfaceRedraw();
                 break;
             case ADD_LAYER:
@@ -369,6 +386,8 @@ public class CommandManagerImplementation implements CommandManager, Observer
     {
         mLayerBitmapCommands.add(command.getLayersBitmapCommands().get(0));
         mLayersAdapter.tryAddLayer(command.getLayer());
+
+        changeActiveLayer(command.getLayer());
         layerDialogRefreshView();
         drawingSurfaceRedraw();
     }
@@ -377,6 +396,8 @@ public class CommandManagerImplementation implements CommandManager, Observer
     {
         mLayerBitmapCommands.remove(command.getLayersBitmapCommands().get(0));
         mLayersAdapter.removeLayer(command.getLayer().getLayerID());
+
+        changeActiveLayer(getNextLayerInCommandList());
         layerDialogRefreshView();
         drawingSurfaceRedraw();
     }
@@ -402,6 +423,7 @@ public class CommandManagerImplementation implements CommandManager, Observer
 
         command.setLayersBitmapCommands(result);
 
+        changeActiveLayer(command.getLayer());
         layerDialogRefreshView();
         drawingSurfaceRedraw();
     }
@@ -430,13 +452,21 @@ public class CommandManagerImplementation implements CommandManager, Observer
         mLayerBitmapCommands.remove(result.get(0));
         mLayersAdapter.removeLayer(command.getLayer().getLayerID());
 
+        changeActiveLayer(getNextLayerInCommandList());
         layerDialogRefreshView();
         drawingSurfaceRedraw();
+    }
+
+    private Layer getNextLayerInCommandList()
+    {
+        return mLayerCommandList.getLast().second.getLayer();
     }
 
     private void handleLayerVisibilityChanged(LayerCommand command)
     {
         command.getLayer().setVisible(!command.getLayer().getVisible());
+
+        changeActiveLayer(command.getLayer());
         layerDialogRefreshView();
         drawingSurfaceRedraw();
     }
@@ -444,6 +474,8 @@ public class CommandManagerImplementation implements CommandManager, Observer
     private void handleLayerLockedChanged(LayerCommand command)
     {
         command.getLayer().setLocked(!command.getLayer().getLocked());
+
+        changeActiveLayer(command.getLayer());
         layerDialogRefreshView();
     }
 
@@ -481,6 +513,17 @@ public class CommandManagerImplementation implements CommandManager, Observer
         if(mUpdateTopBarListener != null)
         {
             mUpdateTopBarListener.onRedoEnabled(enable);
+        }
+    }
+
+    private void changeActiveLayer(Layer layer)
+    {
+        if(mChangeActiveLayerListener != null)
+        {
+            for(ChangeActiveLayerEventListener listener : mChangeActiveLayerListener)
+            {
+                listener.onActiveLayerChanged(layer);
+            }
         }
     }
 

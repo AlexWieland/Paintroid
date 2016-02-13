@@ -212,7 +212,13 @@ public class MainActivity extends OptionsMenuActivity {
 
 
         ((CommandManagerImplementation)PaintroidApplication.commandManager)
-                .setUpdateTopBarListener(mTopBar);
+            .setUpdateTopBarListener(mTopBar);
+
+        ((CommandManagerImplementation)PaintroidApplication.commandManager)
+                .addChangeActiveLayerListener(PaintroidApplication.drawingSurface);
+
+        ((CommandManagerImplementation)PaintroidApplication.commandManager)
+                .addChangeActiveLayerListener(LayersDialog.getInstance());
 
         PaintroidApplication.commandManager.commitAddLayerCommand(new LayerCommand(LayersDialog
                 .getInstance().getAdapter()
