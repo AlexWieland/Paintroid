@@ -357,9 +357,11 @@ public final class LayersDialog extends BaseDialog implements OnItemClickListene
 			@Override
 			public void onClick(DialogInterface dialog, int which)
 			{
+                LayerCommand layerCommand = new LayerCommand(mCurrentLayer, mCurrentLayer.getName());
 				mCurrentLayer.setName(input.getText().toString());
 				getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
-				PaintroidApplication.commandManager.commitRenameLayerCommand(new LayerCommand(mCurrentLayer));
+
+				PaintroidApplication.commandManager.commitRenameLayerCommand(layerCommand);
 				refreshView();
 			}
 		});

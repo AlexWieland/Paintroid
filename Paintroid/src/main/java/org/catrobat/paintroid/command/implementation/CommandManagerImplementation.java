@@ -199,13 +199,18 @@ public class CommandManagerImplementation implements CommandManager, Observer
 
             mLayerCommandList.addLast(createLayerCommand(CommandType.LOCK_LAYER, layerCommand));
         }
-
-        drawingSurfaceRedraw();
     }
 
     @Override
-    public void commitRenameLayerCommand(LayerCommand layerCommand) {
+    public void commitRenameLayerCommand(LayerCommand layerCommand)
+    {
+        synchronized (mLayerCommandList)
+        {
+            clearUndoCommandList();
+            enableUndo(true);
 
+            mLayerCommandList.addLast(createLayerCommand(CommandType.RENAME_LAYER, layerCommand));
+        }
     }
 
     private ArrayList<LayerBitmapCommand> layerBitmapCommandToOneElementList (LayerBitmapCommand command)
@@ -350,6 +355,7 @@ public class CommandManagerImplementation implements CommandManager, Observer
                 handleLayerLockedChanged(command.second);
                 break;
             case RENAME_LAYER:
+                handleLayerRename(command.second);
                 break;
         }
     }
@@ -378,6 +384,7 @@ public class CommandManagerImplementation implements CommandManager, Observer
                 handleLayerLockedChanged(command.second);
                 break;
             case RENAME_LAYER:
+                handleLayerRename(command.second);
                 break;
         }
     }
@@ -457,11 +464,6 @@ public class CommandManagerImplementation implements CommandManager, Observer
         drawingSurfaceRedraw();
     }
 
-    private Layer getNextLayerInCommandList()
-    {
-        return mLayerCommandList.getLast().second.getLayer();
-    }
-
     private void handleLayerVisibilityChanged(LayerCommand command)
     {
         command.getLayer().setVisible(!command.getLayer().getVisible());
@@ -477,6 +479,21 @@ public class CommandManagerImplementation implements CommandManager, Observer
 
         changeActiveLayer(command.getLayer());
         layerDialogRefreshView();
+    }
+
+    private void handleLayerRename(LayerCommand command)
+    {
+        String layerName = command.getLayer().getName();
+        command.getLayer().setName(command.getLayerNameHolder());
+        command.setLayerNameHolder(layerName);
+
+        changeActiveLayer(command.getLayer());
+        layerDialogRefreshView();
+    }
+
+    private Layer getNextLayerInCommandList()
+    {
+        return mLayerCommandList.getLast().second.getLayer();
     }
 
     private synchronized void deleteFailedCommand(Command command)

@@ -16,7 +16,7 @@ public class LayerCommand
     private ArrayList<Integer> mListOfMergedLayerIds;
     private ArrayList<LayerBitmapCommand> mLayersBitmapCommands;
 
-    private String previousLayerName;
+    private String mLayerNameHolder;
 
     public LayerCommand(Layer layer)
     {
@@ -30,10 +30,10 @@ public class LayerCommand
         mLayersBitmapCommands = new ArrayList<LayerBitmapCommand>(mListOfMergedLayerIds.size());
     }
 
-    public LayerCommand(Layer layer, String previousLayerName)
+    public LayerCommand(Layer layer, String layerNameHolder)
     {
         this.mLayer = layer;
-        this.previousLayerName = previousLayerName;
+        this.mLayerNameHolder = layerNameHolder;
     }
 
     public Layer getLayer() {
@@ -52,5 +52,13 @@ public class LayerCommand
 
     public ArrayList<LayerBitmapCommand> getLayersBitmapCommands() {
         return mLayersBitmapCommands;
+    }
+
+    public String getLayerNameHolder() {
+        return mLayerNameHolder;
+    }
+
+    public void setLayerNameHolder(String layerNameHolder) {
+        this.mLayerNameHolder = layerNameHolder;
     }
 }
