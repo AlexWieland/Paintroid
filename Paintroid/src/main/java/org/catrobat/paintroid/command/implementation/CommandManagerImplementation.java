@@ -60,7 +60,7 @@ public class CommandManagerImplementation implements CommandManager, Observer
     private RefreshLayerDialogEventListener mRefreshLayerDialogListener;
     private RedrawSurfaceViewEventListener mRedrawSurfaceViewListener;
 
-    public CommandManagerImplementation(DrawSurfaceTrigger drawSurfaceTrigger, LayersAdapter layersAdapter)
+    public CommandManagerImplementation(LayersAdapter layersAdapter)
     {
         mLayerCommandList = new LinkedList<Pair<CommandType, LayerCommand>>();
         mLayerUndoCommandList = new LinkedList<Pair<CommandType, LayerCommand>>();

@@ -200,9 +200,9 @@ public class MainActivity extends OptionsMenuActivity {
 
     private void initCommandManager()
     {
-        PaintroidApplication.commandManager = new CommandManagerImplementation
-                (PaintroidApplication.drawingSurface.getSurfaceViewDrawTrigger()
-                        , LayersDialog.getInstance().getAdapter());
+        PaintroidApplication.commandManager = new CommandManagerImplementation (LayersDialog
+                                                                                .getInstance()
+                                                                                .getAdapter());
 
         ((CommandManagerImplementation)PaintroidApplication.commandManager)
                                         .setRefreshLayerDialogListener(LayersDialog.getInstance());
