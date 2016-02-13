@@ -130,7 +130,6 @@ public class CommandManagerImplementation implements CommandManager, Observer
             {
                 enableUndo(true);
             }
-
         }
 
         drawingSurfaceRedraw();
@@ -144,7 +143,10 @@ public class CommandManagerImplementation implements CommandManager, Observer
             clearUndoCommandList();
             enableUndo(true);
 
+            ArrayList<LayerBitmapCommand> result = layerIdToOneElementBitmapCommandList(layerCommand.getLayer().getLayerID());
             layerCommand.setLayersBitmapCommands(layerIdToOneElementBitmapCommandList(layerCommand.getLayer().getLayerID()));
+
+            mLayerBitmapCommands.remove(result.get(0));
             mLayerCommandList.addLast(createLayerCommand(CommandType.REMOVE_LAYER, layerCommand));
         }
 
@@ -235,7 +237,7 @@ public class CommandManagerImplementation implements CommandManager, Observer
 
             for (LayerBitmapCommand layerBitmapCommand : mLayerBitmapCommands)
             {
-                for(int id: layerIds)
+                for(int id : layerIds)
                 {
                     if (layerBitmapCommand.getLayer().getLayerID() == id) {
                         result.add(layerBitmapCommand);
@@ -261,7 +263,6 @@ public class CommandManagerImplementation implements CommandManager, Observer
         enableRedo(false);
         enableUndo(false);
     }
-
 
     @Override
     public void undo()
@@ -412,9 +413,9 @@ public class CommandManagerImplementation implements CommandManager, Observer
     private void handleRemoveLayer(LayerCommand command)
     {
         mLayerBitmapCommands.remove(command.getLayersBitmapCommands().get(0));
-        mLayersAdapter.removeLayer(command.getLayer().getLayerID());
+        mLayersAdapter.removeLayer(command.getLayer());
 
-        changeActiveLayer(getNextLayerInCommandList());
+        changeActiveLayer(getNextExistingLayerInCommandList(command.getLayer().getLayerID()));
         layerDialogRefreshView();
         drawingSurfaceRedraw();
     }
@@ -434,7 +435,7 @@ public class CommandManagerImplementation implements CommandManager, Observer
 
         for (LayerBitmapCommand bitmapCommand: result)
         {
-            mLayersAdapter.removeLayer(bitmapCommand.getLayer().getLayerID());
+            mLayersAdapter.removeLayer(bitmapCommand.getLayer());
             mLayerBitmapCommands.remove(bitmapCommand);
         }
 
@@ -467,9 +468,9 @@ public class CommandManagerImplementation implements CommandManager, Observer
         command.setLayersBitmapCommands(result);
 
         mLayerBitmapCommands.remove(result.get(0));
-        mLayersAdapter.removeLayer(command.getLayer().getLayerID());
+        mLayersAdapter.removeLayer(command.getLayer());
 
-        changeActiveLayer(getNextLayerInCommandList());
+        changeActiveLayer(getNextExistingLayerInCommandList(command.getLayer().getLayerID()));
         layerDialogRefreshView();
         drawingSurfaceRedraw();
     }
@@ -501,9 +502,28 @@ public class CommandManagerImplementation implements CommandManager, Observer
         layerDialogRefreshView();
     }
 
-    private Layer getNextLayerInCommandList()
+    private Layer getNextExistingLayerInCommandList(int originLayerId)
     {
-        return mLayerCommandList.getLast().second.getLayer();
+        synchronized (mLayerCommandList)
+        {
+            ListIterator<Pair<CommandType, LayerCommand>> iterator = mLayerCommandList.listIterator(mLayerCommandList.size());
+
+            Layer commandsLayer;
+            while (iterator.hasPrevious())
+            {
+                commandsLayer = iterator.previous().second.getLayer();
+
+                if (commandsLayer.getLayerID() != originLayerId )
+                {
+                    if(layerIdToOneElementBitmapCommandList(commandsLayer.getLayerID()).size() == 1)
+                    {
+                        return commandsLayer;
+                    }
+                }
+            }
+
+            return null;
+        }
     }
 
     private synchronized void deleteFailedCommand(Command command)

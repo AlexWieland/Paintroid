@@ -306,7 +306,7 @@ public final class LayersDialog extends BaseDialog implements OnItemClickListene
 			adjacentLayerPosition = currentLayerPosition - 1;
 		}
 
-		mLayerButtonAdapter.removeLayer(mCurrentLayer.getLayerID());
+		mLayerButtonAdapter.removeLayer(mCurrentLayer);
         PaintroidApplication.commandManager.commitRemoveLayerCommand(new LayerCommand(mCurrentLayer));
 
 		selectLayer(mLayerButtonAdapter.getLayer(adjacentLayerPosition));
@@ -436,8 +436,8 @@ public final class LayersDialog extends BaseDialog implements OnItemClickListene
                 layerToMergeIds.add(mCurrentLayer.getLayerID());
                 layerToMergeIds.add(firstLayertoMerge.getLayerID());
 
-                mLayerButtonAdapter.removeLayer(firstLayertoMerge.getLayerID());
-                mLayerButtonAdapter.removeLayer(mCurrentLayer.getLayerID());
+                mLayerButtonAdapter.removeLayer(firstLayertoMerge);
+                mLayerButtonAdapter.removeLayer(mCurrentLayer);
                 selectLayer(layer);
 
 				PaintroidApplication.commandManager.commitMergeLayerCommand(new LayerCommand(mCurrentLayer, layerToMergeIds));
@@ -446,35 +446,6 @@ public final class LayersDialog extends BaseDialog implements OnItemClickListene
 				refreshView();
 			}
 		}
-	}
-
-	public void mergeLayerCalledFromCommand(int LayerToMergeID)
-	{
-		Layer LayerToMerge = mLayerButtonAdapter.getLayer(mLayerButtonAdapter.getPosition(LayerToMergeID));
-		if(mCurrentLayer.getLayerID() != LayerToMerge.getLayerID())
-		{
-			if(!mCurrentLayer.getLocked())
-			{
-				Bitmap mergedBitmap = null;
-				if (mLayerButtonAdapter.getPosition(mCurrentLayer.getLayerID())
-						< mLayerButtonAdapter.getPosition(LayerToMerge.getLayerID()))
-				{
-					mergedBitmap = overlay(LayerToMerge, mCurrentLayer);
-				}
-				else
-				{
-					mergedBitmap =  overlay(mCurrentLayer, LayerToMerge);
-				}
-
-				mCurrentLayer.setOpacity(100);
-				mCurrentLayer.setBitmap(mergedBitmap);
-				mCurrentLayer.setName(mCurrentLayer.getName());
-
-				mLayerButtonAdapter.removeLayer(LayerToMergeID);
-				refreshView();
-			}
-		}
-
 	}
 
 	public static Bitmap overlay(Layer layer1, Layer layer2)
