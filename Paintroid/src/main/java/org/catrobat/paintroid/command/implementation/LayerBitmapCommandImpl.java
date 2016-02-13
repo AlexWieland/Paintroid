@@ -43,8 +43,9 @@ public class LayerBitmapCommandImpl implements LayerBitmapCommand {
             synchronized (mLayer.getLayerCanvas())
             {
                 command.run(mLayer.getLayerCanvas(), mLayer.getBitmap());
-                PaintroidApplication.currentTool.resetInternalState(Tool.StateChange.RESET_INTERNAL_STATE);
             }
+
+            PaintroidApplication.currentTool.resetInternalState(Tool.StateChange.RESET_INTERNAL_STATE);
         }
     }
 
@@ -70,8 +71,9 @@ public class LayerBitmapCommandImpl implements LayerBitmapCommand {
                 synchronized (mLayer.getLayerCanvas())
                 {
                     command.run(mLayer.getLayerCanvas(), mLayer.getBitmap());
-                    PaintroidApplication.currentTool.resetInternalState(Tool.StateChange.RESET_INTERNAL_STATE);
                 }
+
+                PaintroidApplication.currentTool.resetInternalState(Tool.StateChange.RESET_INTERNAL_STATE);
             }
         }
     }
@@ -83,8 +85,9 @@ public class LayerBitmapCommandImpl implements LayerBitmapCommand {
             for (Command command : mCommandList)
             {
                 command.run(mLayer.getLayerCanvas(), mLayer.getBitmap());
-                PaintroidApplication.currentTool.resetInternalState(Tool.StateChange.RESET_INTERNAL_STATE);
             }
+
+            PaintroidApplication.currentTool.resetInternalState(Tool.StateChange.RESET_INTERNAL_STATE);
         }
     }
 
