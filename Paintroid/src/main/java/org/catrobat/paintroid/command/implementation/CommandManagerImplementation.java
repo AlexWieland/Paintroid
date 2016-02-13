@@ -335,9 +335,7 @@ public class CommandManagerImplementation implements CommandManager, Observer
         switch (command.first)
         {
             case COMMIT_LAYER_BITMAP_COMMAND:
-                command.second.getLayersBitmapCommands().get(0).undo();
-                changeActiveLayer(command.second.getLayer());
-                drawingSurfaceRedraw();
+                handleUndoCommitLayerBitmapCommand(command.second);
                 break;
             case ADD_LAYER:
                 handleRemoveLayer(command.second);
@@ -364,9 +362,7 @@ public class CommandManagerImplementation implements CommandManager, Observer
     {
         switch (command.first) {
             case COMMIT_LAYER_BITMAP_COMMAND:
-                command.second.getLayersBitmapCommands().get(0).redo();
-                changeActiveLayer(command.second.getLayer());
-                drawingSurfaceRedraw();
+                handleRedoCommitLayerBitmapCommand(command.second);
                 break;
             case ADD_LAYER:
                 handleAddLayer(command.second);
@@ -387,6 +383,20 @@ public class CommandManagerImplementation implements CommandManager, Observer
                 handleLayerRename(command.second);
                 break;
         }
+    }
+
+    private void handleUndoCommitLayerBitmapCommand(LayerCommand command)
+    {
+        command.getLayersBitmapCommands().get(0).undo();
+        changeActiveLayer(command.getLayer());
+        drawingSurfaceRedraw();
+    }
+
+    private void handleRedoCommitLayerBitmapCommand(LayerCommand command)
+    {
+        command.getLayersBitmapCommands().get(0).redo();
+        changeActiveLayer(command.getLayer());
+        drawingSurfaceRedraw();
     }
 
     private void handleAddLayer(LayerCommand command)
