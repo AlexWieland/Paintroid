@@ -200,9 +200,7 @@ public class MainActivity extends OptionsMenuActivity {
 
     private void initCommandManager()
     {
-        PaintroidApplication.commandManager = new CommandManagerImplementation (LayersDialog
-                                                                                .getInstance()
-                                                                                .getAdapter());
+        PaintroidApplication.commandManager = new CommandManagerImplementation ();
 
         ((CommandManagerImplementation)PaintroidApplication.commandManager)
                                         .setRefreshLayerDialogListener(LayersDialog.getInstance());
@@ -219,6 +217,10 @@ public class MainActivity extends OptionsMenuActivity {
 
         ((CommandManagerImplementation)PaintroidApplication.commandManager)
                 .addChangeActiveLayerListener(LayersDialog.getInstance());
+
+        ((CommandManagerImplementation)PaintroidApplication.commandManager)
+                .setLayerEventListener(LayersDialog.getInstance().getAdapter());
+
 
         PaintroidApplication.commandManager.commitAddLayerCommand(new LayerCommand(LayersDialog
                 .getInstance().getAdapter()

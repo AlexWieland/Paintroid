@@ -25,6 +25,7 @@ import org.catrobat.paintroid.command.Command;
 import org.catrobat.paintroid.command.CommandManager;
 import org.catrobat.paintroid.command.LayerBitmapCommand;
 import org.catrobat.paintroid.eventlistener.ChangeActiveLayerEventListener;
+import org.catrobat.paintroid.eventlistener.LayerEventListener;
 import org.catrobat.paintroid.eventlistener.RedrawSurfaceViewEventListener;
 import org.catrobat.paintroid.eventlistener.RefreshLayerDialogEventListener;
 import org.catrobat.paintroid.eventlistener.UpdateTopBarEventListener;
@@ -55,19 +56,18 @@ public class CommandManagerImplementation implements CommandManager, Observer
     private LinkedList<Pair<CommandType, LayerCommand>> mLayerCommandList;
     private LinkedList<Pair<CommandType, LayerCommand>> mLayerUndoCommandList;
     private ArrayList<LayerBitmapCommand> mLayerBitmapCommands;
-    private LayersAdapter mLayersAdapter;
 
     private RefreshLayerDialogEventListener mRefreshLayerDialogListener;
     private RedrawSurfaceViewEventListener mRedrawSurfaceViewListener;
     private UpdateTopBarEventListener mUpdateTopBarListener;
     private ArrayList<ChangeActiveLayerEventListener> mChangeActiveLayerListener;
+    private LayerEventListener mLayerEventListener;
 
-    public CommandManagerImplementation(LayersAdapter layersAdapter)
+    public CommandManagerImplementation()
     {
         mLayerCommandList = new LinkedList<Pair<CommandType, LayerCommand>>();
         mLayerUndoCommandList = new LinkedList<Pair<CommandType, LayerCommand>>();
         mLayerBitmapCommands = new ArrayList<LayerBitmapCommand>();
-        mLayersAdapter = layersAdapter;
     }
 
     public void setRefreshLayerDialogListener(RefreshLayerDialogEventListener listener)
@@ -93,6 +93,11 @@ public class CommandManagerImplementation implements CommandManager, Observer
         }
 
         mChangeActiveLayerListener.add(listener);
+    }
+
+    public void setLayerEventListener(LayerEventListener listener)
+    {
+        mLayerEventListener = listener;
     }
 
     @Override
@@ -403,7 +408,7 @@ public class CommandManagerImplementation implements CommandManager, Observer
     private void handleAddLayer(LayerCommand command)
     {
         mLayerBitmapCommands.add(command.getLayersBitmapCommands().get(0));
-        mLayersAdapter.tryAddLayer(command.getLayer());
+        addLayer(command.getLayer());
 
         changeActiveLayer(command.getLayer());
         layerDialogRefreshView();
@@ -413,7 +418,7 @@ public class CommandManagerImplementation implements CommandManager, Observer
     private void handleRemoveLayer(LayerCommand command)
     {
         mLayerBitmapCommands.remove(command.getLayersBitmapCommands().get(0));
-        mLayersAdapter.removeLayer(command.getLayer());
+        removeLayer(command.getLayer());
 
         changeActiveLayer(getNextExistingLayerInCommandList(command.getLayer().getLayerID()));
         layerDialogRefreshView();
@@ -428,14 +433,14 @@ public class CommandManagerImplementation implements CommandManager, Observer
      */
     private void handleMerge(LayerCommand command)
     {
-        mLayersAdapter.tryAddLayer(command.getLayer());
+        addLayer(command.getLayer());
         mLayerBitmapCommands.add(command.getLayersBitmapCommands().get(0));
 
         ArrayList<LayerBitmapCommand> result = getLayerBitmapCommands(command.getLayersToMerge());
 
         for (LayerBitmapCommand bitmapCommand: result)
         {
-            mLayersAdapter.removeLayer(bitmapCommand.getLayer());
+            removeLayer(bitmapCommand.getLayer());
             mLayerBitmapCommands.remove(bitmapCommand);
         }
 
@@ -459,7 +464,7 @@ public class CommandManagerImplementation implements CommandManager, Observer
         while (iterator.hasNext())
         {
             bitmapCommand = iterator.next();
-            mLayersAdapter.tryAddLayer(bitmapCommand.getLayer());
+            addLayer(bitmapCommand.getLayer());
             mLayerBitmapCommands.add(bitmapCommand);
             iterator.remove();
         }
@@ -468,7 +473,7 @@ public class CommandManagerImplementation implements CommandManager, Observer
         command.setLayersBitmapCommands(result);
 
         mLayerBitmapCommands.remove(result.get(0));
-        mLayersAdapter.removeLayer(command.getLayer());
+        removeLayer(command.getLayer());
 
         changeActiveLayer(getNextExistingLayerInCommandList(command.getLayer().getLayerID()));
         layerDialogRefreshView();
@@ -571,6 +576,22 @@ public class CommandManagerImplementation implements CommandManager, Observer
             {
                 listener.onActiveLayerChanged(layer);
             }
+        }
+    }
+
+    private void removeLayer(Layer layer)
+    {
+        if(mLayerEventListener != null)
+        {
+            mLayerEventListener.onLayerRemoved(layer);
+        }
+    }
+
+    private void addLayer(Layer layer)
+    {
+        if(mLayerEventListener != null)
+        {
+            mLayerEventListener.onLayerAdded(layer);
         }
     }
 
