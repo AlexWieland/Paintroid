@@ -70,7 +70,7 @@ public class LayersAdapter extends BaseAdapter implements LayerEventListener{
 
     public Layer createLayerForBitmap(Bitmap bitmap)
     {
-        Layer layer = new Layer(mLayerCounter, bitmap, PaintroidApplication.drawingSurface.getWorkingCanvas());
+        Layer layer = new Layer(mLayerCounter, bitmap, 0);
         mLayerList.add(0, layer);
         mLayerCounter++;
         notifyDataSetChanged();
@@ -135,7 +135,7 @@ public class LayersAdapter extends BaseAdapter implements LayerEventListener{
                     ,drawingSurface.getBitmapHeight()
                     ,Bitmap.Config.ARGB_8888);
 
-            Layer layer = new Layer(mLayerCounter, image, PaintroidApplication.drawingSurface.getWorkingCanvas());
+            Layer layer = new Layer(mLayerCounter, image, 0);
             mLayerList.add(0, layer);
             PaintroidApplication.commandManager.commitAddLayerCommand(new LayerCommand(layer));
             mLayerCounter++;
@@ -234,7 +234,7 @@ public class LayersAdapter extends BaseAdapter implements LayerEventListener{
         if(mLayerList.size() < mMaxLayer)
         {
             Bitmap image = getLayer(currentLayer).getBitmap();
-            mLayerList.add(0,new Layer(mLayerCounter, image.copy(image.getConfig(), true), PaintroidApplication.drawingSurface.getWorkingCanvas()));
+            mLayerList.add(0,new Layer(mLayerCounter, image.copy(image.getConfig(), true), 0));
 
             notifyDataSetChanged();
             return true;

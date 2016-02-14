@@ -7,34 +7,66 @@ public class Layer {
     private static final String LAYER_PREFIX = "Layer ";
 
     private int mLayerID;
-    private int mOpacity;
-    private Bitmap mBitmap;
     private String mLayerName;
-    private boolean mIsLocked;
-    private boolean mIsVisible;
-    private boolean mIsSelected;
+
+    private Bitmap mBitmap;
     private Canvas mLayerCanvas;
 
+    private int mOpacity;
+    private boolean mIsLocked;
+    private boolean mIsVisible;
 
-    public void setSelected(boolean toSet)
+    private int mListPosition;
+    private boolean mIsSelected;
+
+    public Layer(int layer_id, Bitmap bitmap, int listPosition)
     {
-        mIsSelected = toSet;
-    }
-
-    public boolean getSelected()
-    {
-        return mIsSelected;
-    }
-
-    public Layer(int layer_id, Bitmap bitmap, Canvas canvas) {
         mLayerID = layer_id;
+        mLayerName = LAYER_PREFIX + layer_id;
+
         mBitmap = bitmap;
         mLayerCanvas = new Canvas(mBitmap);
-        setSelected(false);
-        mLayerName = LAYER_PREFIX + layer_id;
+
+        mOpacity = 100;
         mIsLocked = false;
         mIsVisible = true;
-        mOpacity = 100;
+
+        mListPosition = listPosition;
+        mIsSelected = false;
+    }
+
+    public int getLayerID()
+    {
+        return mLayerID;
+    }
+
+    public Bitmap getBitmap()
+    {
+        return mBitmap;
+    }
+
+    public String getName()
+    {
+        return mLayerName;
+    }
+
+    public void setName(String layerName)
+    {
+        if(layerName != null && layerName.length()>0)
+        {
+            mLayerName = layerName;
+        }
+    }
+
+    public void setBitmap(Bitmap bitmap)
+    {
+        mBitmap = bitmap;
+        mLayerCanvas.setBitmap(bitmap);
+    }
+
+    public Canvas getLayerCanvas()
+    {
+        return mLayerCanvas;
     }
 
     public void setOpacity(int newOpacity)
@@ -72,43 +104,24 @@ public class Layer {
         return mIsVisible;
     }
 
-    public String getName()
+    public void setListPosition(int listPosition)
     {
-        return mLayerName;
+        this.mListPosition = listPosition;
     }
 
-    public void setName(String layerName)
+    public int getListPosition()
     {
-        if(layerName != null && layerName.length()>0)
-        {
-            mLayerName = layerName;
-        }
+        return mListPosition;
     }
 
-    public int getLayerID()
+    public void setSelected(boolean toSet)
     {
-        return mLayerID;
+        mIsSelected = toSet;
     }
 
-    public Bitmap getBitmap()
+    public boolean getSelected()
     {
-        return mBitmap;
-    }
-
-    public void setBitmap(Bitmap bitmap)
-    {
-        mBitmap = bitmap;
-        mLayerCanvas.setBitmap(bitmap);
-    }
-
-    public Canvas getLayerCanvas()
-    {
-        return mLayerCanvas;
-    }
-
-    public Layer getLayer()
-    {
-        return this;
+        return mIsSelected;
     }
 
     public void recycleBitmap()
