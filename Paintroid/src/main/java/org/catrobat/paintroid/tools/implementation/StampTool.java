@@ -286,27 +286,43 @@ public class StampTool extends BaseToolWithRectangleShape {
     }
 
     private void copy() {
-        if (mCreateAndSetBitmapAsync.getStatus() != AsyncTask.Status.RUNNING) {
-            mCreateAndSetBitmapAsync = new CreateAndSetBitmapAsyncTask();
-            mCreateAndSetBitmapAsync.execute();
+        int bitmapHeight = PaintroidApplication.drawingSurface
+                .getBitmapHeight();
+        int bitmapWidth = PaintroidApplication.drawingSurface.getBitmapWidth();
+        if (!((mToolPosition.x - mBoxWidth / 2 > bitmapWidth) || (mToolPosition.y - mBoxHeight / 2 > bitmapHeight)
+                || (mToolPosition.x + mBoxWidth / 2 < 0) || (mToolPosition.y + mBoxHeight / 2 < 0))) {
+
+            if (mCreateAndSetBitmapAsync.getStatus() != AsyncTask.Status.RUNNING) {
+                mCreateAndSetBitmapAsync = new CreateAndSetBitmapAsyncTask();
+                mCreateAndSetBitmapAsync.execute();
+            }
+            mAttributeButton1.setImageResource(R.drawable.icon_menu_stamp_paste);
+            if (!mAttributeButton2.isEnabled()) {
+                mAttributeButton2.setEnabled(true);
+            }
+            mAttributeButton2.setImageResource(R.drawable.icon_menu_stamp_clear);
         }
-        mAttributeButton1.setImageResource(R.drawable.icon_menu_stamp_paste);
-        if (!mAttributeButton2.isEnabled()) {
-            mAttributeButton2.setEnabled(true);
-        }
-        mAttributeButton2.setImageResource(R.drawable.icon_menu_stamp_clear);
     }
 
     private void paste() {
         Point intPosition = new Point((int) mToolPosition.x,
                 (int) mToolPosition.y);
-        Command command = new StampCommand(mDrawingBitmap, intPosition,
-                mBoxWidth, mBoxHeight, mBoxRotation);
 
-        ((StampCommand) command).addObserver(this);
-        IndeterminateProgressDialog.getInstance().show();
-        Layer layer = PaintroidApplication.drawingSurface.getCurrentLayer();
-        PaintroidApplication.commandManager.commitCommandToLayer(new LayerCommand(layer), command);
+        int bitmapHeight = PaintroidApplication.drawingSurface
+                .getBitmapHeight();
+        int bitmapWidth = PaintroidApplication.drawingSurface.getBitmapWidth();
+        if (!((mToolPosition.x - mBoxWidth / 2 > bitmapWidth) || (mToolPosition.y - mBoxHeight / 2 > bitmapHeight)
+                || (mToolPosition.x + mBoxWidth / 2 < 0) || (mToolPosition.y + mBoxHeight / 2 < 0))) {
+
+
+            Command command = new StampCommand(mDrawingBitmap, intPosition,
+                    mBoxWidth, mBoxHeight, mBoxRotation);
+
+            ((StampCommand) command).addObserver(this);
+            IndeterminateProgressDialog.getInstance().show();
+            Layer layer = PaintroidApplication.drawingSurface.getCurrentLayer();
+            PaintroidApplication.commandManager.commitCommandToLayer(new LayerCommand(layer), command);
+        }
     }
 
     @Override

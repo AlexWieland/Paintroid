@@ -46,12 +46,14 @@ public class DrawTool extends BaseTool {
     protected final Path pathToDraw;
     protected PointF mInitialEventCoordinate;
     protected final PointF movedDistance;
+    protected boolean pathInsideBitmap;
 
     public DrawTool(Context context, ToolType toolType) {
         super(context, toolType);
         pathToDraw = new Path();
         pathToDraw.incReserve(1);
         movedDistance = new PointF(0f, 0f);
+        pathInsideBitmap = false;
     }
 
     @Override
@@ -75,6 +77,13 @@ public class DrawTool extends BaseTool {
         mPreviousEventCoordinate = new PointF(coordinate.x, coordinate.y);
         pathToDraw.moveTo(coordinate.x, coordinate.y);
         movedDistance.set(0, 0);
+        pathInsideBitmap = false;
+
+        if ((coordinate.x < PaintroidApplication.drawingSurface.getBitmapWidth()) && (coordinate.y < PaintroidApplication.drawingSurface
+                .getBitmapHeight()) && (coordinate.x > 0) && (coordinate.y > 0)) {
+            pathInsideBitmap = true;
+        }
+
         return true;
     }
 
@@ -90,6 +99,11 @@ public class DrawTool extends BaseTool {
                 movedDistance.y + Math.abs(coordinate.y - mPreviousEventCoordinate.y));
         mPreviousEventCoordinate.set(coordinate.x, coordinate.y);
 
+        if (pathInsideBitmap == false && (coordinate.x < PaintroidApplication.drawingSurface.getBitmapWidth()) &&
+                (coordinate.y < PaintroidApplication.drawingSurface.getBitmapHeight()) && (coordinate.x > 0) && (coordinate.y > 0)) {
+            pathInsideBitmap = true;
+        }
+
         return true;
     }
 
@@ -99,6 +113,12 @@ public class DrawTool extends BaseTool {
                 || coordinate == null) {
             return false;
         }
+
+        if (pathInsideBitmap == false && (coordinate.x < PaintroidApplication.drawingSurface.getBitmapWidth()) &&
+                (coordinate.y < PaintroidApplication.drawingSurface.getBitmapHeight()) && (coordinate.x > 0) && (coordinate.y > 0)) {
+            pathInsideBitmap = true;
+        }
+
         movedDistance.set(
                 movedDistance.x
                         + Math.abs(coordinate.x - mPreviousEventCoordinate.x),
@@ -116,12 +136,19 @@ public class DrawTool extends BaseTool {
 
     protected boolean addPathCommand(PointF coordinate, Layer layer) {
         pathToDraw.lineTo(coordinate.x, coordinate.y);
+        if (!pathInsideBitmap) {return false;}
         Command command = new PathCommand(mBitmapPaint, pathToDraw);
         PaintroidApplication.commandManager.commitCommandToLayer(new LayerCommand(layer), command);
         return true;
     }
 
     protected boolean addPointCommand(PointF coordinate, Layer layer) {
+        int bitmapHeight = PaintroidApplication.drawingSurface.getBitmapHeight();
+        int bitmapWidth = PaintroidApplication.drawingSurface.getBitmapWidth();
+        if ((coordinate.x > bitmapWidth) || (coordinate.y > bitmapHeight)
+                || (coordinate.x < 0) || (coordinate.y < 0)) {
+            return false;
+        }
         Command command = new PointCommand(mBitmapPaint, coordinate);
         PaintroidApplication.commandManager.commitCommandToLayer(new LayerCommand(layer), command);
         return true;
