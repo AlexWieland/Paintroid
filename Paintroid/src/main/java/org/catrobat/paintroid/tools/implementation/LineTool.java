@@ -38,6 +38,7 @@ public class LineTool extends BaseTool {
 
     protected PointF mInitialEventCoordinate;
     protected PointF mCurrentCoordinate;
+    protected boolean pathInsideBitmap;
 
     public LineTool(Context context, ToolType toolType) {
         super(context, toolType);
@@ -72,6 +73,12 @@ public class LineTool extends BaseTool {
         }
         mInitialEventCoordinate = new PointF(coordinate.x, coordinate.y);
         mPreviousEventCoordinate = new PointF(coordinate.x, coordinate.y);
+        pathInsideBitmap = false;
+
+        if ((coordinate.x < PaintroidApplication.drawingSurface.getBitmapWidth()) && (coordinate.y < PaintroidApplication.drawingSurface
+                .getBitmapHeight()) && (coordinate.x > 0) && (coordinate.y > 0)) {
+            pathInsideBitmap = true;
+        }
 
         return true;
     }
@@ -79,7 +86,10 @@ public class LineTool extends BaseTool {
     @Override
     public boolean handleMove(PointF coordinate) {
         mCurrentCoordinate = new PointF(coordinate.x, coordinate.y);
-
+        if (pathInsideBitmap == false && (coordinate.x < PaintroidApplication.drawingSurface.getBitmapWidth()) &&
+                (coordinate.y < PaintroidApplication.drawingSurface.getBitmapHeight()) && (coordinate.x > 0) && (coordinate.y > 0)) {
+            pathInsideBitmap = true;
+        }
         return true;
     }
 
@@ -92,9 +102,17 @@ public class LineTool extends BaseTool {
         Path finalPath = new Path();
         finalPath.moveTo(mInitialEventCoordinate.x, mInitialEventCoordinate.y);
         finalPath.lineTo(coordinate.x, coordinate.y);
-        Command command = new PathCommand(mBitmapPaint, finalPath);
-        Layer layer = PaintroidApplication.drawingSurface.getCurrentLayer();
-        PaintroidApplication.commandManager.commitCommandToLayer(new LayerCommand(layer), command);
+
+        if (pathInsideBitmap == false && (coordinate.x < PaintroidApplication.drawingSurface.getBitmapWidth()) &&
+                (coordinate.y < PaintroidApplication.drawingSurface.getBitmapHeight()) && (coordinate.x > 0) && (coordinate.y > 0)) {
+            pathInsideBitmap = true;
+        }
+
+        if (pathInsideBitmap) {
+            Command command = new PathCommand(mBitmapPaint, finalPath);
+            Layer layer = PaintroidApplication.drawingSurface.getCurrentLayer();
+            PaintroidApplication.commandManager.commitCommandToLayer(new LayerCommand(layer), command);
+        }
         return true;
     }
 

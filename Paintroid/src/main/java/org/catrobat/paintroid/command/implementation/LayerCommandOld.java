@@ -175,7 +175,11 @@ public class LayerCommandOld extends BaseCommand
 
         if (adapter.getCount() > 1)
         {
+<<<<<<< HEAD
             LayersDialog.getInstance().getAdapter().removeLayer(layer);
+=======
+           // LayersDialog.getInstance().getAdapter().removeLayer(layer.getLayerID());
+>>>>>>> 02e48d2ae6b2fa7edaa916f9ea19521eeec7d65b
             LayersDialog.getInstance().refreshView();
             LayersDialog.getInstance().selectLayer(LayersDialog.getInstance().getAdapter().getLayer(0));
         }
