@@ -433,9 +433,6 @@ public class CommandManagerImplementation implements CommandManager, Observer
      */
     private void handleMerge(LayerCommand command)
     {
-        addLayer(command.getLayer());
-        mLayerBitmapCommands.add(command.getLayersBitmapCommands().get(0));
-
         ArrayList<LayerBitmapCommand> result = getLayerBitmapCommands(command.getLayersToMerge());
 
         for (LayerBitmapCommand bitmapCommand: result)
@@ -443,6 +440,9 @@ public class CommandManagerImplementation implements CommandManager, Observer
             removeLayer(bitmapCommand.getLayer());
             mLayerBitmapCommands.remove(bitmapCommand);
         }
+
+        addLayer(command.getLayer());
+        mLayerBitmapCommands.add(command.getLayersBitmapCommands().get(0));
 
         command.setLayersBitmapCommands(result);
 
@@ -459,6 +459,11 @@ public class CommandManagerImplementation implements CommandManager, Observer
      */
     private void handleUnmerge(LayerCommand command)
     {
+        ArrayList<LayerBitmapCommand> result = layerIdToOneElementBitmapCommandList(command.getLayer().getLayerID());
+
+        mLayerBitmapCommands.remove(result.get(0));
+        removeLayer(command.getLayer());
+
         ListIterator<LayerBitmapCommand> iterator = command.getLayersBitmapCommands().listIterator();
         LayerBitmapCommand bitmapCommand;
         while (iterator.hasNext())
@@ -469,11 +474,7 @@ public class CommandManagerImplementation implements CommandManager, Observer
             iterator.remove();
         }
 
-        ArrayList<LayerBitmapCommand> result = layerIdToOneElementBitmapCommandList(command.getLayer().getLayerID());
         command.setLayersBitmapCommands(result);
-
-        mLayerBitmapCommands.remove(result.get(0));
-        removeLayer(command.getLayer());
 
         changeActiveLayer(getNextExistingLayerInCommandList(command.getLayer().getLayerID()));
         layerDialogRefreshView();

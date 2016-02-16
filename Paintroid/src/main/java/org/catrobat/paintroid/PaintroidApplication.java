@@ -24,8 +24,10 @@ import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.graphics.Point;
 import android.net.Uri;
 import android.util.Log;
+import android.view.WindowManager;
 
 import com.actionbarsherlock.view.Menu;
 
@@ -52,6 +54,8 @@ public class PaintroidApplication extends Application {
 	public static Uri savedPictureUri = null;
 	public static boolean saveCopy = false;
 
+    public static int MAX_LAYER_COUNT = 5;
+
 	@Override
 	public void onCreate()
     {
@@ -76,4 +80,12 @@ public class PaintroidApplication extends Application {
 
 		return versionName;
 	}
+
+    public static Point getDisplaySize()
+    {
+        WindowManager manager = (WindowManager) applicationContext.getSystemService(Context.WINDOW_SERVICE);
+        Point size = new Point();
+        manager.getDefaultDisplay().getSize(size);
+        return size;
+    }
 }

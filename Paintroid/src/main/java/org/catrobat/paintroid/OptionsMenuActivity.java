@@ -22,7 +22,6 @@ package org.catrobat.paintroid;
 import java.io.File;
 
 import org.catrobat.paintroid.command.Command;
-import org.catrobat.paintroid.command.implementation.LayerCommandOld;
 import org.catrobat.paintroid.dialog.IndeterminateProgressDialog;
 import org.catrobat.paintroid.dialog.InfoDialog;
 import org.catrobat.paintroid.dialog.InfoDialog.DialogType;
@@ -333,7 +332,7 @@ public abstract class OptionsMenuActivity extends SherlockFragmentActivity {
                     PaintroidApplication.isPlainImage = false;
                     PaintroidApplication.isSaved = false;
                     PaintroidApplication.savedPictureUri = null;
-                    Command commandLoad = new LayerCommandOld(LayerCommandOld.LayerAction.INSERT_IMAGE, LayersDialog.getInstance().getCurrentLayer(), null);
+                    //TODO: insert image layer command
                     //PaintroidApplication.commandManager.commitCommand(commandLoad);
                     break;
 
@@ -342,7 +341,7 @@ public abstract class OptionsMenuActivity extends SherlockFragmentActivity {
                     PaintroidApplication.isPlainImage = false;
                     PaintroidApplication.isSaved = false;
                     PaintroidApplication.savedPictureUri = null;
-                    Command commandCamera = new LayerCommandOld(LayerCommandOld.LayerAction.INSERT_IMAGE, LayersDialog.getInstance().getCurrentLayer(), null);
+                    //TODO: insert image layer command
                     //PaintroidApplication.commandManager.commitCommand(commandCamera);
                     break;
             }

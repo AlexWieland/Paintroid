@@ -16,10 +16,9 @@ public class Layer {
     private boolean mIsLocked;
     private boolean mIsVisible;
 
-    private int mListPosition;
     private boolean mIsSelected;
 
-    public Layer(int layer_id, Bitmap bitmap, int listPosition)
+    public Layer(int layer_id, Bitmap bitmap)
     {
         mLayerID = layer_id;
         mLayerName = LAYER_PREFIX + layer_id;
@@ -31,7 +30,6 @@ public class Layer {
         mIsLocked = false;
         mIsVisible = true;
 
-        mListPosition = listPosition;
         mIsSelected = false;
     }
 
@@ -102,16 +100,6 @@ public class Layer {
     public boolean getVisible()
     {
         return mIsVisible;
-    }
-
-    public void setListPosition(int listPosition)
-    {
-        this.mListPosition = listPosition;
-    }
-
-    public int getListPosition()
-    {
-        return mListPosition;
     }
 
     public void setSelected(boolean toSet)

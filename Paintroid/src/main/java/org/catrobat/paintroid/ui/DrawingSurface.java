@@ -243,6 +243,7 @@ public class DrawingSurface extends SurfaceView implements SurfaceHolder.Callbac
             mCurrentLayer.setBitmap(bitmap);
             mWorkingBitmapCanvas.setBitmap(bitmap);
             mWorkingBitmapRect.set(0, 0, bitmap.getWidth(), bitmap.getHeight());
+            //TODO: insert image layer command
             //PaintroidApplication.commandManager.commitCommand(new LayerCommandOld(LayerCommandOld.LayerAction.INSERT_IMAGE));
         }
     }

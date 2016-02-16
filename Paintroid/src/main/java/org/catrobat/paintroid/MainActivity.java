@@ -142,7 +142,7 @@ public class MainActivity extends OptionsMenuActivity {
         mTopBar = new TopBar(this, PaintroidApplication.openedFromCatroid);
         mBottomBar = new BottomBar(this);
 
-        LayersDialog.init(this, new Layer(0, Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888), 0));
+        LayersDialog.init(this);
 
         initCommandManager();
 
