@@ -67,9 +67,9 @@ public class LineTool extends BaseTool {
     }
 
     @Override
-    public boolean handleDown(PointF coordinate) {
+    public void handleDown(PointF coordinate) {
         if (coordinate == null) {
-            return false;
+            return;
         }
         mInitialEventCoordinate = new PointF(coordinate.x, coordinate.y);
         mPreviousEventCoordinate = new PointF(coordinate.x, coordinate.y);
@@ -79,25 +79,22 @@ public class LineTool extends BaseTool {
                 .getBitmapHeight()) && (coordinate.x > 0) && (coordinate.y > 0)) {
             pathInsideBitmap = true;
         }
-
-        return true;
     }
 
     @Override
-    public boolean handleMove(PointF coordinate) {
+    public void handleMove(PointF coordinate) {
         mCurrentCoordinate = new PointF(coordinate.x, coordinate.y);
         if (pathInsideBitmap == false && (coordinate.x < PaintroidApplication.drawingSurface.getBitmapWidth()) &&
                 (coordinate.y < PaintroidApplication.drawingSurface.getBitmapHeight()) && (coordinate.x > 0) && (coordinate.y > 0)) {
             pathInsideBitmap = true;
         }
-        return true;
     }
 
     @Override
-    public boolean handleUp(PointF coordinate) {
+    public void handleUp(PointF coordinate) {
         if (mInitialEventCoordinate == null || mPreviousEventCoordinate == null
                 || coordinate == null) {
-            return false;
+            return;
         }
         Path finalPath = new Path();
         finalPath.moveTo(mInitialEventCoordinate.x, mInitialEventCoordinate.y);
@@ -108,12 +105,14 @@ public class LineTool extends BaseTool {
             pathInsideBitmap = true;
         }
 
-        if (pathInsideBitmap) {
+        if (pathInsideBitmap)
+        {
             Command command = new PathCommand(mBitmapPaint, finalPath);
             Layer layer = PaintroidApplication.drawingSurface.getCurrentLayer();
             PaintroidApplication.commandManager.commitCommandToLayer(new LayerCommand(layer), command);
         }
-        return true;
+
+        PaintroidApplication.drawingSurface.getSurfaceViewDrawTrigger().redraw();
     }
 
     @Override

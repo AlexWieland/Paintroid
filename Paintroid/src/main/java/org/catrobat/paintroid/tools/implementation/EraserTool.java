@@ -52,8 +52,9 @@ public class EraserTool extends DrawTool {
     }
 
     @Override
-    public boolean handleDown(PointF coordinate) {
-        return (super.handleDown(coordinate));
+    public void handleDown(PointF coordinate)
+    {
+        super.handleDown(coordinate);
     }
 
     @Override
@@ -88,13 +89,13 @@ public class EraserTool extends DrawTool {
     }
 
     @Override
-    public boolean handleMove(PointF coordinate) {
-        return (super.handleMove(coordinate));
+    public void handleMove(PointF coordinate) {
+        super.handleMove(coordinate);
     }
 
     @Override
-    public boolean handleUp(PointF coordinate) {
-        return (super.handleUp(coordinate));
+    public void handleUp(PointF coordinate) {
+        super.handleUp(coordinate);
     }
 
     @Override

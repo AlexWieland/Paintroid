@@ -69,9 +69,9 @@ public class DrawTool extends BaseTool {
     }
 
     @Override
-    public boolean handleDown(PointF coordinate) {
+    public void handleDown(PointF coordinate) {
         if (coordinate == null) {
-            return false;
+            return;
         }
         mInitialEventCoordinate = new PointF(coordinate.x, coordinate.y);
         mPreviousEventCoordinate = new PointF(coordinate.x, coordinate.y);
@@ -83,15 +83,13 @@ public class DrawTool extends BaseTool {
                 .getBitmapHeight()) && (coordinate.x > 0) && (coordinate.y > 0)) {
             pathInsideBitmap = true;
         }
-
-        return true;
     }
 
     @Override
-    public boolean handleMove(PointF coordinate) {
+    public void handleMove(PointF coordinate) {
         if (mInitialEventCoordinate == null || mPreviousEventCoordinate == null
                 || coordinate == null) {
-            return false;
+            return;
         }
         pathToDraw.quadTo(mPreviousEventCoordinate.x, mPreviousEventCoordinate.y, coordinate.x, coordinate.y);
         pathToDraw.incReserve(1);
@@ -103,55 +101,58 @@ public class DrawTool extends BaseTool {
                 (coordinate.y < PaintroidApplication.drawingSurface.getBitmapHeight()) && (coordinate.x > 0) && (coordinate.y > 0)) {
             pathInsideBitmap = true;
         }
-
-        return true;
     }
 
     @Override
-    public boolean handleUp(PointF coordinate) {
+    public void handleUp(PointF coordinate) {
         if (mInitialEventCoordinate == null || mPreviousEventCoordinate == null
                 || coordinate == null) {
-            return false;
+            return;
         }
 
-        if (pathInsideBitmap == false && (coordinate.x < PaintroidApplication.drawingSurface.getBitmapWidth()) &&
-                (coordinate.y < PaintroidApplication.drawingSurface.getBitmapHeight()) && (coordinate.x > 0) && (coordinate.y > 0)) {
+        if (pathInsideBitmap == false && (coordinate.x < PaintroidApplication.drawingSurface.getBitmapWidth())
+                && (coordinate.y < PaintroidApplication.drawingSurface.getBitmapHeight())
+                && (coordinate.x > 0) && (coordinate.y > 0))
+        {
             pathInsideBitmap = true;
         }
 
-        movedDistance.set(
-                movedDistance.x
-                        + Math.abs(coordinate.x - mPreviousEventCoordinate.x),
-                movedDistance.y
-                        + Math.abs(coordinate.y - mPreviousEventCoordinate.y));
-        boolean returnValue;
-        if (MOVE_TOLERANCE < movedDistance.x
-                || MOVE_TOLERANCE < movedDistance.y) {
-            returnValue = addPathCommand(coordinate, PaintroidApplication.drawingSurface.getCurrentLayer());
-        } else {
-            returnValue = addPointCommand(mInitialEventCoordinate, PaintroidApplication.drawingSurface.getCurrentLayer());
+        movedDistance.set(movedDistance.x + Math.abs(coordinate.x - mPreviousEventCoordinate.x),
+                movedDistance.y + Math.abs(coordinate.y - mPreviousEventCoordinate.y));
+
+        if (MOVE_TOLERANCE < movedDistance.x || MOVE_TOLERANCE < movedDistance.y)
+        {
+            addPathCommand(coordinate, PaintroidApplication.drawingSurface.getCurrentLayer());
         }
-        return returnValue;
+        else
+        {
+            addPointCommand(mInitialEventCoordinate, PaintroidApplication.drawingSurface.getCurrentLayer());
+        }
     }
 
-    protected boolean addPathCommand(PointF coordinate, Layer layer) {
+    protected void addPathCommand(PointF coordinate, Layer layer)
+    {
         pathToDraw.lineTo(coordinate.x, coordinate.y);
-        if (!pathInsideBitmap) {return false;}
+        if (!pathInsideBitmap)
+        {
+            PaintroidApplication.currentTool.resetInternalState(StateChange.RESET_INTERNAL_STATE);
+            PaintroidApplication.drawingSurface.getSurfaceViewDrawTrigger().redraw();
+            return;
+        }
         Command command = new PathCommand(mBitmapPaint, pathToDraw);
         PaintroidApplication.commandManager.commitCommandToLayer(new LayerCommand(layer), command);
-        return true;
     }
 
-    protected boolean addPointCommand(PointF coordinate, Layer layer) {
-        int bitmapHeight = PaintroidApplication.drawingSurface.getBitmapHeight();
-        int bitmapWidth = PaintroidApplication.drawingSurface.getBitmapWidth();
-        if ((coordinate.x > bitmapWidth) || (coordinate.y > bitmapHeight)
-                || (coordinate.x < 0) || (coordinate.y < 0)) {
-            return false;
+    protected void addPointCommand(PointF coordinate, Layer layer)
+    {
+        if (!pathInsideBitmap)
+        {
+            PaintroidApplication.currentTool.resetInternalState(StateChange.RESET_INTERNAL_STATE);
+            PaintroidApplication.drawingSurface.getSurfaceViewDrawTrigger().redraw();
+            return;
         }
         Command command = new PointCommand(mBitmapPaint, coordinate);
         PaintroidApplication.commandManager.commitCommandToLayer(new LayerCommand(layer), command);
-        return true;
     }
 
     @Override

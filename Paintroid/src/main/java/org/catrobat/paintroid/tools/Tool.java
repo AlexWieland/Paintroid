@@ -40,11 +40,11 @@ public interface Tool {
 
     enum StateChange { ALL, RESET_INTERNAL_STATE, NEW_IMAGE_LOADED, MOVE_CANCELED }
 
-    boolean handleDown(PointF coordinate);
+   void handleDown(PointF coordinate);
 
-    boolean handleMove(PointF coordinate);
+   void handleMove(PointF coordinate);
 
-    boolean handleUp(PointF coordinate);
+   void handleUp(PointF coordinate);
 
     void changePaintColor(int color);
 

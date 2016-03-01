@@ -41,29 +41,28 @@ public class FillTool extends BaseTool {
     }
 
     @Override
-    public boolean handleDown(PointF coordinate) {
-        return false;
+    public void handleDown(PointF coordinate) {
+
     }
 
     @Override
-    public boolean handleMove(PointF coordinate) {
-        return false;
+    public void handleMove(PointF coordinate) {
     }
 
     @Override
-    public boolean handleUp(PointF coordinate) {
+    public void handleUp(PointF coordinate) {
         int bitmapHeight = PaintroidApplication.drawingSurface
                 .getBitmapHeight();
         int bitmapWidth = PaintroidApplication.drawingSurface.getBitmapWidth();
 
         if ((coordinate.x > bitmapWidth) || (coordinate.y > bitmapHeight)
                 || (coordinate.x < 0) || (coordinate.y < 0)) {
-            return false;
+            return;
         }
 
         if (mBitmapPaint.getColor() == PaintroidApplication.drawingSurface
                 .getPixel(coordinate)) {
-            return false;
+            return;
         }
 
         Command command = new FillCommand(new Point((int) coordinate.x,
@@ -73,8 +72,6 @@ public class FillTool extends BaseTool {
         ((FillCommand) command).addObserver(this);
         Layer layer = PaintroidApplication.drawingSurface.getCurrentLayer();
         PaintroidApplication.commandManager.commitCommandToLayer(new LayerCommand(layer), command);
-
-        return true;
     }
 
     @Override

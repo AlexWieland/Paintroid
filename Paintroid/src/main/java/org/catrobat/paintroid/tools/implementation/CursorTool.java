@@ -72,21 +72,24 @@ public class CursorTool extends BaseToolWithShape {
     }
 
     @Override
-    public boolean handleDown(PointF coordinate) {
+    public void handleDown(PointF coordinate)
+    {
         pathToDraw.moveTo(this.mToolPosition.x, this.mToolPosition.y);
         mPreviousEventCoordinate.set(coordinate);
         mMovedDistance.set(0, 0);
         pathInsideBitmap = false;
 
-        if ((coordinate.x < PaintroidApplication.drawingSurface.getBitmapWidth()) && (coordinate.y < PaintroidApplication.drawingSurface
-                .getBitmapHeight()) && (coordinate.x > 0) && (coordinate.y > 0)) {
+        if ((coordinate.x < PaintroidApplication.drawingSurface.getBitmapWidth())
+                && (coordinate.y < PaintroidApplication.drawingSurface.getBitmapHeight())
+                && (coordinate.x > 0) && (coordinate.y > 0))
+        {
             pathInsideBitmap = true;
         }
-        return true;
     }
 
     @Override
-    public boolean handleMove(PointF coordinate) {
+    public void handleMove(PointF coordinate)
+    {
         final float vectorCX = coordinate.x - mPreviousEventCoordinate.x;
         final float vectorCY = coordinate.y - mPreviousEventCoordinate.y;
 
@@ -94,13 +97,14 @@ public class CursorTool extends BaseToolWithShape {
         float newCursorPositionY = this.mToolPosition.y + vectorCY;
 
         if (pathInsideBitmap == false && (coordinate.x < PaintroidApplication.drawingSurface.getBitmapWidth()) &&
-                (coordinate.y < PaintroidApplication.drawingSurface.getBitmapHeight()) && (coordinate.x > 0) && (coordinate.y > 0)) {
+                (coordinate.y < PaintroidApplication.drawingSurface.getBitmapHeight())
+                && (coordinate.x > 0) && (coordinate.y > 0))
+        {
             pathInsideBitmap = true;
         }
 
         PointF cursorSurfacePosition = PaintroidApplication.perspective
-                .getSurfacePointFromCanvasPoint(new PointF(newCursorPositionX,
-                        newCursorPositionY));
+                .getSurfacePointFromCanvasPoint(new PointF(newCursorPositionX, newCursorPositionY));
 
         float surfaceWidth = PaintroidApplication.drawingSurface.getWidth();
         float surfaceHeight = PaintroidApplication.drawingSurface.getHeight();
@@ -146,11 +150,10 @@ public class CursorTool extends BaseToolWithShape {
                         + Math.abs(coordinate.y - mPreviousEventCoordinate.y));
 
         mPreviousEventCoordinate.set(coordinate.x, coordinate.y);
-        return true;
     }
 
     @Override
-    public boolean handleUp(PointF coordinate) {
+    public void handleUp(PointF coordinate) {
 
         if (pathInsideBitmap == false && (coordinate.x < PaintroidApplication.drawingSurface.getBitmapWidth()) &&
                 (coordinate.y < PaintroidApplication.drawingSurface.getBitmapHeight()) && (coordinate.x > 0) && (coordinate.y > 0)) {
@@ -164,8 +167,6 @@ public class CursorTool extends BaseToolWithShape {
                         + Math.abs(coordinate.y - mPreviousEventCoordinate.y));
 
         handleDrawMode(PaintroidApplication.drawingSurface.getCurrentLayer());
-
-        return true;
     }
 
     @Override
@@ -284,25 +285,29 @@ public class CursorTool extends BaseToolWithShape {
         this.drawShape(canvas);
     }
 
-    protected boolean addPathCommand(PointF coordinate, Layer layer) {
+    protected void addPathCommand(PointF coordinate, Layer layer) {
         pathToDraw.lineTo(coordinate.x, coordinate.y);
-        if (!pathInsideBitmap) {return false;}
+        if (!pathInsideBitmap)
+        {
+            PaintroidApplication.currentTool.resetInternalState(StateChange.RESET_INTERNAL_STATE);
+            PaintroidApplication.drawingSurface.getSurfaceViewDrawTrigger().redraw();
+            return;
+        }
         Command command = new PathCommand(mBitmapPaint, pathToDraw);
         PaintroidApplication.commandManager.commitCommandToLayer(new LayerCommand(layer), command);
-        return true; //TODO: check why this condition is used
-
     }
 
-    protected boolean addPointCommand(PointF coordinate, Layer layer) {
-        int bitmapHeight = PaintroidApplication.drawingSurface.getBitmapHeight();
-        int bitmapWidth = PaintroidApplication.drawingSurface.getBitmapWidth();
-        if ((coordinate.x > bitmapWidth) || (coordinate.y > bitmapHeight)
-                || (coordinate.x < 0) || (coordinate.y < 0)) {
-            return false;
+    protected void addPointCommand(PointF coordinate, Layer layer)
+    {
+        if (!pathInsideBitmap)
+        {
+            PaintroidApplication.currentTool.resetInternalState(StateChange.RESET_INTERNAL_STATE);
+            PaintroidApplication.drawingSurface.getSurfaceViewDrawTrigger().redraw();
+            return;
         }
+
         Command command = new PointCommand(mBitmapPaint, coordinate);
         PaintroidApplication.commandManager.commitCommandToLayer(new LayerCommand(layer), command);
-        return true;//TODO: check why this condition is used
     }
 
     @Override
@@ -336,18 +341,22 @@ public class CursorTool extends BaseToolWithShape {
 
     private void handleDrawMode(Layer layer) {
 
-        if (toolInDrawMode) {
-            if (MOVE_TOLERANCE < mMovedDistance.x
-                    || MOVE_TOLERANCE < mMovedDistance.y) {
+        if (toolInDrawMode)
+        {
+            if (MOVE_TOLERANCE < mMovedDistance.x || MOVE_TOLERANCE < mMovedDistance.y) {
                 addPathCommand(mToolPosition, layer);
                 mSecondaryShapeColor = mBitmapPaint.getColor();
-            } else {
+            }
+            else
+            {
                 toolInDrawMode = false;
                 mSecondaryShapeColor = Color.LTGRAY;
             }
-        } else {
-            if (MOVE_TOLERANCE >= mMovedDistance.x
-                    && MOVE_TOLERANCE >= mMovedDistance.y) {
+        }
+        else
+        {
+            if (MOVE_TOLERANCE >= mMovedDistance.x && MOVE_TOLERANCE >= mMovedDistance.y)
+            {
                 toolInDrawMode = true;
                 mSecondaryShapeColor = mBitmapPaint.getColor();
                 addPointCommand(mToolPosition, layer);

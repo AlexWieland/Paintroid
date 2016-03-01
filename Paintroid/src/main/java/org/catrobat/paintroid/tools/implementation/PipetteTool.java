@@ -39,18 +39,18 @@ public class PipetteTool extends BaseTool {
     }
 
     @Override
-    public boolean handleDown(PointF coordinate) {
-        return setColor(coordinate);
+    public void handleDown(PointF coordinate) {
+        setColor(coordinate);
     }
 
     @Override
-    public boolean handleMove(PointF coordinate) {
-        return setColor(coordinate);
+    public void handleMove(PointF coordinate) {
+        setColor(coordinate);
     }
 
     @Override
-    public boolean handleUp(PointF coordinate) {
-        return setColor(coordinate);
+    public void handleUp(PointF coordinate) {
+        setColor(coordinate);
     }
 
     protected boolean setColor(PointF coordinate) {

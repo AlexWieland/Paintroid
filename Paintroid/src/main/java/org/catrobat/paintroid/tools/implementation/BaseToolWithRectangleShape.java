@@ -203,24 +203,21 @@ public abstract class BaseToolWithRectangleShape extends BaseToolWithShape {
     }
 
     @Override
-    public boolean handleDown(PointF coordinate) {
+    public void handleDown(PointF coordinate) {
         mIsDown = true;
         mMovedDistance.set(0, 0);
         mPreviousEventCoordinate = new PointF(coordinate.x, coordinate.y);
         mCurrentAction = getAction(coordinate.x, coordinate.y);
-        return true;
     }
 
     @Override
-    public boolean handleMove(PointF coordinate) {
+    public void handleMove(PointF coordinate) {
         if (mPreviousEventCoordinate == null || mCurrentAction == null) {
-            return false;
+            return;
         }
 
-        PointF delta = new PointF(coordinate.x - mPreviousEventCoordinate.x,
-                coordinate.y - mPreviousEventCoordinate.y);
-        mMovedDistance.set(mMovedDistance.x + Math.abs(delta.x),
-                mMovedDistance.y + Math.abs(delta.y));
+        PointF delta = new PointF(coordinate.x - mPreviousEventCoordinate.x, coordinate.y - mPreviousEventCoordinate.y);
+        mMovedDistance.set(mMovedDistance.x + Math.abs(delta.x), mMovedDistance.y + Math.abs(delta.y));
         mPreviousEventCoordinate.set(coordinate.x, coordinate.y);
         switch (mCurrentAction) {
             case MOVE:
@@ -235,26 +232,22 @@ public abstract class BaseToolWithRectangleShape extends BaseToolWithShape {
             default:
                 break;
         }
-        return true;
     }
 
     @Override
-    public boolean handleUp(PointF coordinate) {
+    public void handleUp(PointF coordinate) {
         mIsDown = false;
         if (mPreviousEventCoordinate == null) {
-            return false;
+            return;
         }
         mMovedDistance.set(
-                mMovedDistance.x
-                        + Math.abs(coordinate.x - mPreviousEventCoordinate.x),
-                mMovedDistance.y
-                        + Math.abs(coordinate.y - mPreviousEventCoordinate.y));
-        if (MOVE_TOLERANCE * 2 >= mMovedDistance.x
-                && MOVE_TOLERANCE * 2 >= mMovedDistance.y
-                && isCoordinateInsideBox(coordinate)) {
+                mMovedDistance.x + Math.abs(coordinate.x - mPreviousEventCoordinate.x),
+                mMovedDistance.y + Math.abs(coordinate.y - mPreviousEventCoordinate.y));
+        if (MOVE_TOLERANCE * 2 >= mMovedDistance.x && MOVE_TOLERANCE * 2 >= mMovedDistance.y
+                && isCoordinateInsideBox(coordinate))
+        {
             onClickInBox();
         }
-        return true;
     }
 
     private boolean isCoordinateInsideBox(PointF coordinate) {

@@ -42,18 +42,16 @@ public class FlipTool extends BaseTool {
     }
 
     @Override
-    public boolean handleDown(PointF coordinate) {
-        return false;
+    public void handleDown(PointF coordinate) {
     }
 
     @Override
-    public boolean handleMove(PointF coordinate) {
-        return false;
+    public void handleMove(PointF coordinate) {
+
     }
 
     @Override
-    public boolean handleUp(PointF coordinate) {
-        return false;
+    public void handleUp(PointF coordinate) {
     }
 
     @Override
