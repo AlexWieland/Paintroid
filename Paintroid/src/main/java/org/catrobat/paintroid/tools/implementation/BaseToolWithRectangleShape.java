@@ -162,6 +162,7 @@ public abstract class BaseToolWithRectangleShape extends BaseToolWithShape {
 
         initLinePaint();
         initScaleDependedValues();
+        PaintroidApplication.drawingSurface.getSurfaceViewDrawTrigger().redraw();
     }
 
     public BaseToolWithRectangleShape(Context context, ToolType toolType,

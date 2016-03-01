@@ -58,6 +58,7 @@ public abstract class BaseToolWithShape extends BaseTool implements
                 .convertFromScreenToCanvas(mToolPosition);
         mLinePaint = new Paint();
         mLinePaint.setColor(mPrimaryShapeColor);
+        PaintroidApplication.drawingSurface.getSurfaceViewDrawTrigger().redraw();
     }
 
     @Override

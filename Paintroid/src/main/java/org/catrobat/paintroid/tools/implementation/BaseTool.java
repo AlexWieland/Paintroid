@@ -122,6 +122,7 @@ public abstract class BaseTool extends Observable implements Tool, Observer {
 
         mMovedDistance = new PointF(0f, 0f);
         mPreviousEventCoordinate = new PointF(0f, 0f);
+        PaintroidApplication.drawingSurface.getSurfaceViewDrawTrigger().redraw();
 
     }
 
