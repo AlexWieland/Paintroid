@@ -25,13 +25,14 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.PorterDuff;
 import android.util.Log;
 
 public class FlipCommand extends BaseCommand {
 
     private FlipDirection mFlipDirection;
 
-    public static enum FlipDirection {
+    public enum FlipDirection {
         FLIP_HORIZONTAL, FLIP_VERTICAL
     };
 
@@ -68,15 +69,10 @@ public class FlipCommand extends BaseCommand {
                 return;
         }
 
-        Bitmap flipBitmap = Bitmap.createBitmap(bitmap.getWidth(),
-                bitmap.getHeight(), bitmap.getConfig());
-        Canvas flipCanvas = new Canvas(flipBitmap);
-
-        flipCanvas.drawBitmap(bitmap, flipMatrix, new Paint());
-        if (PaintroidApplication.drawingSurface != null) {
-            //PaintroidApplication.drawingSurface.setBitmap(flipBitmap);
-        }
-
+        bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), flipMatrix, true);
+        canvas.drawColor(0, PorterDuff.Mode.CLEAR);
+        canvas.drawBitmap(bitmap, 0,0, mPaint);
+        
         notifyStatus(NOTIFY_STATES.COMMAND_DONE);
     }
 }
