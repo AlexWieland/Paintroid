@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.PorterDuff;
 import android.util.Log;
 
 public class RotateCommand extends BaseCommand {
@@ -50,20 +51,13 @@ public class RotateCommand extends BaseCommand {
                 return;
         }
 
-        Bitmap rotatedBitmap = Bitmap.createBitmap(bitmap, 0, 0,
-                bitmap.getWidth(), bitmap.getHeight(), rotateMatrix, true);
-        Canvas rotateCanvas = new Canvas(rotatedBitmap);
-
-        rotateCanvas.drawBitmap(bitmap, rotateMatrix, new Paint());
-
-        if (PaintroidApplication.drawingSurface != null) {
-//            PaintroidApplication.drawingSurface.setBitmap(rotatedBitmap);
-        }
+        bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), rotateMatrix, true);
+        canvas.drawColor(0, PorterDuff.Mode.CLEAR);
+        canvas.drawBitmap(bitmap, 0,0, mPaint);
 
         setChanged();
 
         PaintroidApplication.perspective.resetScaleAndTranslation();
         notifyStatus(NOTIFY_STATES.COMMAND_DONE);
-
     }
 }

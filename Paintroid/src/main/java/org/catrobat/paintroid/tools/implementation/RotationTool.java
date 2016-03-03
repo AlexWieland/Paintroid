@@ -3,9 +3,11 @@ package org.catrobat.paintroid.tools.implementation;
 import org.catrobat.paintroid.PaintroidApplication;
 import org.catrobat.paintroid.R;
 import org.catrobat.paintroid.command.Command;
+import org.catrobat.paintroid.command.implementation.LayerCommand;
 import org.catrobat.paintroid.command.implementation.RotateCommand;
 import org.catrobat.paintroid.command.implementation.RotateCommand.RotateDirection;
 import org.catrobat.paintroid.dialog.IndeterminateProgressDialog;
+import org.catrobat.paintroid.tools.Layer;
 import org.catrobat.paintroid.tools.ToolType;
 import org.catrobat.paintroid.ui.TopBar.ToolButtonIDs;
 
@@ -74,7 +76,8 @@ public class RotationTool extends BaseTool {
         Command command = new RotateCommand(rotateDirection);
         IndeterminateProgressDialog.getInstance().show();
         ((RotateCommand) command).addObserver(this);
-        //PaintroidApplication.commandManager.commitCommand(command); TODO: add proper cmd
+        Layer layer = PaintroidApplication.drawingSurface.getCurrentLayer();
+        PaintroidApplication.commandManager.commitCommandToLayer(new LayerCommand(layer), command);
     }
 
     @Override
