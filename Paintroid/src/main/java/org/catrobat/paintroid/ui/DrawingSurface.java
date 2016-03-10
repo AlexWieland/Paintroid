@@ -198,7 +198,7 @@ public class DrawingSurface extends SurfaceView implements SurfaceHolder.Callbac
             {
                 Paint paint = new Paint();
                 paint.setAlpha(layer.getScaledOpacity());
-                canvas.drawBitmap(layer.getBitmap(), 0, 0, null);
+                canvas.drawBitmap(layer.getBitmap(), 0, 0, paint);
             }
         }
     }

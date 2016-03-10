@@ -459,6 +459,7 @@ public final class LayersDialog extends BaseDialog implements OnItemClickListene
     {
         mCurrentLayer.setOpacity(seekBar.getProgress());
         refreshView();
+        PaintroidApplication.drawingSurface.onSurfaceViewRedraw();
     }
 
     @Override
