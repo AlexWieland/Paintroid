@@ -169,18 +169,20 @@ public class CommandManagerImplementation implements CommandManager, Observer
             ArrayList<LayerBitmapCommand> result = getLayerBitmapCommands(layerCommand.getLayersToMerge());
             layerCommand.setLayersBitmapCommands(result);
 
+            LayerBitmapCommand bitmapCommand = new LayerBitmapCommandImpl(layerCommand);
             for (LayerBitmapCommand manager: result)
             {
+                bitmapCommand.copyLayerCommands(manager.getLayerCommands());
                 mLayerBitmapCommands.remove(manager);
             }
 
-            mLayerBitmapCommands.add(new LayerBitmapCommandImpl(layerCommand));
+            mLayerBitmapCommands.add(bitmapCommand);
             mLayerCommandList.addLast(createLayerCommand(CommandType.MERGE_LAYERS, layerCommand));
         }
 
         drawingSurfaceRedraw();
-
     }
+
 
     @Override
     public void commitLayerVisibilityCommand(LayerCommand layerCommand)

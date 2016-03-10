@@ -8,7 +8,9 @@ import org.catrobat.paintroid.command.LayerBitmapCommand;
 import org.catrobat.paintroid.tools.Layer;
 import org.catrobat.paintroid.tools.Tool;
 
+import java.util.Collections;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Contains all the commands that are to be executed on the layer's bitmap.
@@ -50,6 +52,19 @@ public class LayerBitmapCommandImpl implements LayerBitmapCommand {
     }
 
     @Override
+    public List<Command> getLayerCommands() {
+        return mCommandList;
+    }
+
+    @Override
+    public void copyLayerCommands(List<Command> commands) {
+       for(Command command : commands)
+       {
+           mCommandList.add(command);
+       }
+    }
+
+    @Override
     public synchronized void undo()
     {
         synchronized (mCommandList)
@@ -77,6 +92,7 @@ public class LayerBitmapCommandImpl implements LayerBitmapCommand {
             }
         }
     }
+
     private void executeAllCommandsOnLayerCanvas()
     {
         synchronized (mLayer.getLayerCanvas())

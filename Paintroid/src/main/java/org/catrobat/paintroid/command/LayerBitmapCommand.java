@@ -2,6 +2,8 @@ package org.catrobat.paintroid.command;
 
 import org.catrobat.paintroid.tools.Layer;
 
+import java.util.List;
+
 /**
  * Describes layer commands responsible for drawing. These commands are performed on layer's bitmap.
  */
@@ -18,6 +20,18 @@ public interface LayerBitmapCommand
      * @param command which has been performed on layer.
      */
     void commitCommandToLayer(Command command);
+
+    /**
+     * Retrieves all the commands performed on layers bitmap.
+     * @return layer bitmap commands.
+     */
+    List<Command> getLayerCommands();
+
+    /**
+     * Copies layer commands to current LayerBitmapCommand.
+     * @param commands commands to be copied.
+     */
+    void copyLayerCommands(List<Command> commands);
 
     /**
      * Undo drawing command for assigned layer.
