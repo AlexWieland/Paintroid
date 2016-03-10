@@ -433,7 +433,7 @@ public final class LayersDialog extends BaseDialog implements OnItemClickListene
             refreshView();
 
             PaintroidApplication.commandManager.commitMergeLayerCommand(new LayerCommand(mCurrentLayer, layerToMergeIds));
-            PaintroidApplication.drawingSurface.onSurfaceViewRedraw();
+            PaintroidApplication.drawingSurface.getSurfaceViewDrawTrigger().redraw();
         }
     }
 
@@ -459,7 +459,7 @@ public final class LayersDialog extends BaseDialog implements OnItemClickListene
     {
         mCurrentLayer.setOpacity(seekBar.getProgress());
         refreshView();
-        PaintroidApplication.drawingSurface.onSurfaceViewRedraw();
+        PaintroidApplication.drawingSurface.getSurfaceViewDrawTrigger().redraw();
     }
 
     @Override

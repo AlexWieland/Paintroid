@@ -404,6 +404,7 @@ public class MainActivity extends OptionsMenuActivity {
                                 {
                                     ((ImportTool) PaintroidApplication.currentTool)
                                                     .setBitmapFromFile(bitmap);
+                                    PaintroidApplication.drawingSurface.getSurfaceViewDrawTrigger().redraw();
                                 }
                                 else
                                 {
@@ -450,6 +451,7 @@ public class MainActivity extends OptionsMenuActivity {
             default:
                 Tool tool = ToolFactory.createTool(this, changeToToolType);
                 switchTool(tool);
+                PaintroidApplication.drawingSurface.getSurfaceViewDrawTrigger().redraw();
                 break;
         }
 	}
