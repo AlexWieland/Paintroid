@@ -146,6 +146,7 @@ public abstract class BaseTool extends Observable implements Tool, Observer {
         }
         super.setChanged();
         super.notifyObservers();
+        PaintroidApplication.drawingSurface.getSurfaceViewDrawTrigger().redraw();
     }
 
     @Override
@@ -158,6 +159,7 @@ public abstract class BaseTool extends Observable implements Tool, Observer {
 
         super.setChanged();
         super.notifyObservers();
+
     }
 
     @Override

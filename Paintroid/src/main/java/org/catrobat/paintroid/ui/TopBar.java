@@ -215,6 +215,7 @@ public class TopBar extends Observable implements OnTouchListener, UpdateTopBarE
 		if (event.getAction() == MotionEvent.ACTION_DOWN) {
 			if (mPreviousTool != null) {
 				mainActivity.switchTool(mPreviousTool);
+                drawingSurface.onSurfaceViewRedraw();
 			} else {
 				mainActivity.switchTool(ToolType.MOVE);
 			}
