@@ -32,8 +32,10 @@
 
         <ImageView
             android:id="@+id/layer_button_image"
-            android:layout_width="80dp"
-            android:layout_height="120dp"
-            android:layout_marginRight="5dp" />
+            android:layout_width="75dp"
+            android:layout_height="100dp"
+            android:adjustViewBounds="true"
+            android:scaleType="fitXY"
+            android:background="@drawable/checkeredbg_repeat"/>
 
 </LinearLayout>
