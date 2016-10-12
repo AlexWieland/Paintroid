@@ -39,11 +39,13 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 
 import org.catrobat.paintroid.command.implementation.CommandManagerImplementation;
 import org.catrobat.paintroid.command.implementation.LayerCommand;
@@ -55,11 +57,11 @@ import org.catrobat.paintroid.dialog.FillToolDialog;
 import org.catrobat.paintroid.dialog.IndeterminateProgressDialog;
 import org.catrobat.paintroid.dialog.InfoDialog;
 import org.catrobat.paintroid.dialog.InfoDialog.DialogType;
-import org.catrobat.paintroid.dialog.LayersDialog;
 import org.catrobat.paintroid.dialog.TextToolDialog;
 import org.catrobat.paintroid.dialog.ToolsDialog;
 import org.catrobat.paintroid.dialog.colorpicker.ColorPickerDialog;
 import org.catrobat.paintroid.listener.DrawingSurfaceListener;
+import org.catrobat.paintroid.listener.LayerListener;
 import org.catrobat.paintroid.tools.Tool;
 import org.catrobat.paintroid.tools.ToolFactory;
 import org.catrobat.paintroid.tools.ToolType;
@@ -68,6 +70,7 @@ import org.catrobat.paintroid.ui.BottomBar;
 import org.catrobat.paintroid.ui.DrawingSurface;
 import org.catrobat.paintroid.ui.Perspective;
 import org.catrobat.paintroid.ui.TopBar;
+import org.catrobat.paintroid.ui.button.LayersAdapter;
 
 import java.io.File;
 
@@ -80,9 +83,13 @@ public class MainActivity extends NavigationDrawerMenuActivity implements  Navig
 	protected BottomBar mBottomBar;
 
 	protected boolean mToolbarIsVisible = true;
+	private Menu mMenu = null;
 	private static final int ANDROID_VERSION_ICE_CREAM_SANDWICH = 14;
 	ActionBarDrawerToggle actionBarDrawerToggle;
 	DrawerLayout drawerLayout;
+	private ListView mLayerSideNavList;
+	private NavigationView mLayerSideNav;
+	public LayersAdapter mLayersAdapter;
 
 
 	@Override
@@ -145,6 +152,10 @@ public class MainActivity extends NavigationDrawerMenuActivity implements  Navig
 		mDrawingSurfaceListener = new DrawingSurfaceListener();
 		mTopBar = new TopBar(this, PaintroidApplication.openedFromCatroid);
 		mBottomBar = new BottomBar(this);
+		mLayerSideNav = (NavigationView) findViewById(R.id.nav_view_layer);
+		mLayerSideNavList = (ListView) findViewById(R.id.nav_layer_list);
+		mLayersAdapter = new LayersAdapter(this, PaintroidApplication.openedFromCatroid,
+				PaintroidApplication.drawingSurface.getBitmapCopy());
 
 		PaintroidApplication.drawingSurface
 				.setOnTouchListener(mDrawingSurfaceListener);
@@ -189,7 +200,8 @@ public class MainActivity extends NavigationDrawerMenuActivity implements  Navig
 			initialiseNewBitmap();
 		}
 
-		LayersDialog.init(this, PaintroidApplication.drawingSurface.getBitmapCopy());
+		LayerListener.init(this, mLayerSideNav, PaintroidApplication.drawingSurface.getBitmapCopy());
+
 		initCommandManager();
 		initNavigationDrawer();
 	}
@@ -198,20 +210,19 @@ public class MainActivity extends NavigationDrawerMenuActivity implements  Navig
 		PaintroidApplication.commandManager = new CommandManagerImplementation();
 
 		((CommandManagerImplementation) PaintroidApplication.commandManager)
-				.setRefreshLayerDialogListener(LayersDialog.getInstance());
-
-		((CommandManagerImplementation) PaintroidApplication.commandManager)
 				.setUpdateTopBarListener(mTopBar);
 
 		((CommandManagerImplementation) PaintroidApplication.commandManager)
-				.addChangeActiveLayerListener(LayersDialog.getInstance());
+				.addChangeActiveLayerListener(LayerListener.getInstance());
 
 		((CommandManagerImplementation) PaintroidApplication.commandManager)
-				.setLayerEventListener(LayersDialog.getInstance().getAdapter());
+				.setLayerEventListener(LayerListener.getInstance().getAdapter());
 
 
-		PaintroidApplication.commandManager.commitAddLayerCommand(new LayerCommand(LayersDialog
-				.getInstance().getAdapter().getLayer(0)));
+		PaintroidApplication.commandManager.commitAddLayerCommand(
+				new LayerCommand(LayerListener.getInstance().getAdapter().getLayer(0)));
+
+
 	}
 
 	@Override
@@ -268,7 +279,6 @@ public class MainActivity extends NavigationDrawerMenuActivity implements  Navig
 			getSupportActionBar().setSplitBackgroundDrawable(drawable);
 
 		}
-
 	}
 
 	@Override
@@ -291,14 +301,12 @@ public class MainActivity extends NavigationDrawerMenuActivity implements  Navig
 		PaintroidApplication.saveCopy = false;
 
 		ToolsDialog.getInstance().dismiss();
-		LayersDialog.getInstance().dismiss();
 		IndeterminateProgressDialog.getInstance().dismiss();
 		ColorPickerDialog.getInstance().dismiss();
 		// BrushPickerDialog.getInstance().dismiss(); // TODO: how can there
 		// ever be a null pointer exception?
 		super.onDestroy();
 	}
-
 
 	@Override
 	public boolean onNavigationItemSelected(MenuItem item) {
@@ -416,7 +424,6 @@ public class MainActivity extends NavigationDrawerMenuActivity implements  Navig
 				Tool tool = ToolFactory.createTool(this, changeToToolType);
 				switchTool(tool);
 				break;
-
 		}
 
 	}
@@ -434,7 +441,7 @@ public class MainActivity extends NavigationDrawerMenuActivity implements  Navig
 
 	private void showSecurityQuestionBeforeExit() {
 		if (PaintroidApplication.isSaved
-				|| (LayersDialog.getInstance().getAdapter().getLayers().size() == 1)
+				|| (LayerListener.getInstance().getAdapter().getLayers().size() == 1)
 				&& PaintroidApplication.isPlainImage
 				&& !PaintroidApplication.commandManager.checkIfDrawn()) {
 			finish();

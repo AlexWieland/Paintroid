@@ -1,5 +1,10 @@
 package org.catrobat.paintroid.ui;
 
+import android.support.v4.widget.DrawerLayout;
+import android.view.MotionEvent;
+import android.view.View;
+import android.widget.ImageButton;
+
 import org.catrobat.paintroid.MainActivity;
 import org.catrobat.paintroid.PaintroidApplication;
 import org.catrobat.paintroid.R;
@@ -7,15 +12,12 @@ import org.catrobat.paintroid.dialog.LayersDialog;
 import org.catrobat.paintroid.dialog.ToolsDialog;
 import org.catrobat.paintroid.tools.Tool;
 
-import android.view.MotionEvent;
-import android.view.View;
-import android.widget.ImageButton;
-
 public class BottomBar implements View.OnTouchListener {
 	private ImageButton mAttributeButton1;
 	private ImageButton mAttributeButton2;
 	private ImageButton mToolMenuButton;
 	private ImageButton mLayerButton;
+	private DrawerLayout drawer;
 	private MainActivity mMainActivity;
 
 	public BottomBar(MainActivity mainActivity) {
@@ -36,6 +38,7 @@ public class BottomBar implements View.OnTouchListener {
 		mToolMenuButton = (ImageButton) mainActivity
 				.findViewById(R.id.btn_bottom_tools);
 		mToolMenuButton.setOnTouchListener(this);
+		drawer = (DrawerLayout) mMainActivity.findViewById(R.id.drawer_layout);
 	}
 
 	@Override

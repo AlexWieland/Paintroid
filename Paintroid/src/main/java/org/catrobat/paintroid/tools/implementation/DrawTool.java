@@ -32,6 +32,7 @@ import org.catrobat.paintroid.command.implementation.LayerCommand;
 import org.catrobat.paintroid.command.implementation.PathCommand;
 import org.catrobat.paintroid.command.implementation.PointCommand;
 import org.catrobat.paintroid.dialog.LayersDialog;
+import org.catrobat.paintroid.listener.LayerListener;
 import org.catrobat.paintroid.tools.Layer;
 import org.catrobat.paintroid.tools.ToolType;
 import org.catrobat.paintroid.ui.TopBar.ToolButtonIDs;
@@ -125,7 +126,7 @@ public class DrawTool extends BaseTool {
 			PaintroidApplication.currentTool.resetInternalState(StateChange.RESET_INTERNAL_STATE);
 			return false;
 		}
-		Layer layer = LayersDialog.getInstance().getCurrentLayer();
+		Layer layer = LayerListener.getInstance().getCurrentLayer();
 		Command command = new PathCommand(mBitmapPaint, pathToDraw);
 		PaintroidApplication.commandManager.commitCommandToLayer(new LayerCommand(layer), command);
 		return true;
@@ -136,7 +137,7 @@ public class DrawTool extends BaseTool {
 			PaintroidApplication.currentTool.resetInternalState(StateChange.RESET_INTERNAL_STATE);
 			return false;
 		}
-		Layer layer = LayersDialog.getInstance().getCurrentLayer();
+		Layer layer = LayerListener.getInstance().getCurrentLayer();
 		Command command = new PointCommand(mBitmapPaint, coordinate);
 		PaintroidApplication.commandManager.commitCommandToLayer(new LayerCommand(layer), command);
 		return true;
