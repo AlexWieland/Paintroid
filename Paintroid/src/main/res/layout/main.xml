@@ -72,7 +72,6 @@
         android:layout_width="100dp"
         android:layout_height="wrap_content"
         android:layout_gravity="end|center"
-        android:fitsSystemWindows="false"
         android:background="@color/custom_background_color"
         app:insetForeground="@color/custom_background_color">
 
