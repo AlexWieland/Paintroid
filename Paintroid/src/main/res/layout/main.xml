@@ -33,7 +33,6 @@
                 android:layout_height="fill_parent">
         <include layout="@layout/top_bar" />
 
-        <include layout="@layout/top_bar"/>
 
         <LinearLayout
             android:id="@+id/main_bottom_bar"
