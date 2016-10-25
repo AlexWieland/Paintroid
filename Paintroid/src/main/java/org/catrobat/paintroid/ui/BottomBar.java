@@ -1,6 +1,7 @@
 package org.catrobat.paintroid.ui;
 
 import android.support.v4.widget.DrawerLayout;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageButton;
@@ -8,7 +9,6 @@ import android.widget.ImageButton;
 import org.catrobat.paintroid.MainActivity;
 import org.catrobat.paintroid.PaintroidApplication;
 import org.catrobat.paintroid.R;
-import org.catrobat.paintroid.dialog.LayersDialog;
 import org.catrobat.paintroid.dialog.ToolsDialog;
 import org.catrobat.paintroid.tools.Tool;
 
@@ -62,8 +62,9 @@ public class BottomBar implements View.OnTouchListener {
 				ToolsDialog.getInstance().show();
 				return true;
 			case R.id.btn_bottom_layers:
-				LayersDialog tmp = LayersDialog.getInstance();
-				tmp.show();
+				Log.e(PaintroidApplication.TAG, "Not implemented anymore!");
+				// /LayersDialog tmp = LayersDialog.getInstance();
+				//tmp.show();
 				return true;
 			default:
 				return false;

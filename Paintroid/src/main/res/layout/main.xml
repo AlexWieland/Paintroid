@@ -38,9 +38,9 @@
             android:layout_width="fill_parent"
             android:layout_height="50dp"
             android:layout_alignParentBottom="true"
-            android:background="@color/custom_background_color" >
+            android:background="@color/custom_background_color">
 
-            <include layout="@layout/bottom_bar" />
+            <include layout="@layout/bottom_bar"/>
         </LinearLayout>
 
         <org.catrobat.paintroid.ui.DrawingSurface
@@ -62,9 +62,10 @@
         android:layout_height="match_parent"
         android:layout_gravity="start"
         android:fitsSystemWindows="true"
-        app:headerLayout="@layout/nav_header">
+        app:headerLayout="@layout/nav_header"
         app:menu="@menu/nav_menu"
-        android:background="@color/navigationDrawerBackground">
+        android:background="#ffffff">
+
     </android.support.design.widget.NavigationView>
 
     <android.support.design.widget.NavigationView
@@ -80,6 +81,7 @@
         android:layout_height="wrap_content"
         android:fitsSystemWindows="true"
         android:orientation="vertical">
+
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -114,6 +116,5 @@
 
     </LinearLayout>
     </android.support.design.widget.NavigationView>
-
 
 </android.support.v4.widget.DrawerLayout>

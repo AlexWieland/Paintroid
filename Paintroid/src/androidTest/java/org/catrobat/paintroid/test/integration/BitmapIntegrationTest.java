@@ -30,6 +30,7 @@ import org.catrobat.paintroid.R;
 import org.catrobat.paintroid.command.implementation.BitmapCommand;
 import org.catrobat.paintroid.command.implementation.LayerCommand;
 import org.catrobat.paintroid.dialog.LayersDialog;
+import org.catrobat.paintroid.listener.LayerListener;
 import org.catrobat.paintroid.test.utils.PrivateAccess;
 import org.catrobat.paintroid.tools.Layer;
 import org.catrobat.paintroid.ui.DrawingSurface;
@@ -64,7 +65,7 @@ public class BitmapIntegrationTest extends BaseIntegrationTestClass {
 
 		float surfaceScaleBeforeBitmapCommand = PaintroidApplication.perspective.getScale();
 		
-		Layer layer = LayersDialog.getInstance().getCurrentLayer();
+		Layer layer = LayerListener.getInstance().getCurrentLayer();
 		PaintroidApplication.commandManager.commitCommandToLayer(new LayerCommand(layer), new BitmapCommand(widthOverflowedBitmap, true));
 
 		mSolo.sleep(MEDIUM_TIMEOUT);

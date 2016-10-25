@@ -43,6 +43,7 @@ import org.catrobat.paintroid.dialog.IndeterminateProgressDialog;
 import org.catrobat.paintroid.dialog.InfoDialog;
 import org.catrobat.paintroid.dialog.InfoDialog.DialogType;
 import org.catrobat.paintroid.dialog.LayersDialog;
+import org.catrobat.paintroid.listener.LayerListener;
 import org.catrobat.paintroid.tools.Tool.StateChange;
 import org.catrobat.paintroid.tools.implementation.ImportTool;
 
@@ -71,7 +72,7 @@ public abstract class NavigationDrawerMenuActivity extends AppCompatActivity {
 
 	protected void onLoadImage() {
 
-		if ((LayersDialog.getInstance().getAdapter().getLayers().size() == 1)
+		if ((LayerListener.getInstance().getAdapter().getLayers().size() == 1)
 				&& PaintroidApplication.isPlainImage
 				&& !PaintroidApplication.commandManager.checkIfDrawn()) {
 			startLoadImageIntent();
@@ -94,7 +95,7 @@ public abstract class NavigationDrawerMenuActivity extends AppCompatActivity {
 													int id) {
 									saveTask.execute();
 									PaintroidApplication.commandManager.resetAndClear(false);
-									LayersDialog.getInstance().resetLayer();
+									LayerListener.getInstance().resetLayer();
 									startLoadImageIntent();
 								}
 							})
@@ -104,7 +105,7 @@ public abstract class NavigationDrawerMenuActivity extends AppCompatActivity {
 								public void onClick(DialogInterface dialog,
 													int id) {
 									PaintroidApplication.commandManager.resetAndClear(false);
-									LayersDialog.getInstance().resetLayer();
+									LayerListener.getInstance().resetLayer();
 									startLoadImageIntent();
 								}
 							});
@@ -145,12 +146,12 @@ public abstract class NavigationDrawerMenuActivity extends AppCompatActivity {
 	}
 
 	private void onNewImage() {
-		if ((LayersDialog.getInstance().getAdapter().getLayers().size() == 1)
+		if ((LayerListener.getInstance().getAdapter().getLayers().size() == 1)
 				&& PaintroidApplication.isPlainImage
 				&& !PaintroidApplication.openedFromCatroid
 				&& !PaintroidApplication.commandManager.checkIfDrawn()) {
 			PaintroidApplication.commandManager.resetAndClear(false);
-			LayersDialog.getInstance().resetLayer();
+			LayerListener.getInstance().resetLayer();
 		} else if (PaintroidApplication.isSaved) {
 			PaintroidApplication.commandManager.resetAndClear(false);
 			initialiseNewBitmap();
@@ -172,7 +173,7 @@ public abstract class NavigationDrawerMenuActivity extends AppCompatActivity {
 									saveTask.execute();
 									PaintroidApplication.commandManager.resetAndClear(false);
 									initialiseNewBitmap();
-									LayersDialog.getInstance().resetLayer();
+									LayerListener.getInstance().resetLayer();
 								}
 							})
 					.setNegativeButton(R.string.discard_button_text,
@@ -182,7 +183,7 @@ public abstract class NavigationDrawerMenuActivity extends AppCompatActivity {
 													int id) {
 									PaintroidApplication.commandManager.resetAndClear(false);
 									initialiseNewBitmap();
-									LayersDialog.getInstance().resetLayer();
+									LayerListener.getInstance().resetLayer();
 								}
 							});
 			AlertDialog alertNewImage = alertDialogBuilder.create();
@@ -191,7 +192,7 @@ public abstract class NavigationDrawerMenuActivity extends AppCompatActivity {
 	}
 
 	private void onNewImageFromCamera() {
-		if ((LayersDialog.getInstance().getAdapter().getLayers().size() == 1)
+		if ((LayerListener.getInstance().getAdapter().getLayers().size() == 1)
 				&& PaintroidApplication.isPlainImage
 				&& !PaintroidApplication.openedFromCatroid
 				&& !PaintroidApplication.commandManager.checkIfDrawn()) {
@@ -215,7 +216,7 @@ public abstract class NavigationDrawerMenuActivity extends AppCompatActivity {
 													int id) {
 									saveTask.execute();
 									PaintroidApplication.commandManager.resetAndClear(false);
-									LayersDialog.getInstance().resetLayer();
+									LayerListener.getInstance().resetLayer();
 									takePhoto();
 								}
 							})
@@ -225,7 +226,7 @@ public abstract class NavigationDrawerMenuActivity extends AppCompatActivity {
 								public void onClick(DialogInterface dialog,
 													int id) {
 									PaintroidApplication.commandManager.resetAndClear(false);
-									LayersDialog.getInstance().resetLayer();
+									LayerListener.getInstance().resetLayer();
 									takePhoto();
 
 								}
@@ -248,16 +249,16 @@ public abstract class NavigationDrawerMenuActivity extends AppCompatActivity {
 					PaintroidApplication.isSaved = false;
 					PaintroidApplication.savedPictureUri = null;
 					PaintroidApplication.saveCopy = true;
-					LayersDialog.getInstance().getCurrentLayer().setImage(PaintroidApplication.drawingSurface.getBitmapCopy());
-					LayersDialog.getInstance().refreshView();
+					LayerListener.getInstance().getCurrentLayer().setImage(PaintroidApplication.drawingSurface.getBitmapCopy());
+					LayerListener.getInstance().refreshView();
 					break;
 				case REQUEST_CODE_TAKE_PICTURE:
 					loadBitmapFromUri(mCameraImageUri);
 					PaintroidApplication.isPlainImage = false;
 					PaintroidApplication.isSaved = false;
 					PaintroidApplication.savedPictureUri = null;
-					LayersDialog.getInstance().getCurrentLayer().setImage(PaintroidApplication.drawingSurface.getBitmapCopy());
-					LayersDialog.getInstance().refreshView();
+					LayerListener.getInstance().getCurrentLayer().setImage(PaintroidApplication.drawingSurface.getBitmapCopy());
+					LayerListener.getInstance().refreshView();
 					break;
 			}
 
@@ -347,7 +348,7 @@ public abstract class NavigationDrawerMenuActivity extends AppCompatActivity {
 			public void run(Bitmap bitmap) {
 				Command command = new LoadCommand(bitmap);
 				PaintroidApplication.commandManager.commitCommandToLayer(
-						new LayerCommand(LayersDialog.getInstance().getCurrentLayer()), command);
+						new LayerCommand(LayerListener.getInstance().getCurrentLayer()), command);
 			}
 		});
 	}

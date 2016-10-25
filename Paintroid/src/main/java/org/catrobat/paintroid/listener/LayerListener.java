@@ -126,6 +126,13 @@ public final class LayerListener implements OnRefreshLayerDialogListener, OnActi
 
     }
 
+    public void resetLayer() {
+        Layer layer = mLayersAdapter.clearLayer();
+        selectLayer(layer);
+        PaintroidApplication.commandManager.commitAddLayerCommand(new LayerCommand(layer));
+        refreshView();
+    }
+
     public void createLayer() {
         boolean success = mLayersAdapter.addLayer();
         Layer layer = mLayersAdapter.getLayer(0);
