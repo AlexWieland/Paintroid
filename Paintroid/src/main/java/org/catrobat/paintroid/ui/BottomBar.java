@@ -61,11 +61,6 @@ public class BottomBar implements View.OnTouchListener {
 			case R.id.btn_bottom_tools:
 				ToolsDialog.getInstance().show();
 				return true;
-			case R.id.btn_bottom_layers:
-				Log.e(PaintroidApplication.TAG, "Not implemented anymore!");
-				// /LayersDialog tmp = LayersDialog.getInstance();
-				//tmp.show();
-				return true;
 			default:
 				return false;
 			}
