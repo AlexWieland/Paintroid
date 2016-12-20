@@ -7,7 +7,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -35,7 +34,6 @@ public final class LayerListener implements OnRefreshLayerDialogListener, OnActi
     private Layer mCurrentLayer;
     private NavigationView mNavigationView;
 	private BrickDragAndDropLayerMenu brickLayer;
-	private ImageView imageView;
 
     private LayerListener(Context context, NavigationView view, Bitmap firstLayer) {
 		Log.e("---Constuctor called: ", "LayerListener ---");
@@ -60,12 +58,6 @@ public final class LayerListener implements OnRefreshLayerDialogListener, OnActi
 		listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
 			@Override
 			public boolean onItemLongClick(AdapterView v, View arg1, int pos, long id) {
-
-				//int[] colors = {0, 0xFFFF0000, 0};
-				//listView.setDivider(new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, colors));
-				//listView.setDivider(new ColorDrawable(0x99F10529));
-				//listView.setDivider(new ColorDrawable(0x99F10529));
-				//listView.setDividerHeight(3);
 
 				//listView.getChildAt(pos).setBackgroundColor(Color.YELLOW);
 				//listView.getChildAt(pos).setVisibility(View.INVISIBLE);
@@ -184,7 +176,6 @@ public final class LayerListener implements OnRefreshLayerDialogListener, OnActi
         boolean success = mLayersAdapter.addLayer();
         Layer layer = mLayersAdapter.getLayer(0);
         selectLayer(layer);
-        //refreshView();
 
         if (!success) {
             Toast.makeText(PaintroidApplication.applicationContext, R.string.layer_too_many_layers,
@@ -233,7 +224,6 @@ public final class LayerListener implements OnRefreshLayerDialogListener, OnActi
 			refreshView();
 
 			PaintroidApplication.commandManager.commitMergeLayerCommand(new LayerCommand(getCurrentLayer(), layerToMergeIds));
-			//PaintroidApplication.commandManager.commitMergeLayerCommand(new LayerCommand(mLayersAdapter.getLayer(firstLayer), layerToMergeIds));
 		}
 	}
 
@@ -256,6 +246,9 @@ public final class LayerListener implements OnRefreshLayerDialogListener, OnActi
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         selectLayer(mLayersAdapter.getLayer(position));
-        //refreshView();
     }
+
+	public Bitmap getBitmapOfAllLayersToSave() {
+		return mLayersAdapter.getBitmapToSave();
+	}
 }

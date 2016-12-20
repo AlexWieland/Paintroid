@@ -42,7 +42,6 @@ import org.catrobat.paintroid.command.implementation.LoadCommand;
 import org.catrobat.paintroid.dialog.IndeterminateProgressDialog;
 import org.catrobat.paintroid.dialog.InfoDialog;
 import org.catrobat.paintroid.dialog.InfoDialog.DialogType;
-import org.catrobat.paintroid.dialog.LayersDialog;
 import org.catrobat.paintroid.listener.LayerListener;
 import org.catrobat.paintroid.tools.Tool.StateChange;
 import org.catrobat.paintroid.tools.implementation.ImportTool;
@@ -322,12 +321,13 @@ public abstract class NavigationDrawerMenuActivity extends AppCompatActivity {
 			}
 		};
 		thread.start();
+		LayerListener.getInstance().refreshView();
 	}
 
 	// if needed use Async Task
 	public void saveFile() {
 
-		if (!FileIO.saveBitmap(this, LayersDialog.getInstance().getBitmapOfAllLayersToSave())) {
+		if (!FileIO.saveBitmap(this, LayerListener.getInstance().getBitmapOfAllLayersToSave())) {
 			new InfoDialog(DialogType.WARNING,
 					R.string.dialog_error_sdcard_text,
 					R.string.dialog_error_save_title).show(

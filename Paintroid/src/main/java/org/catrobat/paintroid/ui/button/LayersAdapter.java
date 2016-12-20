@@ -206,31 +206,6 @@ public class LayersAdapter extends BaseAdapter implements OnLayerEventListener {
 
 	}
 
-	public void swapUp(int IDcurrentLayer) {
-		int PositionCurrentLayer = getPosition(IDcurrentLayer);
-		if (PositionCurrentLayer > 0)
-			Collections.swap(mLayerList, PositionCurrentLayer, PositionCurrentLayer - 1);
-
-	}
-
-	public void swapDown(int IDcurrentLayer) {
-		int PositionCurrentLayer = getPosition(IDcurrentLayer);
-		if (PositionCurrentLayer < mLayerList.size() - 1)
-			Collections.swap(mLayerList, PositionCurrentLayer, PositionCurrentLayer + 1);
-	}
-
-	public void swapTop(int IDcurrentLayer) {
-		int PositionCurrentLayer = getPosition(IDcurrentLayer);
-		if (PositionCurrentLayer > 0)
-			Collections.swap(mLayerList, PositionCurrentLayer, 0);
-	}
-
-	public void swapBottom(int IDcurrentLayer) {
-		int PositionCurrentLayer = getPosition(IDcurrentLayer);
-		if (PositionCurrentLayer < mLayerList.size() - 1)
-			Collections.swap(mLayerList, PositionCurrentLayer, mLayerList.size() - 1);
-	}
-
 	public void swapLayer(int posMarkedLayer, int targetPosition) {
 		if (posMarkedLayer >= 0 && posMarkedLayer < mLayerList.size() &&
 				targetPosition >= 0 && targetPosition < mLayerList.size()) {
